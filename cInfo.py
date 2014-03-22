@@ -15,8 +15,9 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 	#print args
 
 	if args == []:
-		display_description(client, room=CLIENT_DATA[clientDataID].avatar.currentRoom)
-		display_exits(client, room=CLIENT_DATA[clientDataID].avatar.currentRoom)
+		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
 
 
 def examine(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -26,7 +27,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	clientDataID = str(client.addrport())
 
 	if args == []:
-		examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom )
+		examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
 
 
 
@@ -35,56 +36,65 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 
 
-def render_room(client, player, room):
-    """
-    Displays the details of whatever room the client is in to the client on room entry
-    """
-    region = room.region
-    regionRoom = str(region)+room.name.capitalize()
-    roomDescription = Rooms.master[regionRoom].description
-    roomName = Rooms.master[regionRoom].name
-    roomMobs = Rooms.master[regionRoom].mobs
-    roomContainers = Rooms.master[regionRoom].containers
-    roomPlayers = Rooms.master[regionRoom].players
-    roomExits = Rooms.master[regionRoom].exits.keys()
+def render_room(client, player, room, CLIENT_DATA):
+	"""
+	Displays the details of whatever room the client is in to the client on room entry
+	"""
+	region = room.region
+	regionRoom = str(region)+room.name.capitalize()
+	# roomDescription = Rooms.master[regionRoom].description
+	roomName = Rooms.master[regionRoom].name
+	# roomMobs = Rooms.master[regionRoom].mobs
+	# roomContainers = Rooms.master[regionRoom].containers
+	# roomPlayers = Rooms.master[regionRoom].players
+	# roomExits = Rooms.master[regionRoom].exits.keys()
 
-    client.send_cc("\n^I" + region + " >> " + roomName + "^~\n\n")
-    client.send(roomDescription + "\n\n")
-    client.send_cc("^!Exits: " + str(roomExits) + "^~\n\n")
+	client.send_cc("\n^I" + region + " >> " + roomName + "^~\n")
+	display_description(client, room, CLIENT_DATA)
+	display_other_players(client, room, CLIENT_DATA)
+	display_exits(client, room)
 
-def examine_room(client, player, region, room):
+def examine_room(client, player, region, room, CLIENT_DATA):
 	"""
 	Displays more information than render_room
 	"""
 	regionRoom = str(region)+room.name.capitalize()
 	roomDescription = Rooms.master[regionRoom].longDescription
 	roomName = Rooms.master[regionRoom].name
-	roomMobs = Rooms.master[regionRoom].mobs
-	roomContainers = Rooms.master[regionRoom].containers
-	roomPlayers = Rooms.master[regionRoom].players
-	roomExits = Rooms.master[regionRoom].exits.keys()
+	# roomMobs = Rooms.master[regionRoom].mobs
+	# roomContainers = Rooms.master[regionRoom].containers
+	# roomPlayers = Rooms.master[regionRoom].players
+	# roomExits = Rooms.master[regionRoom].exits.keys()
 
 	client.send_cc("^I\nRegion: " + region +"\n")
-	client.send_cc("Room Name: " + roomName + "^~\n\n")
+	client.send_cc("Room Name: " + roomName + "\n^~\n")
 	client.send(roomDescription + "\n\n")
-	client.send_cc("^!Exits: " + str(roomExits) + "^~\n\n")
+	#display_description(client, room, CLIENT_DATA)
+	display_other_players(client, room, CLIENT_DATA)
+	display_exits(client, room)
 
-def display_description(client, room = None, item = None, entity = None):
+
+
+
+def display_description(client, room, CLIENT_DATA):
 	#print display_description
-	if room != None:
-		region =  room.region
-		regionRoom = str(region)+room.name.capitalize()
-    	roomDescription = Rooms.master[regionRoom].description
-    	client.send("\n" + str(roomDescription) + "\n\n")
+	region =  room.region
+	regionRoom = str(region)+room.name.capitalize()
+	roomDescription = Rooms.master[regionRoom].description
+	client.send("\n" + str(roomDescription) + "\n\n")
 
-	if item != None:
-		pass
-
-	if entity != None:
-		pass
 
 def display_exits(client, room):
 	region =  room.region
 	regionRoom = str(region)+room.name.capitalize()
 	roomExits = Rooms.master[regionRoom].exits.keys()
-	client.send_cc("^!Exits: " + str(roomExits) + "^~\n\n")
+	client.send_cc("^UExits^u: " + str(roomExits) + "\n\n")
+
+
+def display_other_players(client, room, CLIENT_DATA):
+	region = room.region
+	regionRoom = str(region)+room.name.capitalize()
+	roomPlayers = Rooms.master[regionRoom].players
+	for player in roomPlayers:
+		if player != CLIENT_DATA[str(client.addrport())].avatar and player.currentRoom == CLIENT_DATA[str(client.addrport())].avatar.currentRoom:
+			client.send_cc("^g%s is here.^~\n\n" %player.name)

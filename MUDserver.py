@@ -21,6 +21,7 @@ from miniboa import TelnetServer
 from clientInfo import ClientInfo
 
 import Engine, World
+from cMove import alert
 
 IDLE_TIMEOUT = 300
 CLIENT_LIST = []
@@ -50,8 +51,13 @@ def on_disconnect(client):
     Sample on_disconnect function.
     Handles lost connections.
     """
+    clientDataID = str(client.addrport())
+    player = CLIENT_DATA[clientDataID].avatar
     print "-- Lost connection to %s" % client.addrport()
     CLIENT_LIST.remove(client)
+    player.currentRoom.players.remove(player)
+    alert(client, CLIENT_DATA, ("\n^g%s disappeared.^~\n" %player.name))
+
     #broadcast('%s leaves the conversation.\n' % client.addrport() )
 
 

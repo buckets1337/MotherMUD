@@ -35,15 +35,21 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
                 client.send("\nHello, %s!\n" % CLIENT_DATA[clientDataID].name)
                 # client.send(prompt)
-                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, clientDataID = clientDataID)
+                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID)
                 Rooms.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+                player = CLIENT_DATA[clientDataID].avatar
+                cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
-                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Rooms.startingRoom)
+                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Rooms.startingRoom, CLIENT_DATA=CLIENT_DATA)
 
 
             elif cmd == 'say':
                 ## If the client sends a chat command echo it to the chat room via cChat.py
                 cChat.say(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
+            elif cmd == 'shout':
+                cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
             elif cmd == 'look':

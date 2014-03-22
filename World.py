@@ -30,7 +30,7 @@ class Room():
 	# mobs is a list of all badguys in a room
 	# players is a list of all clients in a room
 	# description is a string containing a prose description of the room
-	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], containers=[], mobs=[],):
+	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], containers=[], mobs=[]):
 		self.containers = containers
 		self.exits = exits
 		self.mobs = mobs
@@ -81,7 +81,8 @@ class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general contstructors that the Mob class uses
 	"""
-	def __init__(self, description, currentRoom, name, clientDataID):
+	def __init__(self, description, currentRoom, name, client, clientDataID):
 		Entity.__init__(self, description, currentRoom)
 		self.name = name
+		self.client = client
 		self.clientDataID = clientDataID
