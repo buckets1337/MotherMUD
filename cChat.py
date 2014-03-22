@@ -15,15 +15,15 @@ def say(client, args, CLIENT_LIST, CLIENT_DATA):
     clientDataID = str(client.addrport())
     prompt = CLIENT_DATA[clientDataID].prompt
 
-    print '   %s: %s' % (CLIENT_DATA[clientDataID].name, message)
+    print '   <%s:%s>%s: %s' % (CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom.name.capitalize(), CLIENT_DATA[clientDataID].name, message)
 
     for guest in CLIENT_LIST:
         if guest != client:
             if CLIENT_DATA[str(guest.addrport())].avatar.currentRoom == CLIENT_DATA[clientDataID].avatar.currentRoom:
-                guest.send_cc('\n^!%s says "%s"^.\n' % (CLIENT_DATA[clientDataID].name, message))
+                guest.send_cc('\n^!%s says "%s"^..\n' % (CLIENT_DATA[clientDataID].name, message))
                 # guest.send(prompt)
         else:
-            guest.send('You say "%s"\n' % message)
+            guest.send('You say "%s".\n' % message)
             # guest.send(prompt)
 
 
@@ -39,7 +39,7 @@ def shout(client, args, CLIENT_LIST, CLIENT_DATA):
     clientDataID = str(client.addrport())
     prompt = CLIENT_DATA[clientDataID].prompt
 
-    print '   %s: %s' % (CLIENT_DATA[clientDataID].name, message)
+    print '   <%s>%s: %s' % (CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].name, message)
 
     for guest in CLIENT_LIST:
         if guest != client:
@@ -48,4 +48,26 @@ def shout(client, args, CLIENT_LIST, CLIENT_DATA):
                 # guest.send(prompt)
         else:
             guest.send('You shout "%s" for all to hear.\n' % message)
+            # guest.send(prompt)
+
+def chat(client, args, CLIENT_LIST, CLIENT_DATA):
+    """
+    Echo whatever client types after the command 'say' to everyone in the room.
+    """
+
+    message = ""
+    space = " "
+    # for arg in args:
+    message = space.join(args)
+    clientDataID = str(client.addrport())
+    prompt = CLIENT_DATA[clientDataID].prompt
+
+    print '   <chat> %s: %s' % (CLIENT_DATA[clientDataID].name, message)
+
+    for guest in CLIENT_LIST:
+        if guest != client:
+            guest.send_cc('^Y<chat> %s: "%s"^~\n' % (CLIENT_DATA[clientDataID].name, message))
+                # guest.send(prompt)
+        else:
+            guest.send_cc('^y<chat> %s: %s^~\n' % (CLIENT_DATA[clientDataID].name, message))
             # guest.send(prompt)

@@ -19,6 +19,14 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
 
+	else:
+		arglist = " ".split(args)
+		# handle looking at a player
+
+		# handle looking at a mob
+
+		# handle looking at an item or container
+
 
 def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""

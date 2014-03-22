@@ -52,6 +52,10 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
+            elif cmd == 'chat':
+                cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA
+
+                    )
             elif cmd == 'look':
                 cInfo.look(client, args, CLIENT_LIST, CLIENT_DATA)
 

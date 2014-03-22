@@ -35,7 +35,7 @@ def on_connect(client):
     Handles new connections.
     """
     clientDataID = str(client.addrport())
-    print "++ Opened connection to %s" % client.addrport()
+    print "++ Opened connection to %s" % client.addrport()  
     #broadcast('%s connected.\n' % client.addrport() )
     CLIENT_LIST.append(client)
     clientID = len(CLIENT_LIST) - 1
@@ -68,7 +68,7 @@ def kick_idle():
     ## Who hasn't been typing?
     for client in CLIENT_LIST:
         if client.idle() > IDLE_TIMEOUT:
-            print('-- Kicking idle lobby client from %s' % client.addrport())
+            print('>> Kicking idle lobby client from %s' % client.addrport())
             client.active = False
 
 
