@@ -2,8 +2,11 @@
 """
 contains all the regions in the game
 """
+# Note: each region in the game should be added to 'list', and then have the region attributes defined.
 
 import World
+
+
 
 list = {}
 

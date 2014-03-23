@@ -31,7 +31,7 @@ CLIENT_DATA = {}
 
 def on_connect(client):
     """
-    Sample on_connect function.
+    on_connect function.
     Handles new connections.
     """
     clientDataID = str(client.addrport())
@@ -48,7 +48,7 @@ def on_connect(client):
 
 def on_disconnect(client):
     """
-    Sample on_disconnect function.
+    on_disconnect function.
     Handles lost connections.
     """
     clientDataID = str(client.addrport())
@@ -96,7 +96,8 @@ if __name__ == '__main__':
     ## a function to call with new connections
     ## and one to call with lost connections.
 
-    '''address should be a blank string for deployment across a network, and localhost for testing on one machine'''
+    '''address should be a blank string for deployment across a network, as blank allows the server to use any network interface it finds.
+    localhost is for testing where server and clients both exist on one computer, without going across the network'''
     telnet_server = TelnetServer(
         port=7777,
         address='localhost',
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         timeout = .05
         )
 
-    world = World.World(regions = ['test'])
+    world = World.World(regions = ['test'])     # create the world and load the regions into it
 
     print(">> Listening for connections on port %d.  CTRL-C to break."
         % telnet_server.port)

@@ -3,6 +3,7 @@
 defines the 'say' command, the 'tell' command, the 'shout' command, the 'chat' command, and all individual chat channel commands
 """
 
+
 def say(client, args, CLIENT_LIST, CLIENT_DATA):
     """
     Echo whatever client types after the command 'say' to everyone in the room.
@@ -50,6 +51,7 @@ def shout(client, args, CLIENT_LIST, CLIENT_DATA):
             guest.send('You shout "%s" for all to hear.\n' % message)
             # guest.send(prompt)
 
+
 def chat(client, args, CLIENT_LIST, CLIENT_DATA):
     """
     Echo whatever client types after the command 'say' to everyone in the room.
@@ -71,3 +73,11 @@ def chat(client, args, CLIENT_LIST, CLIENT_DATA):
         else:
             guest.send_cc('^y<chat> %s: %s^~\n' % (CLIENT_DATA[clientDataID].name, message))
             # guest.send(prompt)
+
+
+def tell(client, args, CLIENT_LIST, CLIENT_DATA):
+    """
+    Send args as a message to a specific player specified by the first argument immediately following the command
+    """
+
+    pass

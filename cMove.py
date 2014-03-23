@@ -7,6 +7,8 @@ import Regions
 import Rooms
 import cInfo
 
+
+
 def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 	"""
 	moves from one room to the next.
@@ -29,7 +31,12 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 
 	alert(client, CLIENT_DATA, ("\n^g%s has entered.^~\n" %player.name))
 
+
 def alert(client, CLIENT_DATA, messageString):
+	"""
+	Lets other players know about movement into or out of a room
+	"""
+	
 	clientDataID = str(client.addrport())
 	player = CLIENT_DATA[clientDataID].avatar
 	for guest in player.currentRoom.players:
