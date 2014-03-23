@@ -60,12 +60,12 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'look':
+            elif cmd == 'look' or cmd == 'l':
                 ## If the client sends a 'look' command, send back the description
                 cInfo.look(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'examine':
+            elif cmd == 'examine' or cmd == 'ex':
                 ## If the client sends an 'examine' command, send back the long description
                 cInfo.examine(client, args, CLIENT_LIST, CLIENT_DATA)
 

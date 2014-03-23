@@ -103,7 +103,7 @@ def render_room(client, player, room, CLIENT_DATA):
 	# roomPlayers = Rooms.master[regionRoom].players
 	# roomExits = Rooms.master[regionRoom].exits.keys()
 
-	client.send_cc("\n^I" + region + " >> " + roomName + "^~\n")
+	client.send_cc("\n^I" + roomName + "^~\n")
 	display_description(client, room, CLIENT_DATA)
 	display_objects(client, room, CLIENT_DATA)
 	display_other_players(client, room, CLIENT_DATA)

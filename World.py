@@ -39,7 +39,7 @@ class Room():
 	# region is the world region that the room belongs to
 	# name is the name of the room
 
-	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], items=[], containers=[], mobs=[]):
+	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], objects=[], items=[], containers=[], mobs=[]):
 		self.containers = containers
 		self.exits = exits
 		self.mobs = mobs
@@ -49,6 +49,7 @@ class Room():
 		self.name = name
 		self.longDescription = longDescription
 		self.items = items
+		self.objects = objects
 
 
 

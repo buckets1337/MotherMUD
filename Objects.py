@@ -19,7 +19,7 @@ def setLocation(location):
 	room = location
 
 
-
+# test region objects
 testLobbyPottedPlant = World.Object(
 	name = 'potted plant',
 	description = 'A plant in a pot.',
