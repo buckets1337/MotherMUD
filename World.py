@@ -34,6 +34,11 @@ class Room():
 	# mobs is a list of all badguys in a room
 	# players is a list of all clients in a room
 	# description is a string containing a prose description of the room
+	# longDescription is a string containing a more detailed prose description of the room
+	# items is a list of all items in a room
+	# region is the world region that the room belongs to
+	# name is the name of the room
+
 	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], items=[], containers=[], mobs=[]):
 		self.containers = containers
 		self.exits = exits
@@ -55,15 +60,16 @@ class Object():
 	A class representing objects in the world.  Objects contain a description and location, but may or may not be visible.
 	An object that contains no other components is essentially a prop, or scenery.  Adding components allows items to be built that do more interesting things.
 	"""
-	def __init__(self, description, currentRoom, isVisible = False, longDescription = None, kind = None):
+	def __init__(self, name, description, currentRoom, isVisible = False, longDescription = None, kind = None):
+		self.name = name
 		self.description = description
 		self.currentRoom = currentRoom
 		self.isVisible = isVisible
 		self.longDescription = longDescription
 		if self.longDescription == None:
 			self.longDescription = self.description
-		self.kind = kind
-		if self.kind:
+		self.kind = kind								# The 'kind' attribute is a placeholder for a high-level composition class, like 'item' or 'container'.
+		if self.kind:									# Adding a 'kind' to an object makes the object interactable, and gives it other features.
 			self.kind.owner = self
 
 
@@ -72,16 +78,20 @@ class item:		# 'kind' attribute
 	"""
 	This component represents an item, that is able to be picked up and used by players in some manner
 	"""
-	def __init__(self, isCarryable = True):
-		self.isCarryable = isCarryable
+	def __init__(self, isCarryable = True, respawns = False):
+		self.isCarryable = isCarryable		# if true, item can be picked up into an inventory
+		self.respawns = respawns 			# if true, item will eventually respawn at original location after it has been picked up
 
 
 class container:		# 'kind' attribute
 	"""
 	This component represents some kind of container.  A container is an object that has an inventory and may hold other items.
 	"""
-	def __init__(self, inventory = [], isCarryable = False):
-		self.isCarryable = isCarryable
+	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False):
+		self.inventory = inventory
+		self.isCarryable = isCarryable		# if true, container can be picked up into an inventory
+		self.respawns = respawns 			# if true, container will eventually respawn at original location after it has been picked up
+		self.respawnContents = respawnContents 	# if true, container will eventually respawn it's contents (possibly running a random check on a loot table again)
 
 
 

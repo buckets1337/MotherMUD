@@ -30,6 +30,7 @@ contains all the rooms in the game, separated by region; this file also describe
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 
 import World
+import Objects
 
 ###################################################################################################################################################
 # This section contains the master dictionary, holding a reference to every room in the game
@@ -48,6 +49,8 @@ test = {
 ####################################################################################################################################################
 # This section defines the contents and attributes of each room, and then assigns them to the master list
 
+# The lobby
+Objects.room = test['lobby']		# lets objects in the room know which room they are in
 test['lobby'].region = 'test'
 test['lobby'].name = 'lobby'
 test['lobby'].description = 'A dark and musty lobby.'
@@ -56,10 +59,15 @@ test['lobby'].exits = {
 	'restroom':test['restroom'], 
 	'outside':test['outside']
 	}
+test['lobby'].objects = [				# note: objects inside a container do not have to be defined here, as they are defined in Objects.py
+	Objects.testLobbyPottedPlant,		# This list is just for 'top level' objects in the room, visible or not
+	Objects.testLobbyDesk,
+	Objects.testLobbyDeskDrawer,
+	]
 master['testLobby'] = test['lobby']
 
 
-
+# The restroom
 test['restroom'].region = 'test'
 test['restroom'].name = 'restroom'
 test['restroom'].description = 'A dingy restroom.'
@@ -70,7 +78,7 @@ test['restroom'].exits = {
 master['testRestroom'] = test['restroom']
 
 
-
+# The outside
 test['outside'].region = 'test'
 test['outside'].name = 'outside'
 test['outside'].description = 'The scary, wide world.'

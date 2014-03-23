@@ -8,7 +8,7 @@ import World
 
 
 
-list = {}
+list = {}	# when adding regions to this list, do not ever assign values to the room list.  Rather, let Rooms.py handle assigning individual rooms to a region
 
 list['test'] = World.Region(
 	regionName = 'test',
