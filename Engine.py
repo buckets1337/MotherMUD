@@ -3,7 +3,7 @@
 checks for input from connected clients, and sends them to the appropriate handlers
 """
 
-import cChat, cMove, cInfo
+import cChat, cMove, cInfo, cInteractions
 import Rooms
 import World
 # import clientInfo
@@ -23,7 +23,8 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
             else:
                 cmd = lmsg.split()[0]
 
-            args = lmsg.split()[1:]         # args is everything following the first word, not including the first word(cmd)
+            args = msg.split()[1:]         # args is everything following the first word, not including the first word(cmd)
+            #print "args: " + str(args)
 
             clientDataID = str(client.addrport())       # location of client's data in CLIENT_DATA
             prompt = CLIENT_DATA[clientDataID].prompt   
@@ -37,7 +38,8 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
                 client.send("\nHello, %s!\n" % CLIENT_DATA[clientDataID].name)
                 # client.send(prompt)
-                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID)
+                mortalComponent = World.mortal(100, 0)
+                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                 Rooms.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                 player = CLIENT_DATA[clientDataID].avatar
                 cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
@@ -69,10 +71,18 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 ## If the client sends an 'examine' command, send back the long description
                 cInfo.examine(client, args, CLIENT_LIST, CLIENT_DATA)
 
+            elif cmd == 'inventory' or cmd == 'i':
+                ## If the client sends an 'inventory' command, display the contents of the client avatar's inventory
+                cInfo.inventory(client, args, CLIENT_LIST, CLIENT_DATA)
+
 
             elif cmd in CLIENT_DATA[clientDataID].avatar.currentRoom.exits: 
                 ## player used a room exit name as a command, move to room associated with the exit
                 cMove.move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom.exits)
+
+
+            elif cmd == 'get':
+                cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
 
 
             elif cmd == 'quit':

@@ -13,6 +13,8 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	clientDataID = str(client.addrport())
 	looked = False
+	objectList = []
+	inventory = False
 	#print args
 
 	if args == []:
@@ -23,9 +25,19 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
 		looked = True
 
+	elif args[0] == 'inventory':
+		#print args[0]
+		args = args[1:]
+		inventory = True
+
+	# handle examining at an object
+	if inventory == False:
+		objectList = CLIENT_DATA[clientDataID].avatar.currentRoom.objects
+	else:
+		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
 
 	# handle looking at an object
-	for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+	for obj in objectList:
 		if obj.name == " ".join(args):
 			client.send_cc("^c%s^~\n" %obj.description)
 			looked = True
@@ -43,7 +55,10 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 
 
 	if looked == False:
-		client.send("I don't see a '%s'. Try using 'examine' to see the names of things.\n" %(" ".join(args)))
+		if len(args) > 0:
+			client.send("I don't see a '%s'. I like to 'examine' to help me with the names of things!\n" %(" ".join(args)))
+		else:
+			client.send("You didn't say what you want to look at.\n")
 
 
 
@@ -53,13 +68,25 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	clientDataID = str(client.addrport())
 	examined = False
+	inventory = False
 
 	if args == []:
 		examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
 		examined = True
 
+
+	elif args[0] == 'inventory':
+		#print args[0]
+		args = args[1:]
+		inventory = True
+
 	# handle examining at an object
-	for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+	if inventory == False:
+		objectList = CLIENT_DATA[clientDataID].avatar.currentRoom.objects
+	else:
+		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
+
+	for obj in objectList:
 		if obj.name == " ".join(args):
 			client.send_cc("^c%s^~\n" %obj.longDescription)
 			examined = True
@@ -86,7 +113,31 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 
 	if examined == False:
-		client.send("I don't see a '%s'. Make sure you are using the name for things displayed by 'examine'!\n" %(" ".join(args)))
+		if len(args) > 0:
+			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'examine' them!\n" %(" ".join(args)))
+		else:
+			client.send("You didn't say what you wanted to examine.\n")
+
+
+
+def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
+	"""
+	Display the contents of the player avatar's inventory
+	"""
+	clientDataID = str(client.addrport())
+
+	longestItemName = 0
+
+	for obj in CLIENT_DATA[clientDataID].avatar.kind.inventory:
+		if len(obj.name) > longestItemName:
+			longestItemName = len(obj.name)
+
+	client.send_cc("^U^!Item Name" + (longestItemName* " ") + "    Item Description^~\n")
+
+	for obj in CLIENT_DATA[clientDataID].avatar.kind.inventory:
+		client.send_cc(str(obj.name) + (((9 + longestItemName) - len(obj.name)) * " ") + "    " + str(obj.description) + "\n")
+	client.send("\n")
+
 
 
 
@@ -175,7 +226,7 @@ def display_object_names(client, room, CLIENT_DATA):
 		if obj.isVisible == True:
 			if obj.kind == None:
 				client.send_cc("^cAn object named '%s'^~\n" %obj.name)
-			elif obj.kind == 'item':
+			elif isinstance(obj.kind, World.item):
 				client.send_cc("^cAn item named '%s'^~\n" %obj.name)		
-			elif obj.kind == 'container':
+			elif isinstance(obj.kind, World.container):
 				client.send_cc("^cA container named '%s'^~\n" %obj.name)

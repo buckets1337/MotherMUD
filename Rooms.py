@@ -32,6 +32,14 @@ contains all the rooms in the game, separated by region; this file also describe
 import World
 import Objects
 
+def setCurrentRoom(objectList, currentRoom):		# sets the currentRoom attribute for items in 'objectList'
+	for obj in objectList:
+		if isinstance(obj.kind, World.container):
+			if obj.kind.inventory != []:
+				for ob in obj.kind.inventory:
+					ob.currentRoom = currentRoom
+		obj.currentRoom = currentRoom
+
 ###################################################################################################################################################
 # This section contains the master dictionary, holding a reference to every room in the game
 
@@ -50,7 +58,7 @@ test = {
 # This section defines the contents and attributes of each room, and then assigns them to the master list
 
 # The lobby
-Objects.room = test['lobby']		# lets objects in the room know which room they are in
+room = test['lobby']		# lets objects in the room know which room they are in
 test['lobby'].region = 'test'
 test['lobby'].name = 'lobby'
 test['lobby'].description = 'A dark and musty lobby.'
@@ -64,10 +72,12 @@ test['lobby'].objects = [				# note: objects inside a container do not have to b
 	Objects.testLobbyDesk,
 	Objects.testLobbyDeskDrawer,
 	]
+setCurrentRoom(test['lobby'].objects, room)
 master['testLobby'] = test['lobby']
 
 
 # The restroom
+room = test['restroom']
 test['restroom'].region = 'test'
 test['restroom'].name = 'restroom'
 test['restroom'].description = 'A dingy restroom.'
@@ -75,10 +85,15 @@ test['restroom'].longDescription = 'You are pretty sure you have never seen a mo
 test['restroom'].exits = {
 	'lobby':test['lobby']
 	}
+test['restroom'].objects = [
+	Objects.testTrashcan
+]
+setCurrentRoom(test['restroom'].objects, room)
 master['testRestroom'] = test['restroom']
 
 
 # The outside
+room = test['outside']
 test['outside'].region = 'test'
 test['outside'].name = 'outside'
 test['outside'].description = 'The scary, wide world.'
@@ -86,6 +101,10 @@ test['outside'].longDescription = 'No, really.  This is everything else.  It is 
 test['outside'].exits = {
 	'lobby':test['lobby']
 	}
+test['outside'].objects = [
+	Objects.testRock
+	]
+setCurrentRoom(test['outside'].objects, room)
 master['testOutside'] = test['outside']
 
 

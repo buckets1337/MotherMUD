@@ -61,11 +61,12 @@ class Object():
 	A class representing objects in the world.  Objects contain a description and location, but may or may not be visible.
 	An object that contains no other components is essentially a prop, or scenery.  Adding components allows items to be built that do more interesting things.
 	"""
-	def __init__(self, name, description, currentRoom, isVisible = False, longDescription = None, kind = None):
+	def __init__(self, name, description, currentRoom = None, isVisible = False, spawnContainer = None, longDescription = None, kind = None):
 		self.name = name
 		self.description = description
 		self.currentRoom = currentRoom
 		self.isVisible = isVisible
+		self.spawnContainer = spawnContainer
 		self.longDescription = longDescription
 		if self.longDescription == None:
 			self.longDescription = self.description
@@ -79,21 +80,48 @@ class item:		# 'kind' attribute
 	"""
 	This component represents an item, that is able to be picked up and used by players in some manner
 	"""
-	def __init__(self, isCarryable = True, respawns = False):
+	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None):
 		self.isCarryable = isCarryable		# if true, item can be picked up into an inventory
 		self.respawns = respawns 			# if true, item will eventually respawn at original location after it has been picked up
+		self.itemGrabHandler = itemGrabHandler
+		if self.itemGrabHandler:
+			self.itemGrabHandler.owner = self
 
 
 class container:		# 'kind' attribute
 	"""
 	This component represents some kind of container.  A container is an object that has an inventory and may hold other items.
 	"""
-	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False):
+	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None):
 		self.inventory = inventory
-		self.isCarryable = isCarryable		# if true, container can be picked up into an inventory
+		self.isCarryable = isCarryable		# if true, container can be picked up into an inventory. Must have 'itemGrabHandler' component to do this.
 		self.respawns = respawns 			# if true, container will eventually respawn at original location after it has been picked up
 		self.respawnContents = respawnContents 	# if true, container will eventually respawn it's contents (possibly running a random check on a loot table again)
+		self.itemGrabHandler = itemGrabHandler
+		if self.itemGrabHandler:
+			self.itemGrabHandler.owner = self
 
+
+class itemGrabHandler:		# for 'kind' components, adds the ability for item to be picked up or dropped
+	"""
+	This component adds the ability to pick up and drop an item
+	"""
+	def get(self, client, player):
+		# check if 'item' is in room...if so, remove it from room, and add it to avatar's inventory 
+		if self.owner.isCarryable:
+			player.kind.inventory.append(self.owner.owner)		# add the top level of the item to the avatar's inventory
+
+			if self.owner.owner.spawnContainer is None:
+				self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
+			else:
+				self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
+
+			client.send("You picked up %s.\n" %self.owner.owner.name)
+
+
+		else:
+			client.send("You are not able to carry %s.\n" %item.name)
+		
 
 
 
