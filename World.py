@@ -3,7 +3,8 @@
 describes the classes for objects that will be in the world
 """
 
-
+import Engine
+import Globals
 
 
 
@@ -40,17 +41,58 @@ class Room():
 	# name is the name of the room
 
 	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], objects=[], items=[], containers=[], mobs=[]):
-		self.containers = containers
-		self.exits = exits
-		self.mobs = mobs
-		self.players = players
-		self.description = description
 		self.region = region
 		self.name = name
+		self.description = description
+		self.exits = exits
 		self.longDescription = longDescription
-		self.items = items
+		self.players = players
 		self.objects = objects
+		self.items = items
+		self.containers = containers
+		self.mobs = mobs
 
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+class Timer:
+    """
+    A timer is an object that, when spawned, will count down until zero, and then perform and action and possibly respawn itself
+    """
+    def __init__(self, TIMERS, time, actionFunction, actionArgs = [], attachedTo = None, respawns = False):
+        self.TIMERS = TIMERS
+        self.time = time
+        self.actionFunction = actionFunction
+        self.actionArgs = actionArgs
+        self.attachedTo = attachedTo
+        self.respawns = respawns
+
+        self.currentTime = time
+
+        self.TIMERS.append(self)
+
+        # self.initialTime = time.clock()
+        # self.lastTime = 0
+
+    def tick(self, deltaTime):     
+        """tick should be called once each game loop"""
+        #timePassed = (time.clock() - self.initialTime) - self.lastTime
+
+        self.currentTime -= deltaTime
+        #print self.time
+
+        if self.currentTime <= 0:
+            self.TIMERS.remove(self)
+            if self.actionArgs != []:
+                self.actionFunction(self.actionArgs)
+            else:
+                self.actionFunction()
+
+
+            if self.respawns == True:
+                newTimer = Timer(self.TIMERS, self.time, self.actionFunction, self.actionArgs, self.attachedTo, self.respawns)
 
 
 
@@ -61,7 +103,7 @@ class Object():
 	A class representing objects in the world.  Objects contain a description and location, but may or may not be visible.
 	An object that contains no other components is essentially a prop, or scenery.  Adding components allows items to be built that do more interesting things.
 	"""
-	def __init__(self, name, description, currentRoom = None, isVisible = False, spawnContainer = None, longDescription = None, kind = None):
+	def __init__(self, name, description, currentRoom = None, isVisible = False, spawnContainer = None, longDescription = None, kind = None, TIMERS = None):
 		self.name = name
 		self.description = description
 		self.currentRoom = currentRoom
@@ -73,6 +115,9 @@ class Object():
 		self.kind = kind								# The 'kind' attribute is a placeholder for a high-level composition class, like 'item' or 'container'.
 		if self.kind:									# Adding a 'kind' to an object makes the object interactable, and gives it other features.
 			self.kind.owner = self
+		self.TIMERS = TIMERS
+		if self.TIMERS:
+			self.TIMERS.owner = self
 
 
 
@@ -92,7 +137,7 @@ class container:		# 'kind' attribute
 	"""
 	This component represents some kind of container.  A container is an object that has an inventory and may hold other items.
 	"""
-	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None):
+	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None, objectSpawner = None):
 		self.inventory = inventory
 		self.isCarryable = isCarryable		# if true, container can be picked up into an inventory. Must have 'itemGrabHandler' component to do this.
 		self.respawns = respawns 			# if true, container will eventually respawn at original location after it has been picked up
@@ -100,6 +145,9 @@ class container:		# 'kind' attribute
 		self.itemGrabHandler = itemGrabHandler
 		if self.itemGrabHandler:
 			self.itemGrabHandler.owner = self
+		self.objectSpawner = objectSpawner
+		if self.objectSpawner:
+			self.objectSpawner.owner = self
 
 
 class itemGrabHandler:		# for 'kind' components, adds the ability for item to be picked up or dropped
@@ -122,6 +170,39 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 		else:
 			client.send("You are not able to carry %s.\n" %item.name)
 		
+
+class objectSpawner:		# for 'kind' components, a component that, when placed in a room or container, will attempt to randomly spawn objects at specified intervals
+	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, repeat = False):
+		self.owner = owner
+		self.TIMERS = TIMERS
+		self.time = time
+		self.obj = obj
+		self.oddsList = oddsList
+		self.container = container
+		self.repeat = repeat
+		timer = Timer(TIMERS, time, self.spawn, [], self, False)
+		self.timer = timer
+
+	def spawn(self):
+		# first, make a random determination of if item will be respawning this time
+		if self.owner.respawns == True:
+			winner = Engine.selector(self.oddsList)
+			if winner[0]:
+				# if yes, spawn the item and reset the spawner
+				self.obj.currentRoom = self.owner.owner.currentRoom
+				#print self.owner.owner
+				self.owner.owner.currentRoom.objects.append(self.obj)
+				for client in Globals.CLIENT_LIST:
+					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.owner.owner.currentRoom:
+							client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
+				if self.repeat:
+					self.timer.currentTime = self.time
+					self.TIMERS.append(self.timer)
+			else:
+				self.timer.currentTime = self.time
+				#print self.timer.time
+				self.TIMERS.append(self.timer)
 
 
 

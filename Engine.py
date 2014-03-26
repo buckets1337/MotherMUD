@@ -2,11 +2,19 @@
 """
 checks for input from connected clients, and sends them to the appropriate handlers
 """
+import time, random
 
 import cChat, cMove, cInfo, cInteractions
 import Rooms
 import World
 # import clientInfo
+
+
+
+
+
+
+
 
 
 def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
@@ -66,10 +74,15 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 ## If the client sends a 'look' command, send back the description
                 cInfo.look(client, args, CLIENT_LIST, CLIENT_DATA)
 
+            elif cmd == 'lh':
+                ## alias for 'look harder'
+                cInfo.look(client, ['harder'], CLIENT_LIST, CLIENT_DATA)
+
 
             elif cmd == 'examine' or cmd == 'ex':
                 ## If the client sends an 'examine' command, send back the long description
                 cInfo.examine(client, args, CLIENT_LIST, CLIENT_DATA)
+
 
             elif cmd == 'inventory' or cmd == 'i':
                 ## If the client sends an 'inventory' command, display the contents of the client avatar's inventory
@@ -105,6 +118,29 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
             else:
                 ## command does not exist or is badly formed
                 client.send("\nHuh?  I don't know what %s means.\n\n" % cmd)
+
+
+
+
+
+def selector(oddsList):     # pick a random selection from an odds list and return it.
+                            # an odds list is a list containing any number of smaller lists, each with the format of [<choice>,<odds value>]
+    totalOdds = 0
+
+    for sel in oddsList:
+        totalOdds += sel[1]
+    #print "total odds" + str(totalOdds)
+
+    oddSum = 0
+    selection = random.randint(0, totalOdds)
+    for sel in oddsList:
+        oddSum += sel[1]
+        if oddSum >= selection:
+            break
+    print sel
+    return sel
+
+
 
 
 

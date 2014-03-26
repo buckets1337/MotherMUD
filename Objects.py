@@ -9,12 +9,15 @@ This file defines the various different objects that can be found in the world
 
 
 import World
+import Globals
 
 
 
 def setLocation(location):
 	global room
 	room = location
+
+
 
 
 
@@ -72,4 +75,18 @@ testTrashcan = World.Object(
 	kind = testTrashcanContainer,
 	longDescription = 'This trash can is probably as old as you are.  It is suprisingly rust-free, however.'
 )
+
+testGardenGnomeGrabber = World.itemGrabHandler()
+testGardenGnomeItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testGardenGnomeGrabber)
+testGardenGnome = World.Object(
+	name = 'garden gnome',
+	description = "A beat-up garden gnome.",
+	isVisible = True,
+	kind = testGardenGnomeItemComponent,
+	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
+
+)
+testGardenGnomeSpawnOdds = [[True, 50],[False, 25]]		# a true/false odds listing, with 2/3 odds for True
+testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (10), testGardenGnome, testGardenGnomeSpawnOdds, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+
 

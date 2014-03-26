@@ -25,10 +25,14 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
 		looked = True
 
-	elif args[0] == 'inventory':
+	elif args[0] == 'inventory' or args[0] == 'i':
 		#print args[0]
 		args = args[1:]
 		inventory = True
+
+	elif args[0] == 'harder':
+		examine(client, ['lh'], CLIENT_LIST, CLIENT_DATA)
+		return
 
 	# handle examining at an object
 	if inventory == False:
@@ -56,7 +60,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 
 	if looked == False:
 		if len(args) > 0:
-			client.send("I don't see a '%s'. I like to 'examine' to help me with the names of things!\n" %(" ".join(args)))
+			client.send("I don't see a '%s'. I like to 'look harder' to help me with the names of things!\n" %(" ".join(args)))
 		else:
 			client.send("You didn't say what you want to look at.\n")
 
@@ -71,14 +75,20 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	inventory = False
 
 	if args == []:
-		examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
+		# examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
+		client.send("What did you want to examine?\n")
 		examined = True
 
 
-	elif args[0] == 'inventory':
+	elif args[0] == 'inventory' or args[0] == 'i':
 		#print args[0]
 		args = args[1:]
 		inventory = True
+
+	elif args[0] == 'lh':
+		examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
+		args.pop(0)
+		examined = True
 
 	# handle examining at an object
 	if inventory == False:
@@ -114,7 +124,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 	if examined == False:
 		if len(args) > 0:
-			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'examine' them!\n" %(" ".join(args)))
+			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'look harder' at a room!\n" %(" ".join(args)))
 		else:
 			client.send("You didn't say what you wanted to examine.\n")
 

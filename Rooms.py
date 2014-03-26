@@ -102,7 +102,8 @@ test['outside'].exits = {
 	'lobby':test['lobby']
 	}
 test['outside'].objects = [
-	Objects.testRock
+	Objects.testRock,
+	Objects.testGardenGnome
 	]
 setCurrentRoom(test['outside'].objects, room)
 master['testOutside'] = test['outside']
