@@ -55,14 +55,17 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 
 			# numlist = [(x in range(0,99))]
 			# if args[2] in numlist:
-			if len(resultsList) >= int(args[1]):
-				client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].description)
-				looked = True
+			try:
+				if len(resultsList) >= int(args[1]):
+					client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].description)
+					looked = True
 
-				if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
-					for ob in resultsList[int(args[1]) - 1].kind.inventory:
-						if ob.name == " ".join(args):
-							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.description))
+					if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
+						for ob in resultsList[int(args[1]) - 1].kind.inventory:
+							if ob.name == " ".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.description))
+			except ValueError:
+				client.send("Object index must be an integer!\n")
 
 		else:
 			print resultsList
@@ -150,16 +153,22 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 		if len(args) >= 2:
 
-			# numlist = [(x in range(0,99))]
-			# if args[2] in numlist:
-			if len(resultsList) >= int(args[1]):
-				client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].longDescription)
-				examined = True
+			# numlist = []
+			# for x in range(99):
+			# 	numlist.append(x)
+			# if args[1] in numlist:
+			try:
+				if len(resultsList) >= int(args[1]):
+					client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].longDescription)
+					examined = True
 
-				if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
-					for ob in resultsList[int(args[1]) - 1].kind.inventory:
-						if ob.name == " ".join(args):
-							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.longDescription))
+					if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
+						for ob in resultsList[int(args[1]) - 1].kind.inventory:
+							if ob.name == " ".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.longDescription))
+			except ValueError:
+				client.send("Object index must be an integer!\n")
+
 
 		else:
 			print resultsList
@@ -219,7 +228,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 	if examined == False:
 		if len(args) > 0:
-			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'look harder' at a room!\n" %(" ".join(args)))
+			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'look harder'!\n" %(" ".join(args)))
 		else:
 			client.send("You didn't say what you wanted to examine.\n")
 
