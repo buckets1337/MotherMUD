@@ -25,6 +25,8 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
     for client in CLIENT_LIST:
         if client.active and client.cmd_ready:
             msg = client.get_command()      # the string recieved from the client
+            if msg.startswith("'"):
+                msg = msg[:1] + " " + msg[1:]
             lmsg = msg.lower()              # an all-lowercase version of the string recieved from the client
             if msg == '':
                 cmd = ''                    # cmd is the first word of the string from the client. It represents the command sent by the client, to be processed below
@@ -65,7 +67,7 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'chat':
+            elif cmd == 'chat' or cmd == "'":
                 ## If the client sends a 'chat' command echo it to the chat channel
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
 
