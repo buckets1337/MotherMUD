@@ -24,7 +24,7 @@ def setLocation(location):
 # test region objects
 
 testLobbyPottedPlant = World.Object(
-	name = 'potted plant',
+	name = 'potted_plant',
 	description = 'A plant in a pot.',
 	isVisible = True,
 	longDescription = 'This appears to be a long-neglected fern of some sort, in a crumbling ceramic pot.'
@@ -40,7 +40,7 @@ testLobbyDesk = World.Object(
 testKeyGrabber = World.itemGrabHandler()		
 testKeyItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testKeyGrabber)
 testLobbyKey =  World.Object(
-	name = 'rusty key',
+	name = 'rusty_key',
 	description = 'An old rusty key.',
 	isVisible = False,
 	kind = testKeyItemComponent,
@@ -49,7 +49,7 @@ testLobbyKey =  World.Object(
 
 testDeskContainer = World.container(inventory=[testLobbyKey], respawnContents=True)
 testLobbyDeskDrawer = World.Object(
-	name = 'desk drawer',
+	name = 'desk_drawer',
 	description = 'An unlocked desk drawer.',
 	isVisible = False,
 	longDescription = "This is an ordinary desk drawer.  It has a lock on it, but it does not appear to be engaged.",
@@ -69,7 +69,7 @@ testRock = World.Object(
 
 testTrashcanContainer = World.container(inventory=[], respawnContents=False)
 testTrashcan = World.Object(
-	name = 'trash can',
+	name = 'trash_can',
 	description = 'A metal trash can, in poor condition.',
 	isVisible = True,
 	kind = testTrashcanContainer,
@@ -79,7 +79,7 @@ testTrashcan = World.Object(
 testGardenGnomeGrabber = World.itemGrabHandler()
 testGardenGnomeItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testGardenGnomeGrabber)
 testGardenGnome = World.Object(
-	name = 'garden gnome',
+	name = 'garden_gnome',
 	description = "A beat-up garden gnome.",
 	isVisible = True,
 	kind = testGardenGnomeItemComponent,

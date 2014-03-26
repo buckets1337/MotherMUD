@@ -34,23 +34,62 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		examine(client, ['lh'], CLIENT_LIST, CLIENT_DATA)
 		return
 
-	# handle examining at an object
+	# handle looking at an object
 	if inventory == False:
 		objectList = CLIENT_DATA[clientDataID].avatar.currentRoom.objects
 	else:
 		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
 
-	# handle looking at an object
-	for obj in objectList:
-		if obj.name == " ".join(args):
-			client.send_cc("^c%s^~\n" %obj.description)
-			looked = True
+	resultsList = []
 
-		if isinstance(obj.kind, World.container):
-			for ob in obj.kind.inventory:
-				if ob.name == " ".join(args):
-					client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.description))
+	for obj in objectList:
+		if obj.name == "_".join(args) or obj.name == "_".join(args[:-1]) or obj.name == "_".join(args[:-2]):
+			resultsList.append(obj)
+			print resultsList
+
+	if len(resultsList) > 1:
+		print "args " + str(args)
+		print "arglen " + str(len(args))
+
+		if len(args) >= 2:
+
+			# numlist = [(x in range(0,99))]
+			# if args[2] in numlist:
+			if len(resultsList) >= int(args[1]):
+				client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].description)
+				looked = True
+
+				if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
+					for ob in resultsList[int(args[1]) - 1].kind.inventory:
+						if ob.name == " ".join(args):
+							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.description))
+
+		else:
+			print resultsList
+			for obj in objectList:
+				if obj.name == "_".join(args):
+					client.send_cc("^c%s^~\n" %obj.description)
 					looked = True
+					break
+
+					if isinstance(obj.kind, World.container):
+						for ob in resultsList[obj.kind.inventory]:
+							if ob.name == " ".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.description))
+
+	elif len(resultsList) == 1:
+		print resultsList
+		for obj in objectList:
+			if obj.name == "_".join(args):
+				client.send_cc("^c%s^~\n" %obj.description)
+				looked = True
+				break
+
+				if isinstance(obj.kind, World.container):
+					for ob in resultsList[obj.kind.inventory]:
+						if ob.name == " ".join(args):
+							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.description))
+
 
 	# handle looking at a player
 
@@ -71,6 +110,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	More detailed info than look.  Without arguments, it shows the long description of the current room.  With arguments, it shows the long description of the item that is named by the arguments
 	"""
 	clientDataID = str(client.addrport())
+	objectList = []
 	examined = False
 	inventory = False
 
@@ -96,25 +136,80 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	else:
 		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
 
+
+	resultsList = []
+
 	for obj in objectList:
-		if obj.name == " ".join(args):
-			client.send_cc("^c%s^~\n" %obj.longDescription)
-			examined = True
+		if obj.name == "_".join(args) or obj.name == "_".join(args[:-1]) or obj.name == "_".join(args[:-2]):
+			resultsList.append(obj)
+			print resultsList
 
-			if isinstance(obj.kind, World.container):	# is a container, display the inventory
-				client.send_cc("^c^UContents^u: ")
-				for ob in obj.kind.inventory:
-					if len(obj.kind.inventory) == 1:
-						client.send_cc( "%s " %ob.name)
-					else:
-						client.send_cc( "%s, " %ob.name)
-				client.send_cc("^~\n")
+	if len(resultsList) > 1:
+		print "args " + str(args)
+		print "arglen " + str(len(args))
 
-		elif isinstance(obj.kind, World.container):		# check container inventory for argument
-			for ob in obj.kind.inventory:
-				if ob.name == " ".join(args):
-					client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.longDescription))
+		if len(args) >= 2:
+
+			# numlist = [(x in range(0,99))]
+			# if args[2] in numlist:
+			if len(resultsList) >= int(args[1]):
+				client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].longDescription)
+				examined = True
+
+				if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
+					for ob in resultsList[int(args[1]) - 1].kind.inventory:
+						if ob.name == " ".join(args):
+							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.longDescription))
+
+		else:
+			print resultsList
+			for obj in objectList:
+				if obj.name == "_".join(args):
+					client.send_cc("^c%s^~\n" %obj.longDescription)
 					examined = True
+					break
+
+					if isinstance(obj.kind, World.container):
+						for ob in resultsList[obj.kind.inventory]:
+							if ob.name == " ".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.longDescription))
+
+	elif len(resultsList) == 1:
+		print resultsList
+		for obj in objectList:
+			if obj.name == "_".join(args):
+				client.send_cc("^c%s^~\n" %obj.longDescription)
+				examined = True
+				break
+
+				if isinstance(obj.kind, World.container):
+					for ob in resultsList[obj.kind.inventory]:
+						if ob.name == " ".join(args):
+							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.longDescription))
+
+
+
+
+
+	# for obj in objectList:
+	# 	if obj.name == "_".join(args):
+	# 		client.send_cc("^c%s^~\n" %obj.longDescription)
+	# 		examined = True
+
+	# 		if isinstance(obj.kind, World.container):	# is a container, display the inventory
+	# 			client.send_cc("^c^UContents^u: ")
+	# 			for ob in obj.kind.inventory:
+	# 				if len(obj.kind.inventory) == 1:
+	# 					client.send_cc( "%s " %ob.name)
+	# 				else:
+	# 					client.send_cc( "%s, " %ob.name)
+	# 			client.send_cc("^~\n")
+
+	# 	elif isinstance(obj.kind, World.container):		# check container inventory for argument
+	# 		for ob in obj.kind.inventory:
+	# 			if ob.name == " ".join(args):
+	# 				client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.longDescription))
+	# 				examined = True
 
 	# handle examining a player
 
