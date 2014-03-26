@@ -125,7 +125,7 @@ class item:		# 'kind' attribute
 	"""
 	This component represents an item, that is able to be picked up and used by players in some manner
 	"""
-	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None):
+	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None, objectSpawner = None):
 		self.isCarryable = isCarryable		# if true, item can be picked up into an inventory
 		self.respawns = respawns 			# if true, item will eventually respawn at original location after it has been picked up
 		self.itemGrabHandler = itemGrabHandler
@@ -183,6 +183,8 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		self.repeat = repeat
 		timer = Timer(TIMERS, time, self.spawn, [], self, False)
 		self.timer = timer
+		#print self.owner.owner.currentRoom
+		self.startingLocation = self.owner.owner.currentRoom,
 
 	def spawn(self):
 		# first, make a random determination of if item will be respawning this time
@@ -190,15 +192,17 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
 				# if yes, spawn the item and reset the spawner
-				self.obj.currentRoom = self.owner.owner.currentRoom		# tell the object what room it is in
+				# print self.owner.owner.currentRoom
+				# print self.startingLocation
+				self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
 
 				#print self.owner.owner
 
-				self.owner.owner.currentRoom.objects.append(self.obj)	# add the new object to the room
+				self.startingLocation[0].objects.append(self.obj)	# add the new object to the room
 
 				for client in Globals.CLIENT_LIST:
 					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
-						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.owner.owner.currentRoom:		# if a client is in the room object just appeared in, let it know
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.startingLocation[0]:		# if a client is in the room object just appeared in, let it know
 							client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
 
 				if self.repeat:

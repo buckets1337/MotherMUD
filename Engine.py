@@ -137,7 +137,7 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
         oddSum += sel[1]
         if oddSum >= selection:
             break
-    #print sel, selection
+    print sel, selection
     return sel
 
 

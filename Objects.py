@@ -73,7 +73,7 @@ testTrashcan = World.Object(
 	description = 'A metal trash can, in poor condition.',
 	isVisible = True,
 	kind = testTrashcanContainer,
-	longDescription = 'This trash can is probably as old as you are.  It is suprisingly rust-free, however.'
+	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
 )
 
 testGardenGnomeGrabber = World.itemGrabHandler()
@@ -86,7 +86,10 @@ testGardenGnome = World.Object(
 	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
 
 )
-testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, with 2/3 odds for True
-testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=1, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
+testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=3, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+testGardenGnome.kind.objectSpawner = testGardenGnomeSpawner
+# print "spwn " + str(testGardenGnome.kind.objectSpawner)
+# print "obstrm " + str(testGardenGnome.kind.objectSpawner.startingLocation)
 
 

@@ -107,6 +107,9 @@ test['outside'].objects = [
 	Objects.testGardenGnome
 	]
 setCurrentRoom(test['outside'].objects, room)
+Objects.testGardenGnome.currentRoom = test['outside']
+Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],
+#print "strm " + str(Objects.testGardenGnome.kind.objectSpawner.startingLocation)
 master['testOutside'] = test['outside']
 
 

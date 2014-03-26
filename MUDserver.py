@@ -101,7 +101,7 @@ if __name__ == '__main__':
     startupTime = time.time()
     lastTime = 0
 
-    # testCounter = 0
+
 
     ## Create a telnet server with a port, address,
     ## a function to call with new connections
@@ -119,12 +119,18 @@ if __name__ == '__main__':
 
     world = World.World(regions = ['test'])     # create the world and load the regions into it
 
+
+
+    # testCounter = 0
+
     # def testTimerFunction(args):
     #     print "Timer Alert" + str(args[0])
     #     args[0] += 1
 
-    # testTimer = Engine.Timer(TIMERS, 1, testTimerFunction, [testCounter], respawns = True)
-    #print TIMERS
+    # testTimer = World.Timer(TIMERS, 1, testTimerFunction, [testCounter], respawns = True)
+    # print TIMERS
+
+
 
 
     print(">> Listening for connections on port %d.  CTRL-C to break."
