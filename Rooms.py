@@ -49,7 +49,8 @@ master = {}
 test = {
 	'lobby':World.Room(),
 	'restroom':World.Room(), 
-	'outside':World.Room()
+	'outside':World.Room(),
+	'bullpen':World.Room()
 	}
 
 
@@ -108,6 +109,23 @@ test['outside'].objects = [
 setCurrentRoom(test['outside'].objects, room)
 master['testOutside'] = test['outside']
 
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+# The bullpen.  This is a place to put things that you don't want the clients being able to get to, but need to exist for spawner calls, etc.
+# Each region should have a bullpen.
+room = test['bullpen']
+test['bullpen'].region = 'test'
+test['bullpen'].name = 'bullpen'
+test['bullpen'].description = 'An endless white room.'
+test['bullpen'].longDescription = "This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all."
+test['bullpen'].exits = {
+	'lobby':test['lobby']
+	}
+test['bullpen'].objects = [
+	]
+setCurrentRoom(test['bullpen'].objects, room)
+master['testBullpen'] = test['bullpen']
 
 
 #####################################################################################################################################################

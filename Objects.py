@@ -86,7 +86,7 @@ testGardenGnome = World.Object(
 	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
 
 )
-testGardenGnomeSpawnOdds = [[True, 50],[False, 25]]		# a true/false odds listing, with 2/3 odds for True
-testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (10), testGardenGnome, testGardenGnomeSpawnOdds, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, with 2/3 odds for True
+testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=1, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
 
 

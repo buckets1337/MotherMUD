@@ -172,13 +172,14 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 		
 
 class objectSpawner:		# for 'kind' components, a component that, when placed in a room or container, will attempt to randomly spawn objects at specified intervals
-	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, repeat = False):
+	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, cycles=1, repeat = False):
 		self.owner = owner
 		self.TIMERS = TIMERS
 		self.time = time
 		self.obj = obj
 		self.oddsList = oddsList
 		self.container = container
+		self.cycles = cycles
 		self.repeat = repeat
 		timer = Timer(TIMERS, time, self.spawn, [], self, False)
 		self.timer = timer
@@ -189,16 +190,26 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
 				# if yes, spawn the item and reset the spawner
-				self.obj.currentRoom = self.owner.owner.currentRoom
+				self.obj.currentRoom = self.owner.owner.currentRoom		# tell the object what room it is in
+
 				#print self.owner.owner
-				self.owner.owner.currentRoom.objects.append(self.obj)
+
+				self.owner.owner.currentRoom.objects.append(self.obj)	# add the new object to the room
+
 				for client in Globals.CLIENT_LIST:
 					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
-						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.owner.owner.currentRoom:
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.owner.owner.currentRoom:		# if a client is in the room object just appeared in, let it know
 							client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
+
 				if self.repeat:
 					self.timer.currentTime = self.time
 					self.TIMERS.append(self.timer)
+
+				elif self.cycles > 1:
+					self.cycles -= 1
+					self.timer.currentTime = self.time
+					self.TIMERS.append(self.timer)
+
 			else:
 				self.timer.currentTime = self.time
 				#print self.timer.time
