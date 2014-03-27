@@ -137,8 +137,9 @@ class container:		# 'kind' attribute
 	"""
 	This component represents some kind of container.  A container is an object that has an inventory and may hold other items.
 	"""
-	def __init__(self, inventory = [], isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None, objectSpawner = None):
+	def __init__(self, inventory = [], isLocked = False, isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None, objectSpawner = None):
 		self.inventory = inventory
+		self.isLocked = isLocked
 		self.isCarryable = isCarryable		# if true, container can be picked up into an inventory. Must have 'itemGrabHandler' component to do this.
 		self.respawns = respawns 			# if true, container will eventually respawn at original location after it has been picked up
 		self.respawnContents = respawnContents 	# if true, container will eventually respawn it's contents (possibly running a random check on a loot table again)
@@ -266,8 +267,9 @@ class mortal:		# 'kind' attribute
 	'''
 	A component class for all attributes of mortals (living creatures)
 	'''
-	def __init__(self, hp, exp, inventory=[], equipment={}):
+	def __init__(self, hp, exp, inventory=[], inventorySize=16, equipment={}):
 		self.hp = hp
 		self.exp = exp
 		self.inventory = inventory
+		self.inventorySize = inventorySize
 		self.equipment = equipment

@@ -100,6 +100,10 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
 
 
+            elif cmd == 'drop':
+                cInteractions.drop(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
+
+
             elif cmd == 'quit':
                 ## client is disconnecting
                 client.send("Disconnected.")
@@ -119,7 +123,7 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
 
             else:
                 ## command does not exist or is badly formed
-                client.send("\nHuh?  I don't know what %s means.\n\n" % cmd)
+                client.send("\nHuh?  I don't know what '%s' means.\n\n" % msg)
 
 
 

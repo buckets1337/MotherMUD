@@ -72,6 +72,7 @@ test['lobby'].objects = [				# note: objects inside a container do not have to b
 	Objects.testLobbyPottedPlant,		# This list is just for 'top level' objects in the room, visible or not
 	Objects.testLobbyDesk,
 	Objects.testLobbyDeskDrawer,
+	Objects.testLobbyFileCabinet
 	]
 setCurrentRoom(test['lobby'].objects, room)
 master['testLobby'] = test['lobby']
@@ -134,4 +135,4 @@ master['testBullpen'] = test['bullpen']
 #####################################################################################################################################################
 
 # This variable defines the room that new players will spawn in when first entering the world
-startingRoom = test['lobby']
+startingRoom = test['bullpen']

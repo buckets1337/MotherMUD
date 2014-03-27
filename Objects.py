@@ -57,6 +57,26 @@ testLobbyDeskDrawer = World.Object(
 )
 testLobbyKey.spawnContainer = testLobbyDeskDrawer
 
+testFilesGrabber = World.itemGrabHandler()		
+testFilesItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testFilesGrabber)
+testLobbyFiles =  World.Object(
+	name = 'files',
+	description = 'Random files.',
+	isVisible = False,
+	kind = testFilesItemComponent,
+	longDescription = "A random assortment of files",
+)
+
+testFileCabinetContainer = World.container(isLocked = True, inventory=[testLobbyFiles], respawnContents=True)
+testLobbyFileCabinet = World.Object(
+	name = 'file_cabinet',
+	description = 'A grey steel file cabinet.',
+	isVisible = True,
+	longDescription = "This is a file cabinet.   There are many like it, but this one is here.",
+	kind = testFileCabinetContainer
+)
+testLobbyFiles.spawnContainer = testLobbyFileCabinet
+
 testRockGrabber = World.itemGrabHandler()
 testRockItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testRockGrabber)
 testRock = World.Object(
