@@ -7,6 +7,24 @@ This file describes all the commands used to gather more information about the e
 import Rooms, World
 
 
+def who(client, args, CLIENT_LIST, CLIENT_DATA):
+	"""
+	Displays all players currently online
+	"""
+
+	client.send_cc("\n^I[ Players Online ]^~\n\n")
+	for player in CLIENT_LIST:
+		clientDataID = str(player.addrport())
+		name = CLIENT_DATA[clientDataID].name
+		if name != CLIENT_DATA[client.addrport()].name:
+			client.send_cc("%s, %s\n" %(name, CLIENT_DATA[player.addrport()].avatar.title))
+		else:
+			client.send_cc("^!%s, %s (you)^~\n" %(CLIENT_DATA[client.addrport()].name, CLIENT_DATA[client.addrport()].avatar.title))
+	if len(CLIENT_LIST) > 1:
+		client.send("\n%s players online.\n\n" %len(CLIENT_LIST))
+	elif len(CLIENT_LIST) == 1:
+		client.send("\n%s player online.\n\n" %len(CLIENT_LIST))
+
 def look(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	Gives more information about the room.  Without arguments, it displays description of the room.  With an argument, it displays the description of whatever item is named by the arguments

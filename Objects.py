@@ -101,6 +101,21 @@ testTrashcan = World.Object(
 	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
 )
 
+#@ things that spawn in the restroom
+testTrashGrabber = World.itemGrabHandler()
+testTrashItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testTrashGrabber)
+testTrash = World.Object(
+	name = 'trash_pile',
+	description = "A pile of trash",
+	isVisible = True,
+	kind = testTrashItemComponent,
+	longDescription = "Your typical trash heap.  Trash seems to pile up if no one takes it out.",
+	spawnContainer = testTrashcan.kind
+
+)
+testTrashSpawnOdds = [[True, 1],[False, 20]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
+testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+testTrash.kind.objectSpawner = testTrashSpawner
 
 
 

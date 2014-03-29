@@ -107,10 +107,13 @@ test['outside'].objects = [
 	Objects.testRock,
 	Objects.testGardenGnome
 	]
-Objects.testGardenGnome.currentRoom = test['outside'],
+#Objects.testGardenGnome.currentRoom = test['outside'],
 #print "strm " + str(Objects.testGardenGnome.kind.objectSpawner.startingLocation)
+
 setCurrentRoom(test['outside'].objects, room)
+
 Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],		# by pointing the starting location here, new versions of testGardenGnome will be spawned according to the rules set in the objectSpawner component.  Interestingly, objects can start in one room, and spawn in another.  That is the purpose of the bullpen, in fact.
+
 master['testOutside'] = test['outside']
 
 
@@ -121,14 +124,20 @@ master['testOutside'] = test['outside']
 room = test['bullpen']
 test['bullpen'].region = 'test'
 test['bullpen'].name = 'bullpen'
-test['bullpen'].description = 'An endless white room.'
-test['bullpen'].longDescription = "This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all."
+test['bullpen'].description = 'An endless white room, like the beginning of everything.'
+test['bullpen'].longDescription = "This room is white.\nSo white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.\nThis seems to be where the prototypes for everything are stored."
 test['bullpen'].exits = {
 	'lobby':test['lobby']
 	}
 test['bullpen'].objects = [
+	Objects.testTrash
 	]
+#Objects.testTrash.currentRoom = test['bullpen']
+
 setCurrentRoom(test['bullpen'].objects, room)
+
+Objects.testTrash.kind.objectSpawner.startingLocation = test['restroom'],		# will spawn in restroom
+
 master['testBullpen'] = test['bullpen']
 
 

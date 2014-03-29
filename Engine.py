@@ -4,7 +4,7 @@ checks for input from connected clients, and sends them to the appropriate handl
 """
 import time, random
 
-import cChat, cMove, cInfo, cInteractions
+import cChat, cMove, cInfo, cInteractions, cPersonal
 import Rooms
 import World
 # import clientInfo
@@ -70,6 +70,18 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
             elif cmd == 'chat' or cmd == "'":
                 ## If the client sends a 'chat' command echo it to the chat channel
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
+            elif cmd == 'channel':
+                cChat.Channel()
+
+
+            elif cmd == 'who':
+                cInfo.who(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
+            elif cmd == 'title':
+                cPersonal.title(client,args,CLIENT_LIST,CLIENT_DATA)
 
 
             elif cmd == 'look' or cmd == 'l':
@@ -143,7 +155,7 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
         oddSum += sel[1]
         if oddSum >= selection:
             break
-    print sel, selection
+    #print sel, selection
     return sel
 
 

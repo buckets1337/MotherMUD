@@ -190,6 +190,18 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		#print self.owner.owner.currentRoom
 		self.startingLocation = self.owner.owner.currentRoom,
 
+
+	def stuff(self):
+			#moves newly spawned objects to containers
+		print self.owner.owner.spawnContainer
+		if self.owner.owner.spawnContainer != None:
+			if self.owner.owner.spawnContainer.owner.currentRoom == self.startingLocation[0]:
+				self.startingLocation[0].objects.remove(self.obj)
+				self.owner.owner.spawnContainer.inventory.append(self.obj)
+				return True
+		return False
+
+
 	def spawn(self):
 		# first, make a random determination of if item will be respawning this time
 		if self.owner.respawns == True:
@@ -204,10 +216,13 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 
 				self.startingLocation[0].objects.append(self.obj)	# add the new object to the room
 
+				stuffed = self.stuff()		# try shoving items in containers if they should be there instead of in the room
+
 				for client in Globals.CLIENT_LIST:
 					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
 						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.startingLocation[0]:		# if a client is in the room object just appeared in, let it know
-							client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
+							if not stuffed:
+								client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
 
 				if self.repeat:
 					self.timer.currentTime = self.time
@@ -223,6 +238,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				#print self.timer.time
 				self.TIMERS.append(self.timer)
 
+	
 
 
 
@@ -256,9 +272,10 @@ class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
-	def __init__(self, description, currentRoom, name, client, clientDataID, kind = None):
+	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None):
 		Entity.__init__(self, description, currentRoom)
 		self.name = name
+		self.title = title
 		self.client = client
 		self.clientDataID = clientDataID
 		self.kind = kind

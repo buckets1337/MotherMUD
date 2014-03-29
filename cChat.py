@@ -3,6 +3,10 @@
 defines the 'say' command, the 'tell' command, the 'shout' command, the 'chat' command, and all individual chat channel commands
 """
 
+class Channel():    # a Chat channel
+    def __init__(self):
+        pass
+
 
 def say(client, args, CLIENT_LIST, CLIENT_DATA):
     """
