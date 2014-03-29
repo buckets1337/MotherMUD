@@ -18,7 +18,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 	#print args
 
 	if args == []:
-		client.send_cc("\n^I%s^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+		client.send_cc("\n^I[ %s ]^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
 		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_objects(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
@@ -78,7 +78,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 							# if ob.name == " ".join(args):
 							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.description))
 			except ValueError:
-				client.send("Object index must be an integer!\n")
+				client.send("Object index must be an integer! I mean, it only makes sense.  Duh.\n")
 
 		else:
 			#print resultsList
@@ -132,7 +132,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 	if args == []:
 		# examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
-		client.send("What did you want to examine?\n")
+		client.send("What did I want to examine again?\n")
 		examined = True
 
 
@@ -199,7 +199,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 						else:
 							client.send_cc("^cThe %s is locked.^~\n" %resultsList[int(args[1]) - 1].name)
 			except ValueError:
-				client.send("Object index must be an integer!\n")
+				client.send("Object index must be an integer! My mother always said!\n")
 
 			# for obj in resultsList:
 			# 	if args[-1] == obj.name or args[-2] == obj.name:
@@ -274,7 +274,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 		if len(args) > 0:
 			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'look harder'!\n" %(" ".join(args)))
 		else:
-			client.send("You didn't say what you wanted to examine.\n")
+			client.send("I am not sure what I wanted to examine.\n")
 
 
 

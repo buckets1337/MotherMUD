@@ -114,4 +114,64 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 
 def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# drop items from inventory
-	client.send("Dropping...\n")
+	inventory = CLIENT_DATA[clientDataID].avatar.kind.inventory
+
+	resultsList = []
+	found = False
+
+	if args != []:
+		for item in inventory:
+			if item.name == args[0]:
+				resultsList.append(item)
+
+
+
+	if len(args) == 0:
+		client.send("What did I want to drop?\n")
+		return
+
+	if resultsList == []:
+		client.send("There is not a single '%s' on my person.\n" %args[0])
+		return
+
+
+	if len(args) == 1:
+		if len(resultsList) > 1:
+			client.send("I have more than one %s. Which one did I want to drop?\n" %item.name)
+			found = True
+		else:
+			if resultsList[0].name == args[0]:
+				inventory.remove(resultsList[0])
+				client.send("I dropped %s.  %s is gone.\n" %(resultsList[0].name, resultsList[0].name.capitalize()))
+				found = True
+			else:
+				client.send("I don't see a %s in my bags.\n" %args[0])
+				found = True
+
+
+	if len(args) > 1:
+		try:
+			selector = int(args[1])
+			print "sel" + str(selector)
+		except ValueError:
+			client.send("I don't know which %s '%s' is.\n"%(resultsList[0].name, args[1]))
+			found = True
+			return
+
+		if len(resultsList) >= (selector):
+			selected = resultsList[selector - 1]
+			inventory.remove(selected)
+			client.send("I dropped %s.  %s is gone.\n" %(selected.name, selected.name.capitalize()))
+			found = True
+			return
+
+		client.send("I only have %i '%s'.\n" %(len(resultsList), args[0]))
+		found = True
+
+
+
+	if found == False:
+		client.send("I have nothing to drop!\n")
+
+
+

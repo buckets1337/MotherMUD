@@ -20,8 +20,11 @@ def setLocation(location):
 
 
 
-
+######################
 # test region objects
+######################
+
+## Room: Lobby
 
 testLobbyPottedPlant = World.Object(
 	name = 'potted_plant',
@@ -37,7 +40,8 @@ testLobbyDesk = World.Object(
 	longDescription = "This desk looks like it was flimsy even when it was new.  It has a single desk drawer which does not appear to be locked."
 )
 
-testKeyGrabber = World.itemGrabHandler()		
+#~~~~~~~~~~~~~~  <-This signifies these items are related to each other somehow.  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+testKeyGrabber = World.itemGrabHandler(notDroppable=True)		
 testKeyItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testKeyGrabber)
 testLobbyKey =  World.Object(
 	name = 'rusty_key',
@@ -55,10 +59,14 @@ testLobbyDeskDrawer = World.Object(
 	longDescription = "This is an ordinary desk drawer.  It has a lock on it, but it does not appear to be engaged.",
 	kind = testDeskContainer
 )
+
+# places the key in the desk drawer
 testLobbyKey.spawnContainer = testLobbyDeskDrawer
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 testFilesGrabber = World.itemGrabHandler()		
 testFilesItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testFilesGrabber)
+
 testLobbyFiles =  World.Object(
 	name = 'files',
 	description = 'Random files.',
@@ -75,7 +83,28 @@ testLobbyFileCabinet = World.Object(
 	longDescription = "This is a file cabinet.   There are many like it, but this one is here.",
 	kind = testFileCabinetContainer
 )
+# place the files in the file cabinet
 testLobbyFiles.spawnContainer = testLobbyFileCabinet
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+## Room: restroom
+
+testTrashcanContainer = World.container(inventory=[], respawnContents=False)
+testTrashcan = World.Object(
+	name = 'trash_can',
+	description = 'A metal trash can, in poor condition.',
+	isVisible = True,
+	kind = testTrashcanContainer,
+	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
+)
+
+
+
+
+## Room: outside
 
 testRockGrabber = World.itemGrabHandler()
 testRockItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testRockGrabber)
@@ -85,15 +114,6 @@ testRock = World.Object(
 	isVisible = True,
 	kind = testRockItemComponent,
 	longDescription = "This is a typical rock.  Roundish and hard.",
-)
-
-testTrashcanContainer = World.container(inventory=[], respawnContents=False)
-testTrashcan = World.Object(
-	name = 'trash_can',
-	description = 'A metal trash can, in poor condition.',
-	isVisible = True,
-	kind = testTrashcanContainer,
-	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
 )
 
 testGardenGnomeGrabber = World.itemGrabHandler()

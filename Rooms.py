@@ -107,10 +107,10 @@ test['outside'].objects = [
 	Objects.testRock,
 	Objects.testGardenGnome
 	]
-setCurrentRoom(test['outside'].objects, room)
-Objects.testGardenGnome.currentRoom = test['outside']
-Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],
+Objects.testGardenGnome.currentRoom = test['outside'],
 #print "strm " + str(Objects.testGardenGnome.kind.objectSpawner.startingLocation)
+setCurrentRoom(test['outside'].objects, room)
+Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],		# by pointing the starting location here, new versions of testGardenGnome will be spawned according to the rules set in the objectSpawner component.  Interestingly, objects can start in one room, and spawn in another.  That is the purpose of the bullpen, in fact.
 master['testOutside'] = test['outside']
 
 

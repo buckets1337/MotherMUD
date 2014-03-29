@@ -155,6 +155,9 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 	"""
 	This component adds the ability to pick up and drop an item
 	"""
+	def __init__(self, notDroppable = False):
+		self.notDroppable = notDroppable
+
 	def get(self, client, player):
 		# check if 'item' is in room...if so, remove it from room, and add it to avatar's inventory 
 		if self.owner.isCarryable:
@@ -194,7 +197,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 			if winner[0]:
 				# if yes, spawn the item and reset the spawner
 				# print self.owner.owner.currentRoom
-				# print self.startingLocation
+				#print self.startingLocation
 				self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
 
 				#print self.owner.owner
