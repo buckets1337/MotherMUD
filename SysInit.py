@@ -16,7 +16,7 @@ def dataLoad():
 def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 	"""
 	Saves the CLIENT_DATA and TIMERS lists to data/server/
-	# I'm pretty sure I want raw text files, not serialized files, but we'll see.
+	# I'm pretty sure I want raw text files, not serialized files, but we'll see.  Also don't know if I need to save the CLIENT_LIST
 	"""
 	#print CLIENT_DATA
 

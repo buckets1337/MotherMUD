@@ -27,6 +27,9 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 	player.currentRoom = exits[cmd]
 	player.currentRoom.players.append(player)
 
+	for item in player.kind.inventory:
+		item.currentRoom = player.currentRoom
+
 	cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
 
 	alert(client, CLIENT_DATA, ("\n^g%s has entered.^~\n" %player.name))

@@ -116,6 +116,8 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# drop items from inventory
 	inventory = CLIENT_DATA[clientDataID].avatar.kind.inventory
 
+
+
 	resultsList = []
 	found = False
 
@@ -124,7 +126,9 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 			if item.name == args[0]:
 				resultsList.append(item)
 
-
+			if item.name == args[0] and item.kind.itemGrabHandler.notDroppable == True:
+				client.send("I get the feeling I shouldn't drop %s.  I have decided to keep it.\n" %item.name)
+				return
 
 	if len(args) == 0:
 		client.send("What did I want to drop?\n")

@@ -144,14 +144,17 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
 
 
             elif cmd == 'channel':
+                ## if the client sends a 'channel' command, create a new chat channel
                 cChat.Channel()
 
 
             elif cmd == 'who':
+                ## display who is online
                 cInfo.who(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
             elif cmd == 'title':
+                ## set player title to args
                 cPersonal.title(client,args,CLIENT_LIST,CLIENT_DATA)
 
 
@@ -180,10 +183,12 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
 
 
             elif cmd == 'get':
+                ## pick up an item in the room
                 cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
 
 
             elif cmd == 'drop':
+                ## drop an item in the room
                 cInteractions.drop(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
 
 
@@ -195,7 +200,7 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
 
             elif cmd == 'shutdown':
                 ## shutdown the server (needs to be protected or removed)
-                print "** Shutdown request recieved from %s." % CLIENT_DATA[clientDataID].name
+                print "** Shutdown request received from %s." % CLIENT_DATA[clientDataID].name
                 return 'shutdown'
 
 
