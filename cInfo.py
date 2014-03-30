@@ -207,7 +207,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 
 					if isinstance(resultsList[int(args[-1]) - 1].kind, World.container):
 						#print"has inv"
-						print "isLocked: " + str(resultsList[int(args[-1]) - 1].kind.isLocked)
+						#print "isLocked: " + str(resultsList[int(args[-1]) - 1].kind.isLocked)
 						if resultsList[int(args[-1]) - 1].kind.isLocked == False:
 							for ob in resultsList[int(args[-1]) - 1].kind.inventory:
 								# if ob.name == "_".join(args):

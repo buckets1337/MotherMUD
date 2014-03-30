@@ -131,6 +131,9 @@ class item:		# 'kind' attribute
 		self.itemGrabHandler = itemGrabHandler
 		if self.itemGrabHandler:
 			self.itemGrabHandler.owner = self
+		self.objectSpawner = objectSpawner
+		if self.objectSpawner:
+			self.objectSpawner.owner = self
 
 
 class container:		# 'kind' attribute
@@ -193,7 +196,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 
 	def stuff(self):
 			#moves newly spawned objects to containers
-		print self.owner.owner.spawnContainer
+		#print self.owner.owner.spawnContainer
 		if self.owner.owner.spawnContainer != None:
 			if self.owner.owner.spawnContainer.owner.currentRoom == self.startingLocation[0]:
 				self.startingLocation[0].objects.remove(self.obj)

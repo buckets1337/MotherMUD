@@ -2,7 +2,9 @@
 """
 checks for input from connected clients, and sends them to the appropriate handlers
 """
-import time, random
+import time, random, os
+
+from passlib.hash import sha256_crypt
 
 import cChat, cMove, cInfo, cInteractions, cPersonal
 import Rooms
@@ -22,6 +24,10 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
     Check each client, if client.cmd_ready == True then there is a line of
     input available via client.get_command().
     """
+
+
+
+
     for client in CLIENT_LIST:
         if client.active and client.cmd_ready:
             msg = client.get_command()      # the string recieved from the client
@@ -37,16 +43,80 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
             #print "args: " + str(args)
 
             clientDataID = str(client.addrport())       # location of client's data in CLIENT_DATA
-            prompt = CLIENT_DATA[clientDataID].prompt   
+            prompt = CLIENT_DATA[clientDataID].prompt 
+
+            
 
 
             #---------------------
             # Command Definitions
             #---------------------
+
             if CLIENT_DATA[clientDataID].name == "none":     # client just logged in and doesn't have a name assigned.  Accept the first input and assign it to the client as it's name.
-                CLIENT_DATA[clientDataID].name = msg
+                CLIENT_DATA[clientDataID].name = str(msg)
+
+                path = "data/client/" + CLIENT_DATA[clientDataID].name
+                if os.path.isfile(path):
+                    client.send("\nWelcome back, %s!\n" %CLIENT_DATA[clientDataID].name)
+                    client.send("Please enter your password.\n")
+                    return
+
+                else:
+                    client.send("\nHello, %s!\n" % CLIENT_DATA[clientDataID].name)
+                    client.send("Choose a password.  It can be anything, just be sure to remember it.  If you lose your password, your character is gone forever!\n")
+                    return
+
+            while CLIENT_DATA[clientDataID].authSuccess == False:
+                path = "data/client/" + CLIENT_DATA[clientDataID].name
+                if os.path.isfile(path):
+                    with open(path, 'r') as f:
+                        CLIENT_DATA[clientDataID].password = f.readline()
+                        CLIENT_DATA[clientDataID].password = CLIENT_DATA[clientDataID].password[:-1]
+                else:
+                    CLIENT_DATA[clientDataID].password = ' '
+
+                if CLIENT_DATA[clientDataID].password == ' ':
+                    CLIENT_DATA[clientDataID].password = sha256_crypt.encrypt(str(msg))
+                    # print CLIENT_DATA[clientDataID].password
+                    # print "pwl:" + str(len(CLIENT_DATA[clientDataID].password))
+
+
+                    with  open(path, 'w') as f:
+                        f.write(str(CLIENT_DATA[clientDataID].password) + '\n')
+                        # print CLIENT_DATA[clientDataID].password
+                    CLIENT_DATA[clientDataID].authSuccess = True
+
+                else:
+                    # path = "data/client/" + CLIENT_DATA[clientDataID].name
+                    try:
+                        with open(path, 'r') as f:
+                            password = f.readline()
+                            password = password[:-1]
+                        # print password
+                        # print "pwl:" + str(len(CLIENT_DATA[clientDataID].password))
+                        CLIENT_DATA[clientDataID].authSuccess = sha256_crypt.verify(str(msg), password)
+                        # print authSuccess
+                        CLIENT_DATA[clientDataID].password = password
+
+                    except:
+                        raise
+
+                if CLIENT_DATA[clientDataID].authSuccess == False:
+                    if CLIENT_DATA[clientDataID].numTries == 2:
+                        client.send("Last attempt is final before kick.\n")
+                    elif CLIENT_DATA[clientDataID].numTries > 2:
+                        CLIENT_DATA[clientDataID].numTries = 0
+                        client.active = False
+
+                    client.send("Incorrect password.  Please try again.\n")
+                    CLIENT_DATA[clientDataID].numTries += 1
+                    return
+
+
+
+            if CLIENT_DATA[clientDataID].authSuccess == True and CLIENT_DATA[clientDataID].loadFinish == False:
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
-                client.send("\nHello, %s!\n" % CLIENT_DATA[clientDataID].name)
+
                 # client.send(prompt)
                 mortalComponent = World.mortal(100, 0)
                 CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
@@ -55,6 +125,7 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
                 cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Rooms.startingRoom, CLIENT_DATA=CLIENT_DATA)
+                CLIENT_DATA[clientDataID].loadFinish = True
 
 
             elif cmd == 'say':

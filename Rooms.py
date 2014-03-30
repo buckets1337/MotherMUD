@@ -125,7 +125,7 @@ room = test['bullpen']
 test['bullpen'].region = 'test'
 test['bullpen'].name = 'bullpen'
 test['bullpen'].description = 'An endless white room, like the beginning of everything.'
-test['bullpen'].longDescription = "This room is white.\nSo white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.\nThis seems to be where the prototypes for everything are stored."
+test['bullpen'].longDescription = "This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.\nThis seems to be where the prototypes for everything are stored."
 test['bullpen'].exits = {
 	'lobby':test['lobby']
 	}
