@@ -211,7 +211,7 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 
 # makes sure required directories exist, and if not, it creates them
-path = [str("data/server/"), "data/client/", "data/log/auth"]
+path = [str("data/server/"), "data/client/", "data/log/auth/"]
 for pathname in path:
 	try:
 		os.makedirs(pathname)

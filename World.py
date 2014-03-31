@@ -167,7 +167,14 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 			player.kind.inventory.append(self.owner.owner)		# add the top level of the item to the avatar's inventory
 
 			if self.owner.owner.spawnContainer is None:
-				self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
+				for obj in self.owner.owner.currentRoom.objects:
+					if obj == self.owner.owner:
+						self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
+					elif obj.kind.inventory:
+						if obj.kind.inventory != []:
+							for obj in obj.kind.inventory:
+								if obj == self.owner.owner:
+									inventory.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
 			else:
 				self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
 
@@ -179,7 +186,7 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 		
 
 class objectSpawner:		# for 'kind' components, a component that, when placed in a room or container, will attempt to randomly spawn objects at specified intervals
-	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, cycles=1, repeat = False):
+	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, cycles=1, repeat = False, active = False):
 		self.owner = owner
 		self.TIMERS = TIMERS
 		self.time = time
@@ -188,6 +195,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		self.container = container
 		self.cycles = cycles
 		self.repeat = repeat
+		self.active = active
 		timer = Timer(TIMERS, time, self.spawn, [], self, False)
 		self.timer = timer
 		#print self.owner.owner.currentRoom
@@ -207,7 +215,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 
 	def spawn(self):
 		# first, make a random determination of if item will be respawning this time
-		if self.owner.respawns == True:
+		if self.owner.respawns == True and self.active:
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
 				# if yes, spawn the item and reset the spawner

@@ -9,6 +9,8 @@ from passlib.hash import sha256_crypt
 import cChat, cMove, cInfo, cInteractions, cPersonal
 import Rooms
 import World
+import Objects
+import Globals
 # import clientInfo
 
 
@@ -19,7 +21,7 @@ import World
 
 
 
-def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
+def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
     """
     Check each client, if client.cmd_ready == True then there is a line of
     input available via client.get_command().
@@ -122,6 +124,16 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                 Rooms.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                 player = CLIENT_DATA[clientDataID].avatar
+                for playerName in OPList:
+                    #print str(CLIENT_DATA[clientDataID].name)
+                    #print str(playerName)
+                    if playerName.endswith('\n'):
+                        playerName = playerName[:-1]
+                    if str(CLIENT_DATA[clientDataID].name) == str(playerName):
+                        CLIENT_DATA[clientDataID].op = True
+                        #print "op true"
+                    #print CLIENT_DATA[clientDataID].op
+
                 cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
                 cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Rooms.startingRoom, CLIENT_DATA=CLIENT_DATA)
@@ -204,6 +216,41 @@ def process_clients(SERVER_RUN, CLIENT_LIST, CLIENT_DATA):
                 return 'shutdown'
 
 
+            if CLIENT_DATA[clientDataID].op == True:        # OP-only commands.
+
+                if cmd == 'spawn':     # don't spawn anything but top level items for testing, otherwise it breaks things
+                    item = args[0]
+                    if len(args)>1:
+                        active = args[1]
+                        #print active
+                        if active == 'on':
+                            active = True
+                        elif active == 'off':
+                            active = False
+                        # elif active == '':
+                        #     active = False
+                        else:
+                            client.send("Second argument should be 'on' to turn on object spawning, else 'off' or nothing.\n")
+                            return
+                        if len(args)>2:
+                            container = args[2]
+
+                    else:
+                        active = False
+                        container = None
+
+                    newObject = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, active)
+
+                    if container is not None:
+                        for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+                            if item.name == str(container):
+                                if newObject.kind.objectSpawner:
+                                    newObject.kind.objectSpawner.container = item
+                                item.kind.inventory.append(newObject)
+                                CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newObject)
+
+
+
             elif cmd == '':
                 ## client just send a return ony, with no information at all
                 client.send("\nDid you mean to tell me something?\n\n")
@@ -235,8 +282,156 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
     return sel
 
 
+# def SpawnObject(client, refobj, spawnLocation):
+#     # creates a new object based on the attributes of the object fed to the function
+
+#     obj = None
+#     for thing in Objects.indexList:
+#         if thing.name == refobj:
+#             obj = thing
+#     if obj == None:
+#         client.send("I didn't really understand the thing I was trying to create.\n")
+#         return
+
+#     newObject = World.Object(obj.name, obj.description)
+
+#     newObject.currentRoom = spawnLocation
+#     newObject.isVisible = obj.isVisible
+#     newObject.spawnContainer = obj.spawnContainer
+#     newObject.longDescription = obj.longDescription
+#     newObject.kind = obj.kind
+#     if newObject.kind:
+#         newObject.kind.owner = newObject
+#     newObject.TIMERS = obj.TIMERS
+#     if newObject.TIMERS:
+#         newObject.TIMERS.owner = newObject
+
+#     if newObject.kind is not None:
+#         if isinstance(newObject.kind, World.item):
+#             newObject.kind.isCarryable = obj.kind.isCarryable
+#             newObject.kind.respawns = obj.kind.respawns
+#             newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
+#             if newObject.kind.itemGrabHandler:
+#                 newObject.kind.itemGrabHandler.owner = newObject.kind
+#             newObject.kind.objectSpawner = obj.kind.objectSpawner
+#             if newObject.kind.objectSpawner:
+#                 newObject.kind.objectSpawner.owner = newObject.kind
+
+#         if isinstance(newObject.kind, World.container):
+#             newObject.kind.inventory = obj.kind.inventory
+#             newObject.kind.isLocked = obj.kind.isLocked
+#             newObject.kind.isCarryable = obj.kind.isCarryable
+#             newObject.kind.respawns = obj.kind.respawns
+#             newObject.kind.respawnContents = obj.kind.respawnContents
+#             newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
+#             if newObject.kind.itemGrabHandler:
+#                 newObject.kind.itemGrabHandler.owner = newObject.kind
+#             newObject.kind.objectSpawner = obj.kind.objectSpawner
+#             if newObject.kind.objectSpawner:
+#                 newObject.kind.objectSpawner.owner = newObject.kind
+
+#         if newObject.kind.itemGrabHandler:
+#             newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
+
+#         if newObject.kind.objectSpawner:
+#             newObject.kind.objectSpawner.TIMERS = obj.kind.objectSpawner.TIMERS
+#             newObject.kind.objectSpawner.time = obj.kind.objectSpawner.time
+#             newObject.kind.objectSpawner.obj = obj.kind.objectSpawner.obj
+#             newObject.kind.objectSpawner.oddsList = obj.kind.objectSpawner.oddsList
+#             newObject.kind.objectSpawner.container = obj.kind.objectSpawner.container
+#             newObject.kind.objectSpawner.cycles = obj.kind.objectSpawner.cycles
+#             newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
+#             newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, False)
+#             newObject.kind.objectSpawner.startingLocation = spawnLocation,
+
+#     spawnLocation.objects.append(newObject)
+#     client.send("I just created a %s!\n" %newObject.name)
+#     print newObject
 
 
+def cmdSpawnObject(refobj, spawnLocation, active=False):
+    # creates a new object based on the attributes of the object fed to the function
+
+    obj = None
+    #print Objects.fromFileList[0].name
+    #print str(refobj)
+    for thing in Objects.fromFileList:
+        if thing.name == str(refobj):
+            obj = thing
+            #print obj
+    if obj == None:
+        print ("%s not found." %refobj)
+        return
+
+    newObject = World.Object(obj.name, obj.description)
+
+    newObject.currentRoom = spawnLocation
+    newObject.isVisible = obj.isVisible
+    newObject.spawnContainer = obj.spawnContainer
+    newObject.longDescription = obj.longDescription
+    newObject.kind = obj.kind
+    if newObject.kind:
+        newObject.kind.owner = newObject
+    newObject.TIMERS = obj.TIMERS
+    if newObject.TIMERS:
+        newObject.TIMERS.owner = newObject
+
+    if newObject.kind is not None:
+        if isinstance(newObject.kind, World.item):
+            newObject.kind.isCarryable = obj.kind.isCarryable
+            newObject.kind.respawns = obj.kind.respawns
+            newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
+            if newObject.kind.itemGrabHandler:
+                newObject.kind.itemGrabHandler.owner = newObject.kind
+            newObject.kind.objectSpawner = obj.kind.objectSpawner
+            if newObject.kind.objectSpawner:
+                newObject.kind.objectSpawner.owner = newObject.kind
+
+        if isinstance(newObject.kind, World.container):
+            newObject.kind.inventory = obj.kind.inventory
+            newObject.kind.isLocked = obj.kind.isLocked
+            newObject.kind.isCarryable = obj.kind.isCarryable
+            newObject.kind.respawns = obj.kind.respawns
+            newObject.kind.respawnContents = obj.kind.respawnContents
+            newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
+            if newObject.kind.itemGrabHandler:
+                newObject.kind.itemGrabHandler.owner = newObject.kind
+            newObject.kind.objectSpawner = obj.kind.objectSpawner
+            if newObject.kind.objectSpawner:
+                newObject.kind.objectSpawner.owner = newObject.kind
+
+        if newObject.kind.itemGrabHandler:
+            newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
+
+        if newObject.kind.objectSpawner:
+            newObject.kind.objectSpawner.TIMERS = obj.kind.objectSpawner.TIMERS
+            newObject.kind.objectSpawner.time = obj.kind.objectSpawner.time
+            newObject.kind.objectSpawner.obj = obj.kind.objectSpawner.obj
+            newObject.kind.objectSpawner.oddsList = obj.kind.objectSpawner.oddsList
+            newObject.kind.objectSpawner.container = obj.kind.objectSpawner.container
+            newObject.kind.objectSpawner.cycles = obj.kind.objectSpawner.cycles
+            newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
+            newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, False)
+            newObject.kind.objectSpawner.startingLocation = spawnLocation,
+
+    if newObject.kind:
+        if newObject.kind.objectSpawner:
+            # print "has object spawner"
+            newObject.kind.objectSpawner.active = active      # set the spawned object to active
+            #print "active:" + str(newObject.kind.objectSpawner.active)
+
+    spawnLocation.objects.append(newObject)
+    if newObject.kind:
+        if newObject.kind.objectSpawner:
+            print "so " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
+    else:
+        print "so " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "]"
 
 
+    for client in Globals.CLIENT_LIST:
+        if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+            if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newObject.currentRoom:      # if a client is in the room object just appeared in, let it know
+                # if not stuffed:
+                client.send_cc("^BA %s appeared.^~\n" %newObject.name)
 
+    return newObject

@@ -1,0 +1,19 @@
+name='garden_gnome'
+
+description='A beat-up garden gnome. (spawned)'
+longDescription='This garden gnome is all scratched and worn, as if it had been traveling.'
+isVisible=True
+kind=item
+kind.objectSpawner=True
+kind.itemGrabHandler=True
+
+kind.isCarryable=True
+kind.respawns=True
+
+kind.objectSpawner.time=6
+kind.objectSpawner.spawnOdds=True:1,False:10
+kind.objectSpawner.container=None
+kind.objectSpawner.cycles=1
+kind.objectSpawner.repeat=True
+kind.objectSpawner.active=False
+
