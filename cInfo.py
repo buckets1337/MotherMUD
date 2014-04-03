@@ -327,9 +327,13 @@ def render_room(client, player, room, CLIENT_DATA):
 	"""
 	Displays the details of whatever room the client is in to the client on room entry
 	"""
+	#print room
+	#print room.region
 	region = room.region
 	regionRoom = str(region)+room.name.capitalize()
 	# roomDescription = Rooms.master[regionRoom].description
+	#print Rooms.master
+	#print regionRoom
 	roomName = Rooms.master[regionRoom].name
 	# roomMobs = Rooms.master[regionRoom].mobs
 	roomObjects = Rooms.master[regionRoom].objects

@@ -121,8 +121,8 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 # client.send(prompt)
                 mortalComponent = World.mortal(100, 0)
-                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Rooms.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
-                Rooms.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
+                Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                 player = CLIENT_DATA[clientDataID].avatar
                 for playerName in OPList:
                     #print str(CLIENT_DATA[clientDataID].name)
@@ -136,7 +136,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
-                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Rooms.startingRoom, CLIENT_DATA=CLIENT_DATA)
+                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Globals.startingRoom, CLIENT_DATA=CLIENT_DATA)
                 CLIENT_DATA[clientDataID].loadFinish = True
 
 
@@ -210,10 +210,6 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 client.active = False
 
 
-            elif cmd == 'shutdown':
-                ## shutdown the server (needs to be protected or removed)
-                print "** Shutdown request received from %s." % CLIENT_DATA[clientDataID].name
-                return 'shutdown'
 
 
             if CLIENT_DATA[clientDataID].op == True:        # OP-only commands.
@@ -245,9 +241,27 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                         for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
                             if item.name == str(container):
                                 if newObject.kind.objectSpawner:
-                                    newObject.kind.objectSpawner.container = item
+                                    newObject.kind.objectSpawner.container = item.kind
+                                if newObject.kind:
+                                    newObject.kind.spawnContainer = item
                                 item.kind.inventory.append(newObject)
                                 CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newObject)
+
+
+                            # elif item.inventory != []:
+                            #     for item in item.inventory:
+                            #         if item.name == str(container):
+                            #             if newObject.kind.objectSpawner:
+                            #                 newObject.kind.objectSpawner.container = item
+                            #             item.kind.inventory.append(newObject)
+                            #             CLIENT_DATA[clientDataID].avatar.currentRoom.objects.inventory.remove(newObject)
+
+
+                elif cmd == 'shutdown':
+                    ## shutdown the server (needs to be protected or removed)
+                    print "** Shutdown request received from %s." % CLIENT_DATA[clientDataID].name
+                    return 'shutdown'
+
 
 
 
@@ -259,7 +273,6 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
             else:
                 ## command does not exist or is badly formed
                 client.send("\nHuh?  I don't know what '%s' means.\n\n" % msg)
-
 
 
 
@@ -349,7 +362,7 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
 #     print newObject
 
 
-def cmdSpawnObject(refobj, spawnLocation, active=False):
+def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd'):
     # creates a new object based on the attributes of the object fed to the function
 
     obj = None
@@ -421,11 +434,18 @@ def cmdSpawnObject(refobj, spawnLocation, active=False):
             #print "active:" + str(newObject.kind.objectSpawner.active)
 
     spawnLocation.objects.append(newObject)
+    symbol = '+'
+    if whereFrom == 'cmd':
+        symbol = 's'
+    elif whereFrom == 'objSpawner':
+        symbol = '$'
     if newObject.kind:
         if newObject.kind.objectSpawner:
-            print "so " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
+            print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
+        else:
+            print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "]"
     else:
-        print "so " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "]"
+        print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "]"
 
 
     for client in Globals.CLIENT_LIST:

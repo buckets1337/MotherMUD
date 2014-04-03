@@ -13,6 +13,9 @@ imported into MUDserver.py to still reference these values
 
 
 
+
+
+
 IDLE_TIMEOUT = 300
 CLIENT_LIST = []
 SERVER_RUN = True
@@ -20,3 +23,11 @@ CLIENT_DATA = {}
 TIMERS = []
 
 OPList = []
+
+RegionsList = ['test', 'Onette']
+masterRooms = {}
+regionListDict = {}
+#initializeMasterRooms(RegionsList)
+fromFileList = []
+startingRoom = None
+

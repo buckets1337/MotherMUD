@@ -53,7 +53,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 			# 	client.send("The %s is locked!\n" %obj.name)
 			# 	return
 
-
+	print "resultsList:"+str(resultsList)
 	if len(resultsList) == 1:
 		if resultsList[0].kind is not None and resultsList[0].kind.itemGrabHandler is not None:
 			resultsList[0].kind.itemGrabHandler.get(client, CLIENT_DATA[clientDataID].avatar)
@@ -141,7 +141,7 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 
 	if len(args) == 1:
 		if len(resultsList) > 1:
-			client.send("I have more than one %s. Which one did I want to drop?\n" %item.name)
+			client.send("I have more than one %s. Which one did I want to drop?\n" %str(args[0]))
 			found = True
 		else:
 			if resultsList[0].name == args[0]:

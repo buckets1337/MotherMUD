@@ -1,0 +1,10 @@
+name=stairwell
+region=test
+
+description='A cinder-block stairwell.  One can only imagine this was once a fire escape.'
+
+longDescription='This stairwell is oddly cleaner than the surrounding rooms.  That being said, it is still dark, smelly, and cold.  There isn't much reason to be in here unless you're just passing through.'
+
+exits=test:lobby
+
+objects=testTrashCan

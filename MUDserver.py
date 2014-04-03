@@ -21,7 +21,7 @@ from miniboa import TelnetServer
 
 from clientInfo import ClientInfo
 
-import Engine, World, SysInit
+import Engine, World, SysInit, RoomInit, Rooms
 from cMove import alert
 
 import Globals
@@ -139,13 +139,17 @@ if __name__ == '__main__':
     # print TIMERS
 
 
-
+    RoomInit.setup()
+    Globals.startingRoom = Globals.regionListDict['test']['bullpen']
+    print 'startingRoom:' + str(Globals.startingRoom) + Globals.startingRoom.region + Globals.startingRoom.name.capitalize()+'\n'
 
     print(">> Listening for connections on port %d.  CTRL-C to break."
         % telnet_server.port)
 
     with open('data/OPList', 'r') as f:
         OPList = f.readlines()
+
+
 
     ## Server Loop
     while SERVER_RUN:

@@ -31,6 +31,16 @@ contains all the rooms in the game, separated by region; this file also describe
 
 import World
 import Objects
+import Globals
+import os
+
+
+masterRooms = Globals.masterRooms
+master = masterRooms
+
+
+regionListDict = Globals.regionListDict
+
 
 def setCurrentRoom(objectList, currentRoom):		# sets the currentRoom attribute for items in 'objectList'
 	for obj in objectList:
@@ -40,108 +50,138 @@ def setCurrentRoom(objectList, currentRoom):		# sets the currentRoom attribute f
 					ob.currentRoom = currentRoom
 		obj.currentRoom = currentRoom
 
+def initializeMasterRooms(RegionsList, masterRooms):
+	fileList=[]
+	for region in Globals.RegionsList:
+		regionRooms = os.listdir('world/' + str(region) + '/')
+		for room in regionRooms:
+			path = str(region) + str(room).capitalize()
+			if room.endswith('~'):
+				pass
+			else:
+				newRoom = World.Room()
+				masterRooms[path] = newRoom
+
+def initializeRegionRoomLists(RegionsList, regionListDict):
+	for region in Globals.RegionsList:
+		regionListDict[region] = {}
+		regionRooms = os.listdir('world/' + str(region) + '/')
+		for room in regionRooms:
+			roomName = room[len(region):].lower()
+			if roomName.endswith('~'):
+				pass
+			else:
+				regionListDict[region][room] = World.Room()
+	print regionListDict
+
 ###################################################################################################################################################
 # This section contains the master dictionary, holding a reference to every room in the game
 
-master = {}
+initializeMasterRooms(Globals.RegionsList, master)
+initializeRegionRoomLists(Globals.RegionsList, regionListDict)
 
 # An example of a region dictionary, holding a reference to a blank instance of World.Room for each room in the region
-test = {
-	'lobby':World.Room(),
-	'restroom':World.Room(), 
-	'outside':World.Room(),
-	'bullpen':World.Room()
-	}
+#test = Globals.regionListDict['test']
+
+#	{
+# 	'lobby':World.Room(),
+# 	'restroom':World.Room(), 
+# 	'outside':World.Room(),
+# 	'bullpen':World.Room()
+# 	}
 
 
 
-####################################################################################################################################################
-# This section defines the contents and attributes of each room, and then assigns them to the master list
+# ####################################################################################################################################################
+# # This section defines the contents and attributes of each room, and then assigns them to the master list
 
-# The lobby
-room = test['lobby']		# lets objects in the room know which room they are in
-test['lobby'].region = 'test'
-test['lobby'].name = 'lobby'
-test['lobby'].description = 'A dark and musty lobby.'
-test['lobby'].longDescription = 'This lobby is dingy and poorly lit.  It looks like it has not been cleaned in years, and you doubt it is a very popular place to hang out.  You probably should move on.'
-test['lobby'].exits = {
-	'restroom':test['restroom'], 
-	'outside':test['outside']
-	}
-test['lobby'].objects = [				# note: objects inside a container do not have to be defined here, as they are defined in Objects.py
-	Objects.testLobbyPottedPlant,		# This list is just for 'top level' objects in the room, visible or not
-	Objects.testLobbyDesk,
-	Objects.testLobbyDeskDrawer,
-	Objects.testLobbyFileCabinet
-	]
-setCurrentRoom(test['lobby'].objects, room)
-master['testLobby'] = test['lobby']
-
-
-# The restroom
-room = test['restroom']
-test['restroom'].region = 'test'
-test['restroom'].name = 'restroom'
-test['restroom'].description = 'A dingy restroom.'
-test['restroom'].longDescription = 'You are pretty sure you have never seen a more disgusting restroom.  It is not possible for anyone to use anything in here, due to the filth.'
-test['restroom'].exits = {
-	'lobby':test['lobby']
-	}
-test['restroom'].objects = [
-	Objects.testTrashcan
-]
-setCurrentRoom(test['restroom'].objects, room)
-master['testRestroom'] = test['restroom']
+# # The lobby
+# room = test['lobby']		# lets objects in the room know which room they are in
+# test['lobby'].region = 'test'
+# test['lobby'].name = 'lobby'
+# test['lobby'].description = 'A dark and musty lobby.'
+# test['lobby'].longDescription = 'This lobby is dingy and poorly lit.  It looks like it has not been cleaned in years, and you doubt it is a very popular place to hang out.  You probably should move on.'
+# test['lobby'].exits = {
+# 	'restroom':test['restroom'], 
+# 	'outside':test['outside']
+# 	}
+# test['lobby'].objects = [				# note: objects inside a container do not have to be defined here, as they are defined in Objects.py
+# 	Objects.testLobbyPottedPlant,		# This list is just for 'top level' objects in the room, visible or not
+# 	Objects.testLobbyDesk,
+# 	Objects.testLobbyDeskDrawer,
+# 	Objects.testLobbyFileCabinet
+# 	]
+# setCurrentRoom(test['lobby'].objects, room)
+# master['testLobby'] = test['lobby']
 
 
-# The outside
-room = test['outside']
-test['outside'].region = 'test'
-test['outside'].name = 'outside'
-test['outside'].description = 'The scary, wide world.'
-test['outside'].longDescription = 'No, really.  This is everything else.  It is far too much to describe right now.  If you want to know what this looks like, quit this MUD and step outside.'
-test['outside'].exits = {
-	'lobby':test['lobby']
-	}
-test['outside'].objects = [
-	Objects.testRock,
-	Objects.testGardenGnome
-	]
-#Objects.testGardenGnome.currentRoom = test['outside'],
-#print "strm " + str(Objects.testGardenGnome.kind.objectSpawner.startingLocation)
-
-setCurrentRoom(test['outside'].objects, room)
-
-Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],		# by pointing the starting location here, new versions of testGardenGnome will be spawned according to the rules set in the objectSpawner component.  Interestingly, objects can start in one room, and spawn in another.  That is the purpose of the bullpen, in fact.
-
-master['testOutside'] = test['outside']
+# # The restroom
+# room = test['restroom']
+# test['restroom'].region = 'test'
+# test['restroom'].name = 'restroom'
+# test['restroom'].description = 'A dingy restroom.'
+# test['restroom'].longDescription = 'You are pretty sure you have never seen a more disgusting restroom.  It is not possible for anyone to use anything in here, due to the filth.'
+# test['restroom'].exits = {
+# 	'lobby':test['lobby']
+# 	}
+# test['restroom'].objects = [
+# 	Objects.testTrashcan
+# ]
+# setCurrentRoom(test['restroom'].objects, room)
+# master['testRestroom'] = test['restroom']
 
 
-#-----------------------------------------------------------------------------------------------------------------------------------------------------
+# # The outside
+# room = test['outside']
+# test['outside'].region = 'test'
+# test['outside'].name = 'outside'
+# test['outside'].description = 'The scary, wide world.'
+# test['outside'].longDescription = 'No, really.  This is everything else.  It is far too much to describe right now.  If you want to know what this looks like, quit this MUD and step outside.'
+# test['outside'].exits = {
+# 	'lobby':test['lobby']
+# 	}
+# test['outside'].objects = [
+# 	Objects.testRock,
+# 	Objects.testGardenGnome
+# 	]
+# #Objects.testGardenGnome.currentRoom = test['outside'],
+# #print "strm " + str(Objects.testGardenGnome.kind.objectSpawner.startingLocation)
 
-# The bullpen.  This is a place to put things that you don't want the clients being able to get to, but need to exist for spawner calls, etc.
-# Each region should have a bullpen.
-room = test['bullpen']
-test['bullpen'].region = 'test'
-test['bullpen'].name = 'bullpen'
-test['bullpen'].description = 'An endless white room, like the beginning of everything.'
-test['bullpen'].longDescription = "This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.\nThis seems to be where the prototypes for everything are stored."
-test['bullpen'].exits = {
-	'lobby':test['lobby']
-	}
-test['bullpen'].objects = [
-	Objects.testTrash
-	]
-#Objects.testTrash.currentRoom = test['bullpen']
+# setCurrentRoom(test['outside'].objects, room)
 
-setCurrentRoom(test['bullpen'].objects, room)
+# Objects.testGardenGnome.kind.objectSpawner.startingLocation = test['outside'],		# by pointing the starting location here, new versions of testGardenGnome will be spawned according to the rules set in the objectSpawner component.  Interestingly, objects can start in one room, and spawn in another.  That is the purpose of the bullpen, in fact.
 
-Objects.testTrash.kind.objectSpawner.startingLocation = test['restroom'],		# will spawn in restroom
+# master['testOutside'] = test['outside']
 
-master['testBullpen'] = test['bullpen']
+
+# #-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+# # The bullpen.  This is a place to put things that you don't want the clients being able to get to, but need to exist for spawner calls, etc.
+# # Each region should have a bullpen.
+# room = test['bullpen']
+# test['bullpen'].region = 'test'
+# test['bullpen'].name = 'bullpen'
+# test['bullpen'].description = 'An endless white room, like the beginning of everything.'
+# test['bullpen'].longDescription = "This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.\nThis seems to be where the prototypes for everything are stored."
+# test['bullpen'].exits = {
+# 	'lobby':test['lobby']
+# 	}
+# test['bullpen'].objects = [
+# 	Objects.testTrash
+# 	]
+# #Objects.testTrash.currentRoom = test['bullpen']
+
+# setCurrentRoom(test['bullpen'].objects, room)
+
+# Objects.testTrash.kind.objectSpawner.startingLocation = test['restroom'],		# will spawn in restroom
+# #print "*****" + str(Objects.testTrash.kind.objectSpawner.startingLocation)+str(Objects.testTrash.kind.objectSpawner.startingLocation[0].name)
+
+# master['testBullpen'] = test['bullpen']
 
 
 #####################################################################################################################################################
 
 # This variable defines the room that new players will spawn in when first entering the world
-startingRoom = test['bullpen']
+#startingRoom = test['bullpen']
+# print 'rld:' + str(regionListDict['test'])
+# startingRoom = regionListDict['test']['bullpen']

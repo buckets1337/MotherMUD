@@ -14,9 +14,15 @@ import Globals
 
 
 indexList = []
-fromFileList = []
+fromFileList = Globals.fromFileList
 
-fileList = os.listdir('obj/')
+fileList = []
+
+for region in Globals.RegionsList:
+	directoryFiles = os.listdir('obj/'+str(region)+'/')
+	for obj in directoryFiles:
+		path = str(region)+'/'+obj
+		fileList.append(path)
 
 
 def setLocation(location):
@@ -216,6 +222,7 @@ def buildObjectFromFile(file):
 		itemComponent.respawnContents = respawnContents
 		itemComponent.itemGrabHandler = itemGrabHandlerComponent
 		itemComponent.objectSpawner = objectSpawnerComponent
+		itemComponent.inventory = []
 		#itemComponent = World.container(isLocked, isCarryable, respawns, respawnContents, itemGrabHandlerComponent, objectSpawnerComponent)
 
 	#print newObject.name
@@ -229,7 +236,7 @@ def buildObjectFromFile(file):
 	print "description:" + str(newObject.description)
 	print "currentRoom:" + str(newObject.currentRoom)
 	print "isVisible:" + str(newObject.isVisible)
-	print "spawnContainer" + str(newObject.spawnContainer)
+	print "spawnContainer:" + str(newObject.spawnContainer)
 	print "longDescription:" + str(newObject.longDescription)
 	print "kind:" + str(newObject.kind)
 	print "TIMERS:" + str(newObject.TIMERS)
@@ -370,7 +377,7 @@ testTrash = World.Object(
 )
 indexList.append(testTrash)
 testTrashSpawnOdds = [[True, 1],[False, 20]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
-testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True)		# spawners and their odds have to go after the item definition because they reference it
+testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
 testTrash.kind.objectSpawner = testTrashSpawner
 
 

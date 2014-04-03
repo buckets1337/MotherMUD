@@ -166,17 +166,44 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 		if self.owner.isCarryable:
 			player.kind.inventory.append(self.owner.owner)		# add the top level of the item to the avatar's inventory
 
+			gotten = False
 			if self.owner.owner.spawnContainer is None:
 				for obj in self.owner.owner.currentRoom.objects:
-					if obj == self.owner.owner:
+					if obj == self.owner.owner and gotten == False:
 						self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
-					elif obj.kind.inventory:
-						if obj.kind.inventory != []:
-							for obj in obj.kind.inventory:
-								if obj == self.owner.owner:
-									inventory.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
+						gotten = True
+					elif obj.name == self.owner.owner.name and gotten == False:
+						self.owner.owner.currentRoom.objects.remove(obj)
+						gotten = True
+
+					elif hasattr(obj, 'kind'):
+						if hasattr(obj.kind, 'inventory'):
+							#print obj.kind.inventory
+							if obj.kind.inventory != []:
+								print obj.kind.inventory
+								inv = obj.kind.inventory
+								for ob in inv:
+									print "ob:"+ str(ob)
+									if ob == self.owner.owner and gotten == False:
+										#print obj.kind.inventory
+										obj.kind.inventory.remove(ob)		# remove from the top level currentRoom's objects list the top level of the item
+										gotten = True
+									elif ob.name == self.owner.owner.name and gotten == False:
+										print obj.kind.inventory
+										print ob
+										obj.kind.inventory.remove(ob)
+										gotten == True
 			else:
-				self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
+				if self.owner.owner in self.owner.owner.spawnContainer.inventory:
+					self.owner.owner.spawnContainer.inventory.remove(self.owner.owner)
+
+				for obj in self.owner.owner.spawnContainer.inventory:
+					if obj.name == self.owner.owner.name and gotten == False:
+						self.owner.owner.spawnContainer.inventory.remove(obj)
+						gotten = True
+				if self.owner.owner in self.owner.owner.currentRoom.objects:
+					self.owner.owner.currentRoom.objects.remove(self.owner.owner)
+					gotten = True
 
 			client.send("You picked up %s.\n" %self.owner.owner.name)
 
@@ -198,42 +225,47 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		self.active = active
 		timer = Timer(TIMERS, time, self.spawn, [], self, False)
 		self.timer = timer
-		#print self.owner.owner.currentRoom
+		#print "obj in:" + str(self.owner.owner.currentRoom)
 		self.startingLocation = self.owner.owner.currentRoom,
 
 
-	def stuff(self):
+	def stuff(self, obj):
 			#moves newly spawned objects to containers
 		#print self.owner.owner.spawnContainer
 		if self.owner.owner.spawnContainer != None:
 			if self.owner.owner.spawnContainer.owner.currentRoom == self.startingLocation[0]:
-				self.startingLocation[0].objects.remove(self.obj)
-				self.owner.owner.spawnContainer.inventory.append(self.obj)
+				self.startingLocation[0].objects.remove(obj)
+				self.owner.owner.spawnContainer.inventory.append(obj)
 				return True
 		return False
 
 
 	def spawn(self):
 		# first, make a random determination of if item will be respawning this time
-		if self.owner.respawns == True and self.active:
+		if self.owner.respawns == True and self.active and self.startingLocation[0] is not None:
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
-				# if yes, spawn the item and reset the spawner
-				# print self.owner.owner.currentRoom
+				#print self.owner.owner.currentRoom
 				#print self.startingLocation
-				self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
+				#self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
 
+				for obj in Globals.fromFileList:
+					if obj.name == self.obj.name:
+						refobj = obj.name
+				newObject = Engine.cmdSpawnObject(refobj, self.startingLocation[0], whereFrom='objSpawner')
 				#print self.owner.owner
+				# if self.startingLocation[0] is not None:
+				#self.startingLocation[0].objects.append(self.obj)
+				# else:
+				# 	pass	# add the new object to the room
 
-				self.startingLocation[0].objects.append(self.obj)	# add the new object to the room
+				stuffed = self.stuff(newObject)		# try shoving items in containers if they should be there instead of in the room
 
-				stuffed = self.stuff()		# try shoving items in containers if they should be there instead of in the room
-
-				for client in Globals.CLIENT_LIST:
-					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
-						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.startingLocation[0]:		# if a client is in the room object just appeared in, let it know
-							if not stuffed:
-								client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
+				# for client in Globals.CLIENT_LIST:
+				# 	if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+				# 		if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.startingLocation[0]:		# if a client is in the room object just appeared in, let it know
+				# 			if not stuffed:
+				# 				client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
 
 				if self.repeat:
 					self.timer.currentTime = self.time
@@ -244,10 +276,14 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 					self.timer.currentTime = self.time
 					self.TIMERS.append(self.timer)
 
+				#print "$o  "+ str(self.owner.owner)+ " "+ str(self.owner.owner.name) + " @ [" + str(self.startingLocation[0].region) + ":" + str(self.startingLocation[0].name) +"]"
+
 			else:
 				self.timer.currentTime = self.time
 				#print self.timer.time
 				self.TIMERS.append(self.timer)
+
+
 
 	
 

@@ -1,0 +1,14 @@
+name='trash_can'
+
+description='A metal trash can, in poor condition.'
+
+longDescription='This trash can is probably as old as you are.  It is somehow rust-free...but unfortunately also item-free.'
+
+isVisible=True
+
+kind= container
+
+# container-related attributes
+kind.isLocked=False
+kind.respawnContents=False
+kind.isCarryable=False

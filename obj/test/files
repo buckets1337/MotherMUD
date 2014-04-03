@@ -1,0 +1,13 @@
+name='files'
+
+description='Random files.'
+
+longDescription='A random assortment of files from an organization that is long dead.'
+
+isVisible=False
+
+kind=item
+kind.itemGrabHandler=True
+
+kind.isCarryable=True
+kind.respawns=True
