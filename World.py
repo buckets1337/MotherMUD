@@ -180,26 +180,26 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 						if hasattr(obj.kind, 'inventory'):
 							#print obj.kind.inventory
 							if obj.kind.inventory != []:
-								print obj.kind.inventory
+								#print obj.kind.inventory
 								inv = obj.kind.inventory
 								for ob in inv:
-									print "ob:"+ str(ob)
+									#print "ob:"+ str(ob)
 									if ob == self.owner.owner and gotten == False:
 										#print obj.kind.inventory
 										obj.kind.inventory.remove(ob)		# remove from the top level currentRoom's objects list the top level of the item
 										gotten = True
 									elif ob.name == self.owner.owner.name and gotten == False:
-										print obj.kind.inventory
-										print ob
+										#print obj.kind.inventory
+										#print ob
 										obj.kind.inventory.remove(ob)
 										gotten == True
 			else:
-				if self.owner.owner in self.owner.owner.spawnContainer.inventory:
-					self.owner.owner.spawnContainer.inventory.remove(self.owner.owner)
+				if self.owner.owner in self.owner.owner.spawnContainer.kind.inventory:
+					self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
 
-				for obj in self.owner.owner.spawnContainer.inventory:
+				for obj in self.owner.owner.spawnContainer.kind.inventory:
 					if obj.name == self.owner.owner.name and gotten == False:
-						self.owner.owner.spawnContainer.inventory.remove(obj)
+						self.owner.owner.spawnContainer.kind.inventory.remove(obj)
 						gotten = True
 				if self.owner.owner in self.owner.owner.currentRoom.objects:
 					self.owner.owner.currentRoom.objects.remove(self.owner.owner)
@@ -232,11 +232,16 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 	def stuff(self, obj):
 			#moves newly spawned objects to containers
 		#print self.owner.owner.spawnContainer
-		if self.owner.owner.spawnContainer != None:
-			if self.owner.owner.spawnContainer.owner.currentRoom == self.startingLocation[0]:
-				self.startingLocation[0].objects.remove(obj)
-				self.owner.owner.spawnContainer.inventory.append(obj)
-				return True
+		if obj.spawnContainer != None:
+			#print obj.spawnContainer.name
+			#print obj.spawnContainer.kind
+			# if obj.owner.owner.spawnContainer.currentRoom == self.startingLocation[0]:
+				#print self.startingLocation[0].name
+			obj.currentRoom.objects.remove(obj)
+			obj.spawnContainer.kind.inventory.append(obj)
+			#print obj.spawnContainer.kind.inventory
+			return True
+		#print "stuff of " + obj.name + " failed"
 		return False
 
 
@@ -252,7 +257,9 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				for obj in Globals.fromFileList:
 					if obj.name == self.obj.name:
 						refobj = obj.name
-				newObject = Engine.cmdSpawnObject(refobj, self.startingLocation[0], whereFrom='objSpawner')
+
+				newObject = Engine.cmdSpawnObject(refobj, self.startingLocation[0], whereFrom='objSpawner', spawnContainer=self.owner.owner.spawnContainer)
+				#print newObject.spawnContainer
 				#print self.owner.owner
 				# if self.startingLocation[0] is not None:
 				#self.startingLocation[0].objects.append(self.obj)

@@ -362,7 +362,7 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
 #     print newObject
 
 
-def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd'):
+def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnContainer=None):
     # creates a new object based on the attributes of the object fed to the function
 
     obj = None
@@ -380,7 +380,10 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd'):
 
     newObject.currentRoom = spawnLocation
     newObject.isVisible = obj.isVisible
-    newObject.spawnContainer = obj.spawnContainer
+    if obj.spawnContainer:
+        newObject.spawnContainer = obj.spawnContainer
+    else:
+        newObject.spawnContainer = spawnContainer
     newObject.longDescription = obj.longDescription
     newObject.kind = obj.kind
     if newObject.kind:

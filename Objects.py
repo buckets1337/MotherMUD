@@ -229,6 +229,7 @@ def buildObjectFromFile(file):
 
 	if kind is not None:
 		newObject.kind = itemComponent
+	#print newObject.kind
 	fromFileList.append(newObject)
 
 	# printing suite
@@ -275,141 +276,143 @@ for obj in fileList:
 	buildObjectFromFile(obj)
 
 
-######################
-# test region objects
-######################
-
-## Room: Lobby
-
-testLobbyPottedPlant = World.Object(
-	name = 'potted_plant',
-	description = 'A plant in a pot.',
-	isVisible = True,
-	longDescription = 'This appears to be a long-neglected fern of some sort, in a crumbling ceramic pot.'
-)
-indexList.append(testLobbyPottedPlant)
-
-testLobbyDesk = World.Object(
-	name = 'desk',
-	description = 'A cheap plywood desk.',
-	isVisible = True,
-	longDescription = "This desk looks like it was flimsy even when it was new.  It has a single desk drawer which does not appear to be locked."
-)
-indexList.append(testLobbyDesk)
-
-#~~~~~~~~~~~~~~  <-This signifies these items are related to each other somehow.  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-testKeyGrabber = World.itemGrabHandler(notDroppable=True)		
-testKeyItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testKeyGrabber)
-testLobbyKey =  World.Object(
-	name = 'rusty_key',
-	description = 'An old rusty key.',
-	isVisible = False,
-	kind = testKeyItemComponent,
-	longDescription = "This key appears to be old.  It has to go to something around here, since it was in the desk.",
-)
-indexList.append(testLobbyKey)
-
-testDeskContainer = World.container(inventory=[testLobbyKey], respawnContents=True)
-testLobbyDeskDrawer = World.Object(
-	name = 'desk_drawer',
-	description = 'An unlocked desk drawer.',
-	isVisible = False,
-	longDescription = "This is an ordinary desk drawer.  It has a lock on it, but it does not appear to be engaged.",
-	kind = testDeskContainer
-)
-indexList.append(testLobbyDeskDrawer)
-
-# places the key in the desk drawer
-testLobbyKey.spawnContainer = testLobbyDeskDrawer
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-testFilesGrabber = World.itemGrabHandler()		
-testFilesItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testFilesGrabber)
-
-testLobbyFiles =  World.Object(
-	name = 'files',
-	description = 'Random files.',
-	isVisible = False,
-	kind = testFilesItemComponent,
-	longDescription = "A random assortment of files",
-)
-indexList.append(testLobbyFiles)
-
-testFileCabinetContainer = World.container(isLocked = True, inventory=[testLobbyFiles], respawnContents=True)
-testLobbyFileCabinet = World.Object(
-	name = 'file_cabinet',
-	description = 'A grey steel file cabinet.',
-	isVisible = True,
-	longDescription = "This is a file cabinet.   There are many like it, but this one is here.",
-	kind = testFileCabinetContainer
-)
-indexList.append(testLobbyFileCabinet)
-# place the files in the file cabinet
-testLobbyFiles.spawnContainer = testLobbyFileCabinet
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+# ######################
+# # test region objects
+# ######################
 
+# ## Room: Lobby
 
-## Room: restroom
+# testLobbyPottedPlant = World.Object(
+# 	name = 'potted_plant',
+# 	description = 'A plant in a pot.',
+# 	isVisible = True,
+# 	longDescription = 'This appears to be a long-neglected fern of some sort, in a crumbling ceramic pot.'
+# )
+# indexList.append(testLobbyPottedPlant)
 
-testTrashcanContainer = World.container(inventory=[], respawnContents=False)
-testTrashcan = World.Object(
-	name = 'trash_can',
-	description = 'A metal trash can, in poor condition.',
-	isVisible = True,
-	kind = testTrashcanContainer,
-	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
-)
-indexList.append(testTrashcan)
+# testLobbyDesk = World.Object(
+# 	name = 'desk',
+# 	description = 'A cheap plywood desk.',
+# 	isVisible = True,
+# 	longDescription = "This desk looks like it was flimsy even when it was new.  It has a single desk drawer which does not appear to be locked."
+# )
+# indexList.append(testLobbyDesk)
 
-#@ things that spawn in the restroom
-testTrashGrabber = World.itemGrabHandler()
-testTrashItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testTrashGrabber)
-testTrash = World.Object(
-	name = 'trash_pile',
-	description = "A pile of trash",
-	isVisible = True,
-	kind = testTrashItemComponent,
-	longDescription = "Your typical trash heap.  Trash seems to pile up if no one takes it out.",
-	spawnContainer = testTrashcan.kind
+# #~~~~~~~~~~~~~~  <-This signifies these items are related to each other somehow.  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# testKeyGrabber = World.itemGrabHandler(notDroppable=True)		
+# testKeyItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testKeyGrabber)
+# testLobbyKey =  World.Object(
+# 	name = 'rusty_key',
+# 	description = 'An old rusty key.',
+# 	isVisible = False,
+# 	kind = testKeyItemComponent,
+# 	longDescription = "This key appears to be old.  It has to go to something around here, since it was in the desk.",
+# )
+# indexList.append(testLobbyKey)
 
-)
-indexList.append(testTrash)
-testTrashSpawnOdds = [[True, 1],[False, 20]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
-testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
-testTrash.kind.objectSpawner = testTrashSpawner
+# testDeskContainer = World.container(inventory=[testLobbyKey], respawnContents=True)
+# testLobbyDeskDrawer = World.Object(
+# 	name = 'desk_drawer',
+# 	description = 'An unlocked desk drawer.',
+# 	isVisible = False,
+# 	longDescription = "This is an ordinary desk drawer.  It has a lock on it, but it does not appear to be engaged.",
+# 	kind = testDeskContainer
+# )
+# indexList.append(testLobbyDeskDrawer)
+
+# # places the key in the desk drawer
+# testLobbyKey.spawnContainer = testLobbyDeskDrawer
+# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# testFilesGrabber = World.itemGrabHandler()		
+# testFilesItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testFilesGrabber)
+
+# testLobbyFiles =  World.Object(
+# 	name = 'files',
+# 	description = 'Random files.',
+# 	isVisible = False,
+# 	kind = testFilesItemComponent,
+# 	longDescription = "A random assortment of files",
+# )
+# indexList.append(testLobbyFiles)
+
+# testFileCabinetContainer = World.container(isLocked = True, inventory=[testLobbyFiles], respawnContents=True)
+# testLobbyFileCabinet = World.Object(
+# 	name = 'file_cabinet',
+# 	description = 'A grey steel file cabinet.',
+# 	isVisible = True,
+# 	longDescription = "This is a file cabinet.   There are many like it, but this one is here.",
+# 	kind = testFileCabinetContainer
+# )
+# indexList.append(testLobbyFileCabinet)
+# # place the files in the file cabinet
+# testLobbyFiles.spawnContainer = testLobbyFileCabinet
+# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
-## Room: outside
 
-testRockGrabber = World.itemGrabHandler()
-testRockItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testRockGrabber)
-testRock = World.Object(
-	name = 'rock',
-	description = 'An ordinary rock.',
-	isVisible = True,
-	kind = testRockItemComponent,
-	longDescription = "This is a typical rock.  Roundish and hard.",
-)
-indexList.append(testRock)
+# ## Room: restroom
 
-testGardenGnomeGrabber = World.itemGrabHandler()
-testGardenGnomeItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testGardenGnomeGrabber)
-testGardenGnome = World.Object(
-	name = 'garden_gnome',
-	description = "A beat-up garden gnome.",
-	isVisible = True,
-	kind = testGardenGnomeItemComponent,
-	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
+# testTrashcanContainer = World.container(inventory=[], respawnContents=False)
+# testTrashcan = World.Object(
+# 	name = 'trash_can',
+# 	description = 'A metal trash can, in poor condition.',
+# 	isVisible = True,
+# 	kind = testTrashcanContainer,
+# 	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
+# )
+# indexList.append(testTrashcan)
 
-)
-indexList.append(testGardenGnome)
-testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
-testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=3, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
-testGardenGnome.kind.objectSpawner = testGardenGnomeSpawner
-# print "spwn " + str(testGardenGnome.kind.objectSpawner)
-# print "obstrm " + str(testGardenGnome.kind.objectSpawner.startingLocation)
+# #@ things that spawn in the restroom
+# testTrashGrabber = World.itemGrabHandler()
+# testTrashItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testTrashGrabber)
+# testTrash = World.Object(
+# 	name = 'trash_pile',
+# 	description = "A pile of trash",
+# 	isVisible = True,
+# 	kind = testTrashItemComponent,
+# 	longDescription = "Your typical trash heap.  Trash seems to pile up if no one takes it out.",
+# 	spawnContainer = testTrashcan.kind
+
+# )
+# indexList.append(testTrash)
+# testTrashSpawnOdds = [[True, 1],[False, 20]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
+# testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
+# testTrash.kind.objectSpawner = testTrashSpawner
+
+
+
+# ## Room: outside
+
+# testRockGrabber = World.itemGrabHandler()
+# testRockItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testRockGrabber)
+# testRock = World.Object(
+# 	name = 'rock',
+# 	description = 'An ordinary rock.',
+# 	isVisible = True,
+# 	kind = testRockItemComponent,
+# 	longDescription = "This is a typical rock.  Roundish and hard.",
+# )
+# indexList.append(testRock)
+
+# testGardenGnomeGrabber = World.itemGrabHandler()
+# testGardenGnomeItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testGardenGnomeGrabber)
+# testGardenGnome = World.Object(
+# 	name = 'garden_gnome',
+# 	description = "A beat-up garden gnome.",
+# 	isVisible = True,
+# 	kind = testGardenGnomeItemComponent,
+# 	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
+
+# )
+# indexList.append(testGardenGnome)
+# testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
+# testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=3, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
+# testGardenGnome.kind.objectSpawner = testGardenGnomeSpawner
+# # print "spwn " + str(testGardenGnome.kind.objectSpawner)
+# # print "obstrm " + str(testGardenGnome.kind.objectSpawner.startingLocation)
 
 

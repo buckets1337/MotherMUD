@@ -36,6 +36,13 @@ def loadRoom(file):
 	# objects = []
 	fileDetails = file.split("/")
 	newRoom = regionListDict[fileDetails[0]][fileDetails[1]]
+
+	item = ''
+	destRegion = ''
+	destRoom = ''
+	destContainer = ''
+	hasSpawnContainers = False
+
 	for Data in fileData:
 
 
@@ -96,12 +103,55 @@ def loadRoom(file):
 						coord = pointDetails[1].split('-')
 						obj.kind.objectSpawner.startingLocation = regionListDict[coord[0]][coord[1]],
 
+		if Data.startswith('spawnContainers='):
+			hasSpawnContainers = True
+			containersList = Data[16:-1]
+			containersList = containersList.split(", ")
+			for container in containersList:
+				containerDetails = container.split(":")
+				containerSpecs = containerDetails[1].split("-")
+
+				item = containerDetails[0]
+				destRegion = containerSpecs[0]
+				destRoom = containerSpecs[1]
+				destContainer = containerSpecs[2]
+
+				for obj in newRoom.objects:
+					if obj.name == item:
+						obj.spawnContainer = [item, destRegion, destRoom, destContainer]
+
+
+
 
 
 	labelString = newRoom.region + newRoom.name.capitalize()
 	#print 'ls:' + labelString
 	Globals.masterRooms[labelString] = newRoom
 	Globals.regionListDict[newRoom.region][newRoom.name] = newRoom
+
+
+
+
+
+	# if hasSpawnContainers:
+	# 	found = False
+	# 	for region in Globals.regionListDict:
+	# 		for room in Globals.regionListDict[region]:
+	# 			roomObj = Globals.regionListDict[region][room]
+	# 			#print '****regionRooms:' + str(Globals.regionListDict[region][room])
+	# 	#print Globals.regionListDict
+	# 			# print 'roomName:' + roomObj.name
+	# 			# print 'destRoom:' + destRoom
+	# 			if roomObj == Globals.regionListDict[destRegion][destRoom]:
+	# 				for obj in roomObj.objects:
+	# 					if obj.name == destContainer:
+	# 						for thing in roomObj.objects:
+	# 							if thing.name == item and found == False:
+	# 								roomObj.objects.remove(thing)
+	# 								obj.inventory.append(thing)
+	# 								found = True
+
+
 
 	print "name=" + newRoom.name
 	print "region=" + newRoom.region
@@ -112,6 +162,25 @@ def loadRoom(file):
 	print "\n"
 
 
+	#print newRoom
+	return newRoom
+
+
+def setSpawnContainers(newRoom):
+	for obj in newRoom.objects:
+		#print obj.name
+		if obj.spawnContainer is not None:
+			destination = Globals.regionListDict[obj.spawnContainer[1]][obj.spawnContainer[2]]
+			#print "destination:" + str(destination) + obj.spawnContainer[1] + ":" + obj.spawnContainer[2]
+			#print destination.objects
+			for item in destination.objects:
+				#print item.name
+				#print "destCont:" + obj.spawnContainer[3]
+				if item.name == obj.spawnContainer[3]:
+					obj.spawnContainer = item
+					# for ob in Globals.fromFileList:
+					# 	if ob.name == obj.name
+					#print "spawnCont:" + str(obj.spawnContainer) + str(obj.spawnContainer.name)
 
 
 
@@ -123,5 +192,21 @@ def setup():
 		for roomFile in directoryFiles:
 			path = str(region)+'/'+ roomFile
 			fileList.append(path)
+	newRooms = []
 	for room in fileList:
-		loadRoom(room)
+		if room is not None:
+			newRooms.append(loadRoom(room))
+		#print newRooms
+	for room in newRooms:
+		if room is not None:
+			setSpawnContainers(room)
+
+	# for room in Globals.masterRooms:
+	# 	print room
+	# 	for obj in Globals.masterRooms[room].objects:
+	# 		print obj
+	# 		if obj.kind:
+	# 			if obj.kind.objectSpawner:
+	# 				stuffed = obj.kind.objectSpawner.stuff(obj.kind.objectSpawner)
+	# 				if stuffed:
+	# 					print obj.name + " stuffed"

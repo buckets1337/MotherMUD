@@ -27,7 +27,14 @@ objects=trash_pile
 spawnPoints=trash_pile:test-restroom
 
 # the following line dictates if objects defined for the room spawn inside a container.  The syntax 
-# is slightly expanded from spawnPoints, to allow for spawning inside containers in other rooms as
+# is slightly expanded from spawnPoints, to allow for spawning inside containers in other rooms
 # instead of only the containers in this room.
 
 spawnContainers=trash_pile:test-restroom-trash_can
+
+# the following line dictates if any of the objects defined previously in the room are in containers
+# in the room.  An object in this list will be removed from the room's objects, and placed into the
+# inventory of the container that is defined for the object here, in the format of:
+# stuffList=<object>:<container>,<object2>:<container2>, ...
+
+#stuffList=

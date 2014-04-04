@@ -6,7 +6,7 @@ longDescription='This trash can is probably as old as you are.  It is somehow ru
 
 isVisible=True
 
-kind= container
+kind=container
 
 # container-related attributes
 kind.isLocked=False
