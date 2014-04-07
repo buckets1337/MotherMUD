@@ -247,16 +247,27 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		self.startingLocation = self.owner.owner.currentRoom,
 
 
-	def stuff(self, obj):
+	def stuff(self, obj, isNew):
 			#moves newly spawned objects to containers
 		#print self.owner.owner.spawnContainer
+		print obj.name
 		if obj.spawnContainer != None:
-			#print obj.spawnContainer.name
+			print obj.spawnContainer.name
+			print obj.spawnContainer
+			if obj.spawnContainer in obj.kind.objectSpawner.startingLocation[0].objects:
+				print "object sc and sl ="
 			#print obj.spawnContainer.kind
 			# if obj.owner.owner.spawnContainer.currentRoom == self.startingLocation[0]:
 				#print self.startingLocation[0].name
-			obj.currentRoom.objects.remove(obj)
-			obj.spawnContainer.kind.inventory.append(obj)
+			if isNew:
+				obj.kind.objectSpawner.startingLocation[0].objects.remove(obj)
+			print "sc:" + str(obj.spawnContainer) + " " + str(obj.spawnContainer.name)
+			print "sro:" + str(obj.kind.objectSpawner.startingLocation[0].objects)
+			for ob in obj.kind.objectSpawner.startingLocation[0].objects:
+				print ob.name
+				if ob == obj.spawnContainer:
+					ob.kind.inventory.append(obj)
+					print ob.kind.inventory
 			#print obj.spawnContainer.kind.inventory
 			return True
 		#print "stuff of " + obj.name + " failed"
@@ -307,7 +318,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				# else:
 				# 	pass	# add the new object to the room
 
-				stuffed = self.stuff(newObject)		# try shoving items in containers if they should be there instead of in the room
+				stuffed = self.stuff(newObject, True)		# try shoving items in containers if they should be there instead of in the room
 
 				# for client in Globals.CLIENT_LIST:
 				# 	if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
@@ -330,13 +341,15 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 			# 	Globals.TIMERS.append(self.obj.kind.objectSpawner.timer)
 			# 	print "noWin " + str(Globals.TIMERS)
 	
+		else:
+			stuffed = self.stuff(self.owner.owner, False)	
 
-	print "timers:",
-	for timer in Globals.TIMERS:
-	# 	print str(timer)
-	 	print str(timer.attachedTo.owner.owner.name),
-	# 	print str(timer.currentTime
-	print "\n"
+		print "timers:",
+		for timer in Globals.TIMERS:
+		# 	print str(timer)
+		 	print str(timer.attachedTo.owner.owner.name),
+		# 	print str(timer.currentTime
+		print "\n"
 
 
 

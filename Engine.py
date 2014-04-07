@@ -347,7 +347,8 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
                 newObject.kind.objectSpawner.owner = newObject.kind
 
         if isinstance(newObject.kind, World.container):
-            newObject.kind = World.container
+            newObject.kind = World.container()
+            newObject.kind.owner = newObject
             newObject.kind.inventory = obj.kind.inventory
             newObject.kind.isLocked = obj.kind.isLocked
             newObject.kind.isCarryable = obj.kind.isCarryable
