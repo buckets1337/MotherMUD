@@ -49,17 +49,20 @@ def loadRoom(file):
 		if Data.startswith('name='):
 			newRoom.name = Data[5:-1]
 			#print "name-" + newRoom.name
+
 		if Data.startswith('region='):
 			newRoom.region = Data[7:-1]
+
 		if Data.startswith('description='):
 			newRoom.description = Data[13:-2]
+
 		if Data.startswith('longDescription='):
 			newRoom.longDescription = Data[17:-2]
 
 		if Data.startswith('exits='):
 			#print Data
 			exitsDict = {}
-			exitsList = (Data[6:-1]).split(',')
+			exitsList = (Data[6:-1]).split(', ')
 			#print exitsList
 			regionRooms = Globals.regionListDict[newRoom.region]
 			for exit in exitsList:
@@ -71,7 +74,7 @@ def loadRoom(file):
 		if Data.startswith('objects='):
 			#print Data
 			objectList = Data[8:-1]
-			objectList = objectList.split(",")
+			objectList = objectList.split(", ")
 			#print objectList
 			spawnList = []
 			#print "ffl:"+str(Globals.fromFileList)
@@ -81,13 +84,13 @@ def loadRoom(file):
 					if ob.name == obj:
 						if ob.kind:
 							if ob.kind.objectSpawner:
-								newObject = Engine.cmdSpawnObject(ob.name, newRoom, ob.kind.objectSpawner.active)
+								newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=True, whereFrom='file')
 								spawnList.append(newObject)
 							else:
-								newObject = Engine.cmdSpawnObject(ob.name, newRoom, False)
+								newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=False)
 								spawnList.append(newObject)
 						else:
-							newObject = Engine.cmdSpawnObject(ob.name, newRoom, False)
+							newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=False)
 							spawnList.append(newObject)
 
 			newRoom.objects = spawnList
@@ -119,6 +122,20 @@ def loadRoom(file):
 				for obj in newRoom.objects:
 					if obj.name == item:
 						obj.spawnContainer = [item, destRegion, destRoom, destContainer]
+
+		if Data.startswith('stuffList='):
+			stuffList = Data[10:-1]
+			stuffList = stuffList.split(', ')
+			for entry in stuffList:
+				stuffDesc = entry.split(':')
+				item = stuffDesc[0]
+				container = stuffDesc[1]
+				for obj in newRoom.objects:
+					if obj.name == item:
+						for ob in newRoom.objects:
+							if ob.name == container and ob.kind is not None and ob.kind.inventory is not None:
+								newRoom.objects.remove(obj)
+								ob.kind.inventory.append(obj)
 
 
 

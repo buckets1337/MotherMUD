@@ -149,7 +149,7 @@ if __name__ == '__main__':
     with open('data/OPList', 'r') as f:
         OPList = f.readlines()
 
-
+    print str(Globals.TIMERS)
 
     ## Server Loop
     while SERVER_RUN:
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         # print "last " + str(lastTime)
         # print "cur+start " + str((currentTime-startupTime))
         # print "del " + str(deltaTime)
-        for timer in TIMERS:
+        for timer in Globals.TIMERS:
             timer.tick(deltaTime)
         lastTime = (currentTime - startupTime)
 

@@ -7,4 +7,4 @@ longDescription='This stairwell is oddly cleaner than the surrounding rooms.  Th
 
 exits=test:lobby
 
-objects=testTrashCan
+objects=trash_can, trash_can

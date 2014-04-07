@@ -7,4 +7,4 @@ longDescription='No, really.  This is everything else.  It is far too much to de
 
 exits=test:lobby
 
-objects=rock,garden_gnome
+objects=rock, garden_gnome

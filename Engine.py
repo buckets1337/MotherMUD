@@ -291,81 +291,22 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
         oddSum += sel[1]
         if oddSum >= selection:
             break
-    #print sel, selection
+    print sel, selection
+    print Globals.TIMERS
+    for timer in Globals.TIMERS:
+        print timer.attachedTo.owner.owner.name
     return sel
 
 
-# def SpawnObject(client, refobj, spawnLocation):
-#     # creates a new object based on the attributes of the object fed to the function
 
-#     obj = None
-#     for thing in Objects.indexList:
-#         if thing.name == refobj:
-#             obj = thing
-#     if obj == None:
-#         client.send("I didn't really understand the thing I was trying to create.\n")
-#         return
-
-#     newObject = World.Object(obj.name, obj.description)
-
-#     newObject.currentRoom = spawnLocation
-#     newObject.isVisible = obj.isVisible
-#     newObject.spawnContainer = obj.spawnContainer
-#     newObject.longDescription = obj.longDescription
-#     newObject.kind = obj.kind
-#     if newObject.kind:
-#         newObject.kind.owner = newObject
-#     newObject.TIMERS = obj.TIMERS
-#     if newObject.TIMERS:
-#         newObject.TIMERS.owner = newObject
-
-#     if newObject.kind is not None:
-#         if isinstance(newObject.kind, World.item):
-#             newObject.kind.isCarryable = obj.kind.isCarryable
-#             newObject.kind.respawns = obj.kind.respawns
-#             newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
-#             if newObject.kind.itemGrabHandler:
-#                 newObject.kind.itemGrabHandler.owner = newObject.kind
-#             newObject.kind.objectSpawner = obj.kind.objectSpawner
-#             if newObject.kind.objectSpawner:
-#                 newObject.kind.objectSpawner.owner = newObject.kind
-
-#         if isinstance(newObject.kind, World.container):
-#             newObject.kind.inventory = obj.kind.inventory
-#             newObject.kind.isLocked = obj.kind.isLocked
-#             newObject.kind.isCarryable = obj.kind.isCarryable
-#             newObject.kind.respawns = obj.kind.respawns
-#             newObject.kind.respawnContents = obj.kind.respawnContents
-#             newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
-#             if newObject.kind.itemGrabHandler:
-#                 newObject.kind.itemGrabHandler.owner = newObject.kind
-#             newObject.kind.objectSpawner = obj.kind.objectSpawner
-#             if newObject.kind.objectSpawner:
-#                 newObject.kind.objectSpawner.owner = newObject.kind
-
-#         if newObject.kind.itemGrabHandler:
-#             newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
-
-#         if newObject.kind.objectSpawner:
-#             newObject.kind.objectSpawner.TIMERS = obj.kind.objectSpawner.TIMERS
-#             newObject.kind.objectSpawner.time = obj.kind.objectSpawner.time
-#             newObject.kind.objectSpawner.obj = obj.kind.objectSpawner.obj
-#             newObject.kind.objectSpawner.oddsList = obj.kind.objectSpawner.oddsList
-#             newObject.kind.objectSpawner.container = obj.kind.objectSpawner.container
-#             newObject.kind.objectSpawner.cycles = obj.kind.objectSpawner.cycles
-#             newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
-#             newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, False)
-#             newObject.kind.objectSpawner.startingLocation = spawnLocation,
-
-#     spawnLocation.objects.append(newObject)
-#     client.send("I just created a %s!\n" %newObject.name)
-#     print newObject
 
 
 def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnContainer=None):
     # creates a new object based on the attributes of the object fed to the function
 
     obj = None
+    # if whereFrom == 'cmd':
+    #     active = True
     #print Objects.fromFileList[0].name
     #print str(refobj)
     for thing in Objects.fromFileList:
@@ -389,11 +330,13 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
     if newObject.kind:
         newObject.kind.owner = newObject
     newObject.TIMERS = obj.TIMERS
-    if newObject.TIMERS:
-        newObject.TIMERS.owner = newObject
+    # if newObject.TIMERS:
+    #     newObject.TIMERS.owner = newObject
 
     if newObject.kind is not None:
         if isinstance(newObject.kind, World.item):
+            newObject.kind = World.item()
+            newObject.kind.owner = newObject
             newObject.kind.isCarryable = obj.kind.isCarryable
             newObject.kind.respawns = obj.kind.respawns
             newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
@@ -404,6 +347,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
                 newObject.kind.objectSpawner.owner = newObject.kind
 
         if isinstance(newObject.kind, World.container):
+            newObject.kind = World.container
             newObject.kind.inventory = obj.kind.inventory
             newObject.kind.isLocked = obj.kind.isLocked
             newObject.kind.isCarryable = obj.kind.isCarryable
@@ -420,6 +364,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
 
         if newObject.kind.objectSpawner:
+            newObject.kind.objectSpawner = World.objectSpawner(newObject.kind)
             newObject.kind.objectSpawner.TIMERS = obj.kind.objectSpawner.TIMERS
             newObject.kind.objectSpawner.time = obj.kind.objectSpawner.time
             newObject.kind.objectSpawner.obj = obj.kind.objectSpawner.obj
@@ -427,7 +372,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             newObject.kind.objectSpawner.container = obj.kind.objectSpawner.container
             newObject.kind.objectSpawner.cycles = obj.kind.objectSpawner.cycles
             newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
-            newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, False)
+            newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, newObject.kind.respawns)
             newObject.kind.objectSpawner.startingLocation = spawnLocation,
 
     if newObject.kind:

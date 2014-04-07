@@ -71,6 +71,8 @@ class Timer:
 
         self.currentTime = time
 
+        self.count = 0
+
         self.TIMERS.append(self)
 
         # self.initialTime = time.clock()
@@ -81,18 +83,30 @@ class Timer:
         #timePassed = (time.clock() - self.initialTime) - self.lastTime
 
         self.currentTime -= deltaTime
-        #print self.time
+        #print self.currentTime
+        #print "tick"
+        self.count += 1
+        #print str(self.count) + self.attachedTo.owner.owner.name
 
         if self.currentTime <= 0:
-            self.TIMERS.remove(self)
-            if self.actionArgs != []:
-                self.actionFunction(self.actionArgs)
-            else:
-                self.actionFunction()
+
+			print "time out. " + str(self.attachedTo.owner.owner.name) + " " + str(self)
+
+			Globals.TIMERS.remove(self)
+
+			print "removed " + str(self)
+
+			if self.actionArgs != []:
+				self.actionFunction(self.actionArgs)
+			else:
+			    self.actionFunction()
 
 
-            if self.respawns == True:
-                newTimer = Timer(self.TIMERS, self.time, self.actionFunction, self.actionArgs, self.attachedTo, self.respawns)
+			print "timers:" + str(Globals.TIMERS)
+
+
+            # if self.respawns == True:
+            #     newTimer = Timer(self.TIMERS, self.time, self.actionFunction, self.actionArgs, self.attachedTo, self.respawns)
 
 
 
@@ -213,9 +227,10 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 		
 
 class objectSpawner:		# for 'kind' components, a component that, when placed in a room or container, will attempt to randomly spawn objects at specified intervals
-	def __init__(self, owner, TIMERS, time, obj, oddsList, container = None, cycles=1, repeat = False, active = False):
+	def __init__(self, owner, TIMERS = None, time = 0, obj = None, oddsList = None, container = None, cycles=1, repeat = False, active = False):
 		self.owner = owner
 		self.TIMERS = TIMERS
+		self.owner.owner.TIMERS = self.TIMERS
 		self.time = time
 		self.obj = obj
 		self.oddsList = oddsList
@@ -223,7 +238,10 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		self.cycles = cycles
 		self.repeat = repeat
 		self.active = active
-		timer = Timer(TIMERS, time, self.spawn, [], self, False)
+		if self.active:
+			timer = Timer(TIMERS, time, self.spawn, [], self, False)
+		else:
+			timer = None
 		self.timer = timer
 		#print "obj in:" + str(self.owner.owner.currentRoom)
 		self.startingLocation = self.owner.owner.currentRoom,
@@ -247,9 +265,26 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 
 	def spawn(self):
 		# first, make a random determination of if item will be respawning this time
-		if self.owner.respawns == True and self.active and self.startingLocation[0] is not None:
+		if self.active:
+		 	#if self.startingLocation[0] is not None:
+			print self.active
+
+			if self.repeat:
+				self.timer.currentTime = self.time
+				print "repeatTime: " + str(self.timer.currentTime)
+				self.TIMERS.append(self.timer)
+				print str(self.timer) + " repeated. " + str(Globals.TIMERS)
+
+			elif self.cycles > 1:
+				self.cycles -= 1
+				#Globals.TIMERS.remove(self.timer)
+				self.timer.currentTime = self.time
+				print "cycleTime: " + str(self.timer.currentTime)
+				Globals.TIMERS.append(self.timer)
+				print "cycles -1 " + str(Globals.TIMERS)
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
+				print self.active
 				#print self.owner.owner.currentRoom
 				#print self.startingLocation
 				#self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
@@ -257,8 +292,14 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				for obj in Globals.fromFileList:
 					if obj.name == self.obj.name:
 						refobj = obj.name
+						ob = obj
 
+				print self.active
 				newObject = Engine.cmdSpawnObject(refobj, self.startingLocation[0], whereFrom='objSpawner', spawnContainer=self.owner.owner.spawnContainer)
+				print self.active
+				print str(newObject.name) + " added timer " + str(newObject.kind.objectSpawner.timer)
+				print "ob " +str(ob.kind.objectSpawner.active)
+				print self.active
 				#print newObject.spawnContainer
 				#print self.owner.owner
 				# if self.startingLocation[0] is not None:
@@ -273,26 +314,30 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				# 		if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == self.startingLocation[0]:		# if a client is in the room object just appeared in, let it know
 				# 			if not stuffed:
 				# 				client.send_cc("^BA %s appeared.^~\n" %self.owner.owner.name)
-
-				if self.repeat:
-					self.timer.currentTime = self.time
-					self.TIMERS.append(self.timer)
-
-				elif self.cycles > 1:
-					self.cycles -= 1
-					self.timer.currentTime = self.time
-					self.TIMERS.append(self.timer)
-
-				#print "$o  "+ str(self.owner.owner)+ " "+ str(self.owner.owner.name) + " @ [" + str(self.startingLocation[0].region) + ":" + str(self.startingLocation[0].name) +"]"
-
-			else:
-				self.timer.currentTime = self.time
-				#print self.timer.time
-				self.TIMERS.append(self.timer)
+				# print "repeat:" + str(self.repeat)
+				# print "cycles:" + str(self.cycles)
+				# print "timer:" + str(self.timer)
+				#print "currentTime:" + str(self.obj.kind.objectSpawner.timer.currentTime)
+				# print "time:" + str(self.timer.time)
+				# print "name:" + str(self.owner.owner.name)
 
 
+					#print "$o  "+ str(self.owner.owner)+ " "+ str(self.owner.owner.name) + " @ [" + str(self.startingLocation[0].region) + ":" + str(self.startingLocation[0].name) +"]"
 
+			# else:
+			# 	self.obj.kind.objectSpawner.timer.currentTime = self.time
+			# 	#print self.timer.time
+			# 	Globals.TIMERS.append(self.obj.kind.objectSpawner.timer)
+			# 	print "noWin " + str(Globals.TIMERS)
 	
+
+	print "timers:",
+	for timer in Globals.TIMERS:
+	# 	print str(timer)
+	 	print str(timer.attachedTo.owner.owner.name),
+	# 	print str(timer.currentTime
+	print "\n"
+
 
 
 

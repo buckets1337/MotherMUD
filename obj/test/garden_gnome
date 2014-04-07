@@ -18,5 +18,6 @@ kind.objectSpawner.spawnOdds=True:1,False:10
 kind.objectSpawner.container=None
 kind.objectSpawner.cycles=1
 kind.objectSpawner.repeat=True
-kind.objectSpawner.active=True
+# active should always be false in an item definition
+kind.objectSpawner.active=False
 
