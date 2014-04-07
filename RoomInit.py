@@ -136,7 +136,7 @@ def loadRoom(file):
 							if ob.name == container and ob.kind is not None and ob.kind.inventory is not None:
 								newRoom.objects.remove(obj)
 								ob.kind.inventory.append(obj)
-								print ob.kind.inventory
+								#print ob.kind.inventory
 
 
 

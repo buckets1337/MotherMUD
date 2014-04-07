@@ -240,10 +240,12 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     if container is not None:
                         for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
                             if item.name == str(container):
-                                if newObject.kind.objectSpawner:
-                                    newObject.kind.objectSpawner.container = item.kind
-                                if newObject.kind:
-                                    newObject.kind.spawnContainer = item
+                                if hasattr(newObject, 'kind'):
+                                    if hasattr(newObject.kind, 'objectSpawner'):
+                                        if newObject.kind.objectSpawner is not None:
+                                            newObject.kind.objectSpawner.container = item.kind
+                                    if newObject.kind is not None:
+                                        newObject.kind.spawnContainer = item
                                 item.kind.inventory.append(newObject)
                                 CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newObject)
 
@@ -291,10 +293,10 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
         oddSum += sel[1]
         if oddSum >= selection:
             break
-    print sel, selection
-    print Globals.TIMERS
-    for timer in Globals.TIMERS:
-        print timer.attachedTo.owner.owner.name
+    #print sel, selection
+    #print Globals.TIMERS
+    #for timer in Globals.TIMERS:
+        #print timer.attachedTo.owner.owner.name
     return sel
 
 

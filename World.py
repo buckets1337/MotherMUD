@@ -90,11 +90,11 @@ class Timer:
 
         if self.currentTime <= 0:
 
-			print "time out. " + str(self.attachedTo.owner.owner.name) + " " + str(self)
+			#print "time out. " + str(self.attachedTo.owner.owner.name) + " " + str(self)
 
 			Globals.TIMERS.remove(self)
 
-			print "removed " + str(self)
+			#print "removed " + str(self)
 
 			if self.actionArgs != []:
 				self.actionFunction(self.actionArgs)
@@ -102,7 +102,7 @@ class Timer:
 			    self.actionFunction()
 
 
-			print "timers:" + str(Globals.TIMERS)
+			#print "timers:" + str(Globals.TIMERS)
 
 
             # if self.respawns == True:
@@ -250,24 +250,24 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 	def stuff(self, obj, isNew):
 			#moves newly spawned objects to containers
 		#print self.owner.owner.spawnContainer
-		print obj.name
+		#print obj.name
 		if obj.spawnContainer != None:
-			print obj.spawnContainer.name
-			print obj.spawnContainer
-			if obj.spawnContainer in obj.kind.objectSpawner.startingLocation[0].objects:
-				print "object sc and sl ="
+			#print obj.spawnContainer.name
+			#print obj.spawnContainer
+			#if obj.spawnContainer in obj.kind.objectSpawner.startingLocation[0].objects:
+				#print "object sc and sl ="
 			#print obj.spawnContainer.kind
 			# if obj.owner.owner.spawnContainer.currentRoom == self.startingLocation[0]:
 				#print self.startingLocation[0].name
 			if isNew:
 				obj.kind.objectSpawner.startingLocation[0].objects.remove(obj)
-			print "sc:" + str(obj.spawnContainer) + " " + str(obj.spawnContainer.name)
-			print "sro:" + str(obj.kind.objectSpawner.startingLocation[0].objects)
+			#print "sc:" + str(obj.spawnContainer) + " " + str(obj.spawnContainer.name)
+			#print "sro:" + str(obj.kind.objectSpawner.startingLocation[0].objects)
 			for ob in obj.kind.objectSpawner.startingLocation[0].objects:
-				print ob.name
+				#print ob.name
 				if ob == obj.spawnContainer:
 					ob.kind.inventory.append(obj)
-					print ob.kind.inventory
+					#print ob.kind.inventory
 			#print obj.spawnContainer.kind.inventory
 			return True
 		#print "stuff of " + obj.name + " failed"
@@ -278,24 +278,24 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		# first, make a random determination of if item will be respawning this time
 		if self.active:
 		 	#if self.startingLocation[0] is not None:
-			print self.active
+			#print self.active
 
 			if self.repeat:
 				self.timer.currentTime = self.time
-				print "repeatTime: " + str(self.timer.currentTime)
+				#print "repeatTime: " + str(self.timer.currentTime)
 				self.TIMERS.append(self.timer)
-				print str(self.timer) + " repeated. " + str(Globals.TIMERS)
+				#print str(self.timer) + " repeated. " + str(Globals.TIMERS)
 
 			elif self.cycles > 1:
 				self.cycles -= 1
 				#Globals.TIMERS.remove(self.timer)
 				self.timer.currentTime = self.time
-				print "cycleTime: " + str(self.timer.currentTime)
+				#print "cycleTime: " + str(self.timer.currentTime)
 				Globals.TIMERS.append(self.timer)
-				print "cycles -1 " + str(Globals.TIMERS)
+				#print "cycles -1 " + str(Globals.TIMERS)
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
-				print self.active
+				#print self.active
 				#print self.owner.owner.currentRoom
 				#print self.startingLocation
 				#self.obj.currentRoom = self.startingLocation[0]	# tell the object what room it is in
@@ -305,12 +305,12 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 						refobj = obj.name
 						ob = obj
 
-				print self.active
+				#print self.active
 				newObject = Engine.cmdSpawnObject(refobj, self.startingLocation[0], whereFrom='objSpawner', spawnContainer=self.owner.owner.spawnContainer)
-				print self.active
-				print str(newObject.name) + " added timer " + str(newObject.kind.objectSpawner.timer)
-				print "ob " +str(ob.kind.objectSpawner.active)
-				print self.active
+				#print self.active
+				#print str(newObject.name) + " added timer " + str(newObject.kind.objectSpawner.timer)
+				#print "ob " +str(ob.kind.objectSpawner.active)
+				#print self.active
 				#print newObject.spawnContainer
 				#print self.owner.owner
 				# if self.startingLocation[0] is not None:
@@ -344,12 +344,12 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		else:
 			stuffed = self.stuff(self.owner.owner, False)	
 
-		print "timers:",
-		for timer in Globals.TIMERS:
+		#print "timers:",
+		#for timer in Globals.TIMERS:
 		# 	print str(timer)
-		 	print str(timer.attachedTo.owner.owner.name),
+		 	#print str(timer.attachedTo.owner.owner.name),
 		# 	print str(timer.currentTime
-		print "\n"
+		#print "\n"
 
 
 

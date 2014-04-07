@@ -206,7 +206,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 					examined = True
 
 					if isinstance(resultsList[int(args[-1]) - 1].kind, World.container):
-						print"has inv"
+						#print"has inv"
 						#print "isLocked: " + str(resultsList[int(args[-1]) - 1].kind.isLocked)
 						if resultsList[int(args[-1]) - 1].kind.isLocked == False:
 							for ob in resultsList[int(args[-1]) - 1].kind.inventory:
@@ -233,10 +233,10 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 				examined = True
 
 				if isinstance(obj.kind, World.container):
-					print "*******"
+					#print "*******"
 					if obj.kind.isLocked == False:
 						for ob in obj.kind.inventory:
-							print ob.name,
+							#print ob.name,
 							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
 						if obj.kind.inventory == []:
 							client.send_cc("^c[In %s]:^~\n" %obj.name)
@@ -248,15 +248,15 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 	elif len(resultsList) == 1:
 		#print resultsList
 		for obj in resultsList:
-			print "result: " + str(obj)
+			#print "result: " + str(obj)
 			client.send_cc("^c%s^~\n" %obj.longDescription)
 			examined = True
 
-			print obj.kind
-			print 'ob.inv: ' + str(obj.kind.inventory)
+			#print obj.kind
+			#print 'ob.inv: ' + str(obj.kind.inventory)
 
 			if hasattr(obj.kind, 'inventory'):
-				print"&&&&&&&&&&&&&&"
+				#print"&&&&&&&&&&&&&&"
 				if obj.kind.isLocked == False:
 					for ob in obj.kind.inventory:
 						client.send_cc("^c[In %s]: A %s^~\n" %(obj.name, ob.name))
