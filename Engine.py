@@ -11,6 +11,7 @@ import Rooms
 import World
 import Objects
 import Globals
+import SysInit
 # import clientInfo
 
 
@@ -122,6 +123,10 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 # client.send(prompt)
                 mortalComponent = World.mortal(100, 0)
                 CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
+                if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
+                    print "cl:" + str(CLIENT_LIST)
+                    SysInit.clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, Globals.TIMERS, mortalComponent)
+                    print "cl2:" + str(CLIENT_LIST)
                 Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                 player = CLIENT_DATA[clientDataID].avatar
                 for playerName in OPList:
@@ -136,7 +141,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
-                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=Globals.startingRoom, CLIENT_DATA=CLIENT_DATA)
+                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA=CLIENT_DATA)
                 CLIENT_DATA[clientDataID].loadFinish = True
 
 
@@ -207,12 +212,13 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
             elif cmd == 'quit':
                 ## client is disconnecting
                 client.send("Disconnected.")
+                #CLIENT_LIST.remove(client)
                 client.active = False
 
 
 
 
-            if CLIENT_DATA[clientDataID].op == True:        # OP-only commands.
+            elif CLIENT_DATA[clientDataID].op == True:        # OP-only commands.
 
                 if cmd == 'spawn':     # don't spawn anything but top level items for testing, otherwise it breaks things
                     item = args[0]

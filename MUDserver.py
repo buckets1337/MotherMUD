@@ -46,6 +46,7 @@ def on_connect(client):
     print "++ Opened connection to %s" % client.addrport()  
     #broadcast('%s connected.\n' % client.addrport() )
     CLIENT_LIST.append(client)
+    print "&&&&&&&&&&&&" + str(Globals.CLIENT_LIST)
     clientID = len(CLIENT_LIST) - 1
 
     clientInfo = ClientInfo(name='none', prompt='>>', client=client, clientID=clientID)
@@ -65,9 +66,13 @@ def on_disconnect(client):
     """
     clientDataID = str(client.addrport())
     player = CLIENT_DATA[clientDataID].avatar
+    print player
     print "-- Lost connection to %s" % client.addrport()
-    CLIENT_LIST.remove(client)
+
+    print "clE:" + str(Globals.CLIENT_LIST)
+    Globals.CLIENT_LIST.remove(client)
     if player is not None:
+        SysInit.clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS)
         player.currentRoom.players.remove(player)
         alert(client, CLIENT_DATA, ("\n^g%s disappeared.^~\n" %player.name))
 
@@ -82,6 +87,7 @@ def kick_idle():
     for client in CLIENT_LIST:
         if client.idle() > IDLE_TIMEOUT:
             print('>> Kicking idle lobby client from %s' % client.addrport())
+            SysInit.clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS)
             client.active = False
 
 
