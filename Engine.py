@@ -124,9 +124,9 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 mortalComponent = World.mortal(100, 0)
                 CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                 if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
-                    print "cl:" + str(CLIENT_LIST)
+                    #print "cl:" + str(CLIENT_LIST)
                     SysInit.clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, Globals.TIMERS, mortalComponent)
-                    print "cl2:" + str(CLIENT_LIST)
+                    #print "cl2:" + str(CLIENT_LIST)
                 Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                 player = CLIENT_DATA[clientDataID].avatar
                 for playerName in OPList:

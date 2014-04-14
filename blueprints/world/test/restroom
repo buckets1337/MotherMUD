@@ -1,0 +1,10 @@
+name=restroom
+region=test
+
+description='A filthy restroom.'
+
+longDescription='You are pretty sure you have never seen a more disgusting restroom.  It is not possible for anyone to use anything in here, due to the filth.'
+
+exits=test:lobby
+
+objects=trash_can

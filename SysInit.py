@@ -33,7 +33,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	inventorySize = None
 	inventoryItems = []
 
-	print fileData
+	#print fileData
 	for data in fileData:
 		if data.startswith('name='):
 			clientName = data[5:-1]
@@ -49,7 +49,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			description = data[12:-1]
 		if data.startswith("currentRoom="):
 			currentRoomString = data[12:-1]
-			print "crs=" + currentRoomString
+			#print "crs=" + currentRoomString
 		if data.startswith("hp="):
 			hp = int(data[3:-1])
 		if data.startswith("exp="):
@@ -61,18 +61,18 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			inventory = inventory.split(", ")
 
 			for item in inventory:
-				print item
+				#print item
 				for obj in Globals.fromFileList:
-					print obj.name
+					#print obj.name
 					if item == obj.name:
-						newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom)
+						newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
 						inventoryItems.append(newItem)
 						CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newItem)
 
 
-	print currentRoomString
+	#print currentRoomString
 	currentRoomCoord = currentRoomString.split(":")
-	print str(currentRoomCoord)
+	#print str(currentRoomCoord)
 	currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
 
 	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
@@ -83,7 +83,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	CLIENT_DATA[clientDataID].clientID = clientID
 	CLIENT_DATA[clientDataID].avatar = newAvatar
 	CLIENT_DATA[clientDataID].avatar.kind = kind
-	print "********" + str(inventoryItems)
+	#print "********" + str(inventoryItems)
 	CLIENT_DATA[clientDataID].avatar.kind.inventory = inventoryItems
 	#CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(newAvatar)
 	CLIENT_DATA[clientDataID].avatar.kind.hp = hp
@@ -98,8 +98,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 	clientDataID = str(client.addrport())
-	print CLIENT_DATA
-	print "cdi"+clientDataID
+	#print CLIENT_DATA
+	#print "cdi"+clientDataID
 	player = CLIENT_DATA[clientDataID]
 	CLIENT = clientDataID
 
@@ -253,8 +253,8 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 	try:
 		for client in CLIENT_LIST:
-			print client
-			print CLIENT_DATA
+			#print client
+			#print CLIENT_DATA
 
 			clientDataID = str(client.addrport())
 
@@ -465,7 +465,7 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 
 
-def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnContainer=None):
+def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='cmd', spawnContainer=None):
     # creates a new object based on the attributes of the object fed to the function
 
     obj = None
@@ -552,6 +552,8 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
         symbol = 's'
     elif whereFrom == 'objSpawner':
         symbol = '$'
+    elif whereFrom == 'inv':
+    	symbol = 'i'
     if newObject.kind:
         if newObject.kind.objectSpawner:
             print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
@@ -564,8 +566,8 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
     for client in Globals.CLIENT_LIST:
         if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
             if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newObject.currentRoom:      # if a client is in the room object just appeared in, let it know
-                # if not stuffed:
-                client.send_cc("^BA %s appeared.^~\n" %newObject.name)
+                if alert==True:
+                	client.send_cc("^BA %s appeared.^~\n" %newObject.name)
 
     return newObject
 

@@ -1,0 +1,12 @@
+name=lobby
+region=test
+
+description='A dark and musty lobby.'
+
+longDescription='This lobby is dingy and poorly lit.  It looks like it has not been cleaned in years, and you doubt it is a very popular place to hang out.  You should probably move on.'
+
+exits=test:restroom, test:outside, test:stairwell
+
+objects=potted_plant, desk, desk_drawer, file_cabinet, rusty_key
+
+stuffList=rusty_key:desk_drawer

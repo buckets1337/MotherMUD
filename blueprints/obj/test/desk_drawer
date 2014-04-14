@@ -1,0 +1,12 @@
+name='desk_drawer'
+
+description='An unlocked desk drawer.'
+
+longDescription='This is an ordinary desk drawer that slides out.  It has a lock on it, but the lock does not appear to be engaged.'
+
+isVisible=False
+
+kind=container
+
+kind.isCarryable=False
+kind.respawnContents=True

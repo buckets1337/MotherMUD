@@ -53,7 +53,7 @@ def setCurrentRoom(objectList, currentRoom):		# sets the currentRoom attribute f
 def initializeMasterRooms(RegionsList, masterRooms):
 	fileList=[]
 	for region in Globals.RegionsList:
-		regionRooms = os.listdir('world/' + str(region) + '/')
+		regionRooms = os.listdir('blueprints/world/' + str(region) + '/')
 		for room in regionRooms:
 			path = str(region) + str(room).capitalize()
 			if room.endswith('~'):
@@ -65,7 +65,7 @@ def initializeMasterRooms(RegionsList, masterRooms):
 def initializeRegionRoomLists(RegionsList, regionListDict):
 	for region in Globals.RegionsList:
 		regionListDict[region] = {}
-		regionRooms = os.listdir('world/' + str(region) + '/')
+		regionRooms = os.listdir('blueprints/world/' + str(region) + '/')
 		for room in regionRooms:
 			roomName = room[len(region):].lower()
 			if roomName.endswith('~'):

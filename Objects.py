@@ -19,7 +19,7 @@ fromFileList = Globals.fromFileList
 fileList = []
 
 for region in Globals.RegionsList:
-	directoryFiles = os.listdir('obj/'+str(region)+'/')
+	directoryFiles = os.listdir('blueprints/obj/'+str(region)+'/')
 	for obj in directoryFiles:
 		path = str(region)+'/'+obj
 		fileList.append(path)
@@ -40,7 +40,7 @@ def buildObjectFromFile(file):
 		print "\n"
 		return
 
-	path = 'obj/' + file
+	path = 'blueprints/obj/' + file
 	with open(path, 'r') as f:
 		fileData = f.readlines()
 

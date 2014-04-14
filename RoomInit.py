@@ -9,6 +9,96 @@ masterRooms = Globals.masterRooms
 regionListDict = Globals.regionListDict
 fileData = []
 
+def saveAllRooms():
+	'''
+	saves each room in the server's memory to a room definition text file
+	'''
+	for region in Globals.regionListDict:
+		# pathRoot= 'data/world/'
+		# if not os.path.exists(pathRoot):
+		# 	os.makedirs(pathRoom)
+		path= 'data/world/'+ region + '/'
+		if not os.path.exists(path):
+			os.makedirs(path)
+		print 'region:' + str(region)
+		for room in Globals.regionListDict[region]:
+			print 'room:' + str(Globals.regionListDict[region][room])
+			saveRoom(Globals.regionListDict[region][room])
+
+
+def saveRoom(room):
+	'''
+	saves the room and it's contents to a room definition file
+	'''
+	#print room
+	region = room.region
+	path = 'data/world/'+region+'/'+room.name
+
+
+	with open(path, 'w') as f:
+		f.write('name=%s\n' %room.name)
+		f.write('region=%s' %room.region)
+		f.write('\n\n')
+		f.write("description='%s'" %room.description)
+		f.write('\n\n')
+		f.write("longDescription='%s'" %room.longDescription)
+		f.write('\n\n')
+		f.write('exits=',)
+		fileString = ''
+		for exit in room.exits:
+			exitRegion = room.exits[exit].region
+			exitRoom = room.exits[exit].name
+			fileString = fileString + (exitRegion+':'+exitRoom+', ')
+		if fileString.endswith(', '):
+			fileString = fileString[:-2]
+		f.write(fileString)
+		f.write('\n\n')
+		f.write('actives=',)
+		fileString = ''
+		for obj in room.objects:
+			if hasattr(obj.kind,'objectSpawner'):
+				if hasattr(obj.kind.objectSpawner, 'active'):
+					if obj.kind.objectSpawner.active:
+						fileString = fileString + (obj.name+', ')
+		if fileString.endswith(', '):
+			fileString = fileString[:-2]
+		f.write(fileString)
+		f.write('\n\n')				
+		f.write('objects=',)
+		fileString = ''
+		for obj in room.objects:
+			print obj
+			info = dir(obj)
+			print info
+			fileString = fileString + (obj.name+', ')
+			if hasattr(obj.kind,'inventory'):
+				print 'inv:' + str(obj.kind.inventory)
+				for ob in obj.kind.inventory:
+					fileString = fileString + (ob.name+', ')
+		if fileString.endswith(', '):
+			fileString = fileString[:-2]
+		f.write(fileString)
+		f.write('\n\n')
+		f.write('stuffList=',)
+		fileString = ''
+		for obj in room.objects:
+			if hasattr(obj, 'kind'):
+				print "^^^stuffkind"
+				if hasattr(obj.kind, 'inventory'):
+					print "^^^stuffinv"
+					if obj.kind.inventory != []:
+						print "^^^stuffobjinv" + str(obj.kind.inventory)
+						for ob in obj.kind.inventory:
+							fileString = fileString + (ob.name+':'+obj.name+', ')
+		if fileString.endswith(', '):
+			fileString = fileString[:-2]
+		f.write(fileString)
+		f.write('\n\n')
+
+
+
+
+
 
 def loadRoom(file):
 	'''
@@ -20,7 +110,9 @@ def loadRoom(file):
 
 	print file
 
-	path = 'world/' + file
+	path = 'blueprints/world/' + file
+	if os.path.exists('data/world/' + file):
+		path = 'data/world/' + file
 	with open(path, 'r') as f:
 		fileData = f.readlines()
 
@@ -42,6 +134,7 @@ def loadRoom(file):
 	destRoom = ''
 	destContainer = ''
 	hasSpawnContainers = False
+	activesList = []
 
 	for Data in fileData:
 
@@ -66,10 +159,16 @@ def loadRoom(file):
 			#print exitsList
 			regionRooms = Globals.regionListDict[newRoom.region]
 			for exit in exitsList:
-				exitDetails = (exit).split(':')
-				#print exitDetails
-				exitsDict[exitDetails[1]] = Globals.regionListDict[exitDetails[0]][exitDetails[1]]
+				if exit != '':
+					exitDetails = (exit).split(':')
+					#print exitDetails
+					exitsDict[exitDetails[1]] = Globals.regionListDict[exitDetails[0]][exitDetails[1]]
 			newRoom.exits = exitsDict
+
+		if Data.startswith('actives='):
+			activesList = Data[8:-1]
+			activesList = activesList.split(", ")
+			print 'actives:' + str(activesList)
 
 		if Data.startswith('objects='):
 			#print Data
@@ -82,9 +181,22 @@ def loadRoom(file):
 				#print obj
 				for ob in Globals.fromFileList:
 					if ob.name == obj:
-						if ob.kind:
-							if ob.kind.objectSpawner:
-								newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=True, whereFrom='file')
+						print '!!!name'
+						if hasattr(ob, 'kind'):
+							print '!!!kind'
+							if hasattr(ob.kind, 'objectSpawner'):
+								print '!!!objSpwn'
+								act = False
+								print '###actives:' + str(activesList)
+								for spawner in activesList:
+									print 'spn:' + spawner
+									print 'ob:' + ob.name
+									if str(ob.name) == str(spawner):
+										act = True
+										activesList.remove(spawner)
+								newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=act, whereFrom='file')
+								if act == False and hasattr(newObject, 'kind') and hasattr(newObject.kind,'objectSpawner') and hasattr(newObject.kind.objectSpawner,'timer'):
+									Globals.TIMERS.remove(newObject.kind.objectSpawner.timer)
 								spawnList.append(newObject)
 							else:
 								newObject = Engine.cmdSpawnObject(ob.name, newRoom, active=False)
@@ -127,16 +239,23 @@ def loadRoom(file):
 			stuffList = Data[10:-1]
 			stuffList = stuffList.split(', ')
 			for entry in stuffList:
-				stuffDesc = entry.split(':')
-				item = stuffDesc[0]
-				container = stuffDesc[1]
-				for obj in newRoom.objects:
-					if obj.name == item:
-						for ob in newRoom.objects:
-							if ob.name == container and ob.kind is not None and ob.kind.inventory is not None:
-								newRoom.objects.remove(obj)
-								ob.kind.inventory.append(obj)
-								#print ob.kind.inventory
+				if entry != '':
+					stuffDesc = entry.split(':')
+					item = stuffDesc[0]
+					container = stuffDesc[1]
+					print "container:" + container
+					for obj in newRoom.objects:
+						if obj.name == item:
+							for ob in newRoom.objects:
+								if hasattr(ob, 'kind'):
+									print "$$$$$$stuff2kind"
+									if hasattr(ob.kind, 'inventory'):
+										print "$$$$$stuff2inv"
+										if ob.name == container:
+											print "$$$$$stuff2cont " + ob.name
+											newRoom.objects.remove(obj)
+											ob.kind.inventory.append(obj)
+											#print ob.kind.inventory
 
 
 
@@ -206,7 +325,7 @@ def setSpawnContainers(newRoom):
 def setup():
 	fileList=[]
 	for region in Globals.RegionsList:
-		directoryFiles = os.listdir('world/'+str(region)+'/')
+		directoryFiles = os.listdir('blueprints/world/'+str(region)+'/')
 		for roomFile in directoryFiles:
 			path = str(region)+'/'+ roomFile
 			fileList.append(path)

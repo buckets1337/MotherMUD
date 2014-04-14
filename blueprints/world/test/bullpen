@@ -1,0 +1,44 @@
+# The bullpen is a special room.  Each region should contain a bullpen.  The bullpen will not
+# normally be accessible to the players, and should have no exits (though right now I left one in 
+# for easier testing).  In the bullpen, all objects and mobs that are in a region that should not 
+# necessarily be present in the rooms when the region is first formed will be stored.  It is the
+# spawners attached to the objects and mobs that determine when and where they will spawn in to
+# the region.  If we are playing Hero Quest, and the region is the board, then the Bullpen is the 
+# game box that has all the plastic figures in it, waiting to be placed on the board.
+
+name=bullpen
+region=test
+
+description='An endless white room, like the beginning of everything.'
+
+longDescription='This room is white.  So white that you can't tell where the walls meet the floor and ceiling, or even where the ceiling is at all.  This seems to be where the molds of objects are stored.'
+
+exits=test:lobby
+
+actives=trash_pile
+
+objects=trash_pile
+
+# the following line dictates if any of the objects in the room have a startingLocation that
+# is different than the room defined in this file.  In this case, the trash_pile in this room 
+# actually spawns in test:restroom when the object spawner attached to it creates a new copy.  
+# Since this is the main purpose of the bullpen, all objects in here should have spawn points set
+# using the below syntax(note the space after the comma for readability):
+# spawnpoints = <item_name>:<region>-<Room>, <item_name2>:<region2>-<Room2>, ...
+
+spawnPoints=trash_pile:test-restroom
+
+# the following line dictates if objects defined for the room spawn inside a container.  The syntax 
+# is slightly expanded from spawnPoints, to allow for spawning inside containers in other rooms
+# instead of only the containers in this room.
+
+spawnContainers=trash_pile:test-restroom-trash_can
+
+# the following line dictates if any of the objects defined previously in the room are in containers
+# in the room.  An object in this list will be removed from the room's objects, and placed into the
+# inventory of the container that is defined for the object here, in the format of:
+# stuffList=<object>:<container>,<object2>:<container2>, ...
+
+#stuffList=
+
+

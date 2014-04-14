@@ -46,7 +46,7 @@ def on_connect(client):
     print "++ Opened connection to %s" % client.addrport()  
     #broadcast('%s connected.\n' % client.addrport() )
     CLIENT_LIST.append(client)
-    print "&&&&&&&&&&&&" + str(Globals.CLIENT_LIST)
+    #print "&&&&&&&&&&&&" + str(Globals.CLIENT_LIST)
     clientID = len(CLIENT_LIST) - 1
 
     clientInfo = ClientInfo(name='none', prompt='>>', client=client, clientID=clientID)
@@ -66,11 +66,12 @@ def on_disconnect(client):
     """
     clientDataID = str(client.addrport())
     player = CLIENT_DATA[clientDataID].avatar
-    print player
+    #print player
     print "-- Lost connection to %s" % client.addrport()
 
-    print "clE:" + str(Globals.CLIENT_LIST)
     Globals.CLIENT_LIST.remove(client)
+    #print "clE:" + str(Globals.CLIENT_LIST)
+    #Globals.CLIENT_LIST.remove(client)
     if player is not None:
         SysInit.clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS)
         player.currentRoom.players.remove(player)
@@ -176,6 +177,7 @@ if __name__ == '__main__':
         if engineState == 'shutdown':
             #print engineState
             SysInit.dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS)
+            RoomInit.saveAllRooms()
             SERVER_RUN = False
 
     print("<< Server shutdown.")
