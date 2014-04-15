@@ -181,13 +181,26 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 			player.kind.inventory.append(self.owner.owner)		# add the top level of the item to the avatar's inventory
 
 			gotten = False
+			# print 'sc:' + str(self.owner.owner.spawnContainer)
+			# print 'owner:'+str(self.owner.owner.name)
+			# print 'sooco:'+str(self.owner.owner.currentRoom.objects)
+			# for obj in self.owner.owner.currentRoom.objects:
+			# 	print obj.name
+			# print 'cr:'+str(self.owner.owner.currentRoom.name)
 			if self.owner.owner.spawnContainer is None:
 				for obj in self.owner.owner.currentRoom.objects:
+					# print 'objname:'+obj.name
+					# print 'ownname:'+self.owner.owner.name
 					if obj == self.owner.owner and gotten == False:
+						# print 'cro:' + str(self.owner.owner.currentRoom.objects)
 						self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
+						print '!self.owner.owner removed!'
 						gotten = True
 					elif obj.name == self.owner.owner.name and gotten == False:
+						# print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
 						self.owner.owner.currentRoom.objects.remove(obj)
+						# print self.owner.owner.currentRoom.objects
+						print'!'+ obj.name + ' removed!'
 						gotten = True
 
 					elif hasattr(obj, 'kind'):
@@ -199,12 +212,12 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 								for ob in inv:
 									#print "ob:"+ str(ob)
 									if ob == self.owner.owner and gotten == False:
-										#print obj.kind.inventory
+										print obj.kind.inventory
 										obj.kind.inventory.remove(ob)		# remove from the top level currentRoom's objects list the top level of the item
 										gotten = True
 									elif ob.name == self.owner.owner.name and gotten == False:
 										#print obj.kind.inventory
-										#print ob
+										print ob
 										obj.kind.inventory.remove(ob)
 										gotten == True
 			else:
@@ -218,6 +231,8 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 				if self.owner.owner in self.owner.owner.currentRoom.objects:
 					self.owner.owner.currentRoom.objects.remove(self.owner.owner)
 					gotten = True
+
+				print str(self.owner.owner.name) +'not found.'
 
 			client.send("You picked up %s.\n" %self.owner.owner.name)
 

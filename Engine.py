@@ -122,12 +122,20 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 # client.send(prompt)
                 mortalComponent = World.mortal(100, 0)
-                CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
+                
                 if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
                     #print "cl:" + str(CLIENT_LIST)
+                    #CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)          
                     SysInit.clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, Globals.TIMERS, mortalComponent)
+                    #Globals.startingRoom.players.remove(CLIENT_DATA[clientDataID].avatar)
+                    # print 'sp:' + str(Globals.startingRoom.players) + " sr:" + str(Globals.startingRoom.name) + ' ' + str(Globals.startingRoom)
+                    # print 'ava:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)+ ' asrp:'+ str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
+                    # print 'avacr:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom)
                     #print "cl2:" + str(CLIENT_LIST)
-                Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+                else:
+                    CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
+                    Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+                    # print 'starting;' + str(Globals.startingRoom.players)
                 player = CLIENT_DATA[clientDataID].avatar
                 for playerName in OPList:
                     #print str(CLIENT_DATA[clientDataID].name)

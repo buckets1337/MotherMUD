@@ -55,7 +55,11 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 
 	print "resultsList:"+str(resultsList)
 	if len(resultsList) == 1:
-		if resultsList[0].kind is not None and resultsList[0].kind.itemGrabHandler is not None:
+		print 'len resultsList = 1'
+		print resultsList[0]
+		print resultsList[0].kind
+		print resultsList[0].kind.itemGrabHandler
+		if resultsList[0].kind is not None and resultsList[0].kind.itemGrabHandler is not None and hasattr(resultsList[0],'kind') and hasattr(resultsList[0].kind,'itemGrabHandler'):
 			resultsList[0].kind.itemGrabHandler.get(client, CLIENT_DATA[clientDataID].avatar)
 			objectFound = True
 		else:

@@ -11,6 +11,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	"""
 	Loads the information in the client file to CLIENT_DATA
 	"""
+
 	clientDataID = str(client.addrport())
 	name = CLIENT_DATA[clientDataID].name
 	fileData = []
@@ -20,6 +21,9 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			fileData = CD.readlines()
 	except:
 		print "!! " + path + " not found, " + name + " failed to load."
+
+
+
 
 	clientName = ''
 	op = False
@@ -56,6 +60,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			exp = int(data[4:-1])
 		if data.startswith("inventorySize="):
 			inventorySize = int(data[14:-1])
+
 		if data.startswith("inventory="):
 			inventory = data[10:-1]
 			inventory = inventory.split(", ")
@@ -65,17 +70,27 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 				for obj in Globals.fromFileList:
 					#print obj.name
 					if item == obj.name:
-						newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
-						inventoryItems.append(newItem)
-						CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newItem)
+						inventoryItems.append(item)
 
 
 	#print currentRoomString
 	currentRoomCoord = currentRoomString.split(":")
-	#print str(currentRoomCoord)
+	print str(currentRoomCoord)
 	currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
+	print currentRoomRoom.name
 
+
+	#print Globals.startingRoom.players
+	#print Globals.startingRoom
 	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
+	print newAvatar.currentRoom.players
+	print newAvatar.currentRoom.name
+	print Globals.startingRoom.players
+	print Globals.startingRoom.name
+	#print newAvatar.currentRoom
+
+
+
 
 	CLIENT_DATA[clientDataID].name = clientName
 	CLIENT_DATA[clientDataID].op = op
@@ -84,12 +99,49 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	CLIENT_DATA[clientDataID].avatar = newAvatar
 	CLIENT_DATA[clientDataID].avatar.kind = kind
 	#print "********" + str(inventoryItems)
-	CLIENT_DATA[clientDataID].avatar.kind.inventory = inventoryItems
+
+	for item in inventoryItems:
+		removed = False
+		newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, whereFrom='inv')
+		CLIENT_DATA[clientDataID].avatar.kind.inventory.append(newItem)
+		for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+			if item.name == newItem.name and removed == False:
+				CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(item)
+				removed = True
+	#CLIENT_DATA[clientDataID].avatar.kind.inventory = inventoryItems
 	#CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(newAvatar)
 	CLIENT_DATA[clientDataID].avatar.kind.hp = hp
 	CLIENT_DATA[clientDataID].avatar.kind.exp = exp
 	CLIENT_DATA[clientDataID].avatar.kind.inventorySize = inventorySize
 	CLIENT_DATA[clientDataID].avatar.currentRoom = currentRoomRoom
+	#print 'avcr:' +str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+	# for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+	# 	print obj.currentRoom.name
+	#print 'gsrp:'+str(Globals.startingRoom.players)
+
+	for item in inventoryItems:
+		newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
+		CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(newItem)
+
+	#print '&&:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.name) + " " + str(CLIENT_DATA[clientDataID].avatar.currentRoom) + ":"+ str(Globals.startingRoom)
+	#print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
+	#print str(Globals.startingRoom.players)
+	CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+	# print str(Globals.startingRoom.players)
+	# print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
+	# print str(CLIENT_DATA[clientDataID].avatar.currentRoom) + ":" + str(Globals.startingRoom)
+	# print 'acrpl:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
+	# print 'avcr:' +str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+	# print Globals.startingRoom.name
+	# print Globals.startingRoom.players
+	# #Globals.startingRoom.players.remove(CLIENT_DATA[clientDataID].avatar)
+	# print 'acrpl:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
+	# print 'avcr:' +str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+	# print Globals.startingRoom.name
+	# print Globals.startingRoom.players
+	# print 'loaded:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players) + " in:" + str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+	# print 'av:'+str(CLIENT_DATA[clientDataID].avatar.currentRoom.name)+ ' avp:'+ str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)+' sr:' + str(Globals.startingRoom.name) + ' srp:'+ str(Globals.startingRoom.players)
+	# print dir(CLIENT_DATA[clientDataID].avatar.kind)
 
 	# CLIENT_LIST.remove(client)
 	# CLIENT_LIST.append(client)
@@ -150,9 +202,12 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 			f.write("\ninventory=")
 
-			location = 1
+			fileString = ''
 			for item in inventory:
-				f.write(item.name + ", ")
+				fileString = fileString + (item.name + ", ")
+			if fileString.endswith(', '):
+				fileString = fileString[:-2]
+			f.write(fileString)
 			f.write("\n")
 
 				# name = item.name

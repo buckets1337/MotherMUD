@@ -20,9 +20,9 @@ def saveAllRooms():
 		path= 'data/world/'+ region + '/'
 		if not os.path.exists(path):
 			os.makedirs(path)
-		print 'region:' + str(region)
+		#print 'region:' + str(region)
 		for room in Globals.regionListDict[region]:
-			print 'room:' + str(Globals.regionListDict[region][room])
+			#print 'room:' + str(Globals.regionListDict[region][room])
 			saveRoom(Globals.regionListDict[region][room])
 
 
@@ -67,27 +67,47 @@ def saveRoom(room):
 		f.write('objects=',)
 		fileString = ''
 		for obj in room.objects:
-			print obj
+			#print obj
 			info = dir(obj)
-			print info
+			#print info
 			fileString = fileString + (obj.name+', ')
 			if hasattr(obj.kind,'inventory'):
-				print 'inv:' + str(obj.kind.inventory)
+				#print 'inv:' + str(obj.kind.inventory)
 				for ob in obj.kind.inventory:
 					fileString = fileString + (ob.name+', ')
 		if fileString.endswith(', '):
 			fileString = fileString[:-2]
 		f.write(fileString)
 		f.write('\n\n')
+		f.write('spawnPoints=',)
+		for obj in room.objects:
+			fileString = ''
+			if hasattr(obj, 'kind') and hasattr(obj.kind, 'objectSpawner') and obj.kind is not None and obj.kind.objectSpawner is not None:
+				if obj.kind.objectSpawner.startingLocation[0].name != room.name:
+					fileString = fileString + (obj.name +':'+obj.currentRoom.region+'-'+obj.kind.objectSpawner.startingLocation[0].name + ', ')
+				if fileString.endswith(', '):
+					fileString = fileString[:-2]
+				f.write(fileString)
+		f.write('\n\n')
+		f.write('spawnContainers=',)
+		for obj in room.objects:
+			fileString = ''
+
+			if obj.spawnContainer != None:
+				fileString = fileString + (obj.name +':'+obj.currentRoom.region+'-'+obj.kind.objectSpawner.startingLocation[0].name + '-'+ str(obj.spawnContainer.name)+', ')
+			if fileString.endswith(', '):
+				fileString = fileString[:-2]
+			f.write(fileString)
+		f.write('\n\n')
 		f.write('stuffList=',)
 		fileString = ''
 		for obj in room.objects:
 			if hasattr(obj, 'kind'):
-				print "^^^stuffkind"
+				#print "^^^stuffkind"
 				if hasattr(obj.kind, 'inventory'):
-					print "^^^stuffinv"
+					#print "^^^stuffinv"
 					if obj.kind.inventory != []:
-						print "^^^stuffobjinv" + str(obj.kind.inventory)
+						#print "^^^stuffobjinv" + str(obj.kind.inventory)
 						for ob in obj.kind.inventory:
 							fileString = fileString + (ob.name+':'+obj.name+', ')
 		if fileString.endswith(', '):
@@ -128,6 +148,8 @@ def loadRoom(file):
 	# objects = []
 	fileDetails = file.split("/")
 	newRoom = regionListDict[fileDetails[0]][fileDetails[1]]
+
+	newRoom.players = []
 
 	item = ''
 	destRegion = ''
@@ -181,16 +203,16 @@ def loadRoom(file):
 				#print obj
 				for ob in Globals.fromFileList:
 					if ob.name == obj:
-						print '!!!name'
+						#print '!!!name'
 						if hasattr(ob, 'kind'):
-							print '!!!kind'
+							#print '!!!kind'
 							if hasattr(ob.kind, 'objectSpawner'):
-								print '!!!objSpwn'
+								#print '!!!objSpwn'
 								act = False
-								print '###actives:' + str(activesList)
+								#print '###actives:' + str(activesList)
 								for spawner in activesList:
-									print 'spn:' + spawner
-									print 'ob:' + ob.name
+									# print 'spn:' + spawner
+									# print 'ob:' + ob.name
 									if str(ob.name) == str(spawner):
 										act = True
 										activesList.remove(spawner)
@@ -207,6 +229,9 @@ def loadRoom(file):
 
 			newRoom.objects = spawnList
 			Rooms.setCurrentRoom(newRoom.objects, newRoom)
+			#print newRoom.name
+			for obj in newRoom.objects:
+				print str((obj.name, obj.currentRoom.name))
 
 		if Data.startswith('spawnPoints='):
 			pointsList = Data[12:-1]
@@ -221,19 +246,22 @@ def loadRoom(file):
 		if Data.startswith('spawnContainers='):
 			hasSpawnContainers = True
 			containersList = Data[16:-1]
-			containersList = containersList.split(", ")
-			for container in containersList:
-				containerDetails = container.split(":")
-				containerSpecs = containerDetails[1].split("-")
+			if containersList != '':
+				containersList = containersList.split(", ")
+				print '***' + str(containersList)
+				for container in containersList:
+					containerDetails = container.split(":")
+					print '***' + str(containerDetails)
+					containerSpecs = containerDetails[1].split("-")
 
-				item = containerDetails[0]
-				destRegion = containerSpecs[0]
-				destRoom = containerSpecs[1]
-				destContainer = containerSpecs[2]
+					item = containerDetails[0]
+					destRegion = containerSpecs[0]
+					destRoom = containerSpecs[1]
+					destContainer = containerSpecs[2]
 
-				for obj in newRoom.objects:
-					if obj.name == item:
-						obj.spawnContainer = [item, destRegion, destRoom, destContainer]
+					for obj in newRoom.objects:
+						if obj.name == item:
+							obj.spawnContainer = [item, destRegion, destRoom, destContainer]
 
 		if Data.startswith('stuffList='):
 			stuffList = Data[10:-1]
@@ -243,16 +271,16 @@ def loadRoom(file):
 					stuffDesc = entry.split(':')
 					item = stuffDesc[0]
 					container = stuffDesc[1]
-					print "container:" + container
+					#print "container:" + container
 					for obj in newRoom.objects:
 						if obj.name == item:
 							for ob in newRoom.objects:
 								if hasattr(ob, 'kind'):
-									print "$$$$$$stuff2kind"
+									#print "$$$$$$stuff2kind"
 									if hasattr(ob.kind, 'inventory'):
-										print "$$$$$stuff2inv"
+										#print "$$$$$stuff2inv"
 										if ob.name == container:
-											print "$$$$$stuff2cont " + ob.name
+											#print "$$$$$stuff2cont " + ob.name
 											newRoom.objects.remove(obj)
 											ob.kind.inventory.append(obj)
 											#print ob.kind.inventory
