@@ -1,8 +1,0 @@
-name='desk'
-
-description='A cheap plywood desk.'
-
-longDescription='This desk looks like it was flimsy even when it was new.  It has a single desk drawer which does not appear to be locked.'
-
-isVisible=True
-
