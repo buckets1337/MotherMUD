@@ -83,5 +83,28 @@ def tell(client, args, CLIENT_LIST, CLIENT_DATA):
     """
     Send args as a message to a specific player specified by the first argument immediately following the command
     """
+    who = args[0]
+    message = " ".join(args[1:])
+    senderName = CLIENT_DATA[str(client.addrport())].name
+    success = False
+    isSelf = False
 
-    pass
+    for player in CLIENT_LIST:
+        clientDataID = str(player.addrport())
+        if CLIENT_DATA[clientDataID].name == who:
+            if CLIENT_DATA[clientDataID].name != CLIENT_DATA[str(client.addrport())].name:
+                player.send_cc("^w" + senderName + " tells you: " + message +"^~\n")
+                CLIENT_DATA[clientDataID].replyTo = client
+                success = True
+            else:
+                client.send_cc('^wYou mutter "' + message + '" to yourself quietly.^~\n')
+                success = True
+                isSelf = True
+    if success:
+        if not isSelf:
+            client.send_cc("^wYou tell "+ who + ": "+ message +"^~\n")
+        return True
+        
+    else:
+        client.send_cc("^wIt appears "+ who + " isnt around right now.^~\n")
+        return False

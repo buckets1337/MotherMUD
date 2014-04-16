@@ -163,9 +163,23 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'chat' or cmd == "'":
+            elif cmd == 'tell':
+                cChat.tell(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
+            elif cmd == 'chat':
                 ## If the client sends a 'chat' command echo it to the chat channel
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
+
+            elif cmd == "'":
+                if CLIENT_DATA[client.addrport()].replyTo is None:
+                    cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
+                else:
+                    args.insert(0, CLIENT_DATA[(CLIENT_DATA[client.addrport()].replyTo).addrport()].name)
+                    isOnline = cChat.tell(client, args, CLIENT_LIST, CLIENT_DATA)
+                    if isOnline == False:
+                        CLIENT_DATA[client.addrport()].replyTo = None
+                    print CLIENT_DATA[client.addrport()].replyTo
 
 
             elif cmd == 'channel':
