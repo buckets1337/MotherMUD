@@ -343,7 +343,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
         newObject.spawnContainer = spawnContainer
     newObject.longDescription = obj.longDescription
     newObject.kind = obj.kind
-    if newObject.kind:
+    if newObject.kind is not None and hasattr(newObject, 'kind'):
         newObject.kind.owner = newObject
     newObject.TIMERS = obj.TIMERS
     # if newObject.TIMERS:
@@ -355,12 +355,17 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             newObject.kind.owner = newObject
             newObject.kind.isCarryable = obj.kind.isCarryable
             newObject.kind.respawns = obj.kind.respawns
-            newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
-            if newObject.kind.itemGrabHandler:
+            if hasattr(obj.kind, 'itemGrabHandler') and obj.kind.itemGrabHandler is not None:
+                newObject.kind.itemGrabHandler = World.itemGrabHandler()
+            else:
+                newObject.kind.itemGrabHandler = None
+            if newObject.kind.itemGrabHandler is not None:
                 newObject.kind.itemGrabHandler.owner = newObject.kind
             newObject.kind.objectSpawner = obj.kind.objectSpawner
             if newObject.kind.objectSpawner:
                 newObject.kind.objectSpawner.owner = newObject.kind
+
+
 
         if isinstance(newObject.kind, World.container):
             newObject.kind = World.container()
@@ -370,15 +375,23 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             newObject.kind.isCarryable = obj.kind.isCarryable
             newObject.kind.respawns = obj.kind.respawns
             newObject.kind.respawnContents = obj.kind.respawnContents
-            newObject.kind.itemGrabHandler = obj.kind.itemGrabHandler
-            if newObject.kind.itemGrabHandler:
+            if hasattr(obj.kind, 'itemGrabHandler') and obj.kind.itemGrabHandler is not None:
+                newObject.kind.itemGrabHandler = World.itemGrabHandler()
+            else:
+                newObject.kind.itemGrabHandler = None
+            #print newObject.kind.itemGrabHandler
+            # newObject.kind.itemGrabHandler.owner = newObject.kind
+            if newObject.kind.itemGrabHandler is not None:
                 newObject.kind.itemGrabHandler.owner = newObject.kind
             newObject.kind.objectSpawner = obj.kind.objectSpawner
             if newObject.kind.objectSpawner:
                 newObject.kind.objectSpawner.owner = newObject.kind
 
-        if newObject.kind.itemGrabHandler:
-            newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
+        if newObject.kind.itemGrabHandler is not None:
+            if obj.kind.itemGrabHandler.notDroppable is not None:
+                newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
+            else:
+                newObject.kind.itemGrabHandler.notDroppable = False
 
         if newObject.kind.objectSpawner:
             newObject.kind.objectSpawner = World.objectSpawner(newObject.kind)
@@ -391,6 +404,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
             newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, newObject.kind.respawns)
             newObject.kind.objectSpawner.startingLocation = spawnLocation,
+
 
     if newObject.kind:
         if newObject.kind.objectSpawner:
