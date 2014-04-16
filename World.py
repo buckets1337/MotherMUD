@@ -197,9 +197,9 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 						print '!self.owner.owner removed!'
 						gotten = True
 					elif obj.name == self.owner.owner.name and gotten == False:
-						# print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
+						print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
 						self.owner.owner.currentRoom.objects.remove(obj)
-						# print self.owner.owner.currentRoom.objects
+						print self.owner.owner.currentRoom.objects
 						print'!'+ obj.name + ' removed!'
 						gotten = True
 
@@ -221,8 +221,8 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 										obj.kind.inventory.remove(ob)
 										gotten == True
 			else:
-				if self.owner.owner in self.owner.owner.spawnContainer.kind.inventory:
-					self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
+				# if self.owner.owner in self.owner.owner.spawnContainer.kind.inventory:
+				# 	self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
 
 				for obj in self.owner.owner.spawnContainer.kind.inventory:
 					if obj.name == self.owner.owner.name and gotten == False:
@@ -231,8 +231,8 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 				if self.owner.owner in self.owner.owner.currentRoom.objects:
 					self.owner.owner.currentRoom.objects.remove(self.owner.owner)
 					gotten = True
-
-				print str(self.owner.owner.name) +'not found.'
+				if gotten == False:
+					print str(self.owner.owner.name) +'not found.'
 
 			client.send("You picked up %s.\n" %self.owner.owner.name)
 
@@ -282,7 +282,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				#print ob.name
 				if ob == obj.spawnContainer:
 					ob.kind.inventory.append(obj)
-					#print ob.kind.inventory
+					print ob.kind.inventory
 			#print obj.spawnContainer.kind.inventory
 			return True
 		#print "stuff of " + obj.name + " failed"
@@ -290,7 +290,6 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 
 
 	def spawn(self):
-		# first, make a random determination of if item will be respawning this time
 		if self.active:
 		 	#if self.startingLocation[0] is not None:
 			#print self.active
@@ -308,6 +307,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				#print "cycleTime: " + str(self.timer.currentTime)
 				Globals.TIMERS.append(self.timer)
 				#print "cycles -1 " + str(Globals.TIMERS)
+
 			winner = Engine.selector(self.oddsList)
 			if winner[0]:
 				#print self.active
@@ -357,7 +357,9 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 			# 	print "noWin " + str(Globals.TIMERS)
 	
 		else:
-			stuffed = self.stuff(self.owner.owner, False)	
+			if self.owner.owner.spawnContainer is not None:
+				if not(self.owner.owner in self.owner.owner.spawnContainer.kind.inventory):
+					stuffed = self.stuff(self.owner.owner, False)	
 
 		#print "timers:",
 		#for timer in Globals.TIMERS:

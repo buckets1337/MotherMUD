@@ -5,7 +5,9 @@ description='An ordinary rock.'
 longDescription='This rock is hard as stone.'
 
 isVisible=True
+
 kind=item
 kind.itemGrabHandler=True
 
 kind.isCarryable=True
+kind.respawns=False
