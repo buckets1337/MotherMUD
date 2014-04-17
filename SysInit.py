@@ -75,6 +75,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 
 
 	#print currentRoomString
+	if currentRoomString == '':
+		currentRoomString = Globals.startingRoom.region + ":" + Globals.startingRoom.name
 	currentRoomCoord = currentRoomString.split(":")
 	print str(currentRoomCoord)
 	currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]

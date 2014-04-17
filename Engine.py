@@ -225,6 +225,9 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 ## pick up an item in the room
                 cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
 
+            elif cmd == 'check':
+                cInteractions.check(client, args, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom)
+
 
             elif cmd == 'drop':
                 ## drop an item in the room

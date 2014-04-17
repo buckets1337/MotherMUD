@@ -272,8 +272,9 @@ def loadRoom(file):
 					item = stuffDesc[0]
 					container = stuffDesc[1]
 					#print "container:" + container
+					found = False
 					for obj in newRoom.objects:
-						if obj.name == item:
+						if obj.name == item and found == False:
 							for ob in newRoom.objects:
 								if hasattr(ob, 'kind'):
 									#print "$$$$$$stuff2kind"
@@ -281,7 +282,10 @@ def loadRoom(file):
 										#print "$$$$$stuff2inv"
 										if ob.name == container:
 											#print "$$$$$stuff2cont " + ob.name
-											newRoom.objects.remove(obj)
+											print newRoom.objects
+											if obj in newRoom.objects:
+												newRoom.objects.remove(obj)
+												found = True
 											ob.kind.inventory.append(obj)
 											#print ob.kind.inventory
 

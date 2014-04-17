@@ -183,3 +183,77 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 
 
 
+def check(client, args, clientDataID, CLIENT_DATA, room):
+	'''
+	get all items from the container named in args
+	'''
+	if len(args)== 0:
+		client.send("Nothing unusual here.\n")
+
+	resultsList = []
+	pickups = []
+	notContainer = False
+	for obj in room.objects:
+		if hasattr(obj, 'kind') and isinstance(obj.kind, World.container):
+			if obj.name == args[0]:
+				resultsList.append(obj)
+		else:
+			if obj.name == args[0]:
+				notContainer = True
+
+	if len(resultsList) == 0 and notContainer == False:
+		client.send("It is difficult to check the " + args[0] + " when I can't find it.\n")
+	elif len(resultsList) == 0 and notContainer == True:
+		client.send("I couldn't figure out how to get the " + args[0] + " open.\n")
+
+	elif len(resultsList) == 1:
+		if resultsList[0].kind.isLocked == False:
+			for obj in resultsList[0].kind.inventory:
+				pickups.append(obj)
+			if len(pickups) == 0:
+				client.send("The " + resultsList[0].name + " is empty.\n")
+				return
+			for thing in pickups:
+				#print CLIENT_DATA[clientDataID]
+				if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) <= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
+					CLIENT_DATA[clientDataID].avatar.kind.inventory.append(thing)
+					resultsList[0].kind.inventory.remove(thing)
+					client.send("I got a " +thing.name + " from the " + resultsList[0].name + "!\n")
+				else:
+					client.send("I was unable to get the" + thing.name + " from the " + resultsList[0].name + " because I couldn't carry any more.\nMaybe I should try dropping something and checking the " + obj.name + " again.\n")
+		else:
+			client.send("The " + args[0] + " is locked.\n")
+
+	elif len(resultsList) > 1:
+		print "resList:" + str(resultsList)
+		if len(args) < 2:
+			client.send("You see more than one " + args[0] + " here.  Which one did you want to check?\n")
+		elif len(args) == 2:
+			index = int(args[1]) - 1
+			if index > 1:
+				index = 1
+			print index
+			result = resultsList[index]
+			print result
+			print result.kind.isLocked
+			if result.kind.isLocked == False:
+				for obj in result.kind.inventory:
+					print obj
+					pickups.append(obj)		
+				print pickups	
+			else:
+				client.send("The " + args[0] + " is locked.\n")
+			for thing in pickups:
+				if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) <= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
+					CLIENT_DATA[clientDataID].avatar.kind.inventory.append(thing)
+					result.kind.inventory.remove(thing)
+					client.send("I found " + thing.name + " in the " + obj.name + "\n")
+				else:
+					client.send("I was unable to get " + thing.name + " from the " + obj.name + " because I couldn't carry any more.\nMaybe I should try dropping something and checking the " + obj.name + " again.\n")
+			if pickups == []:
+				client.send("The " + args[0] + " is empty.\n")
+		elif len(args) > 2:
+			client.send("I got confused about what I wanted to check.  Maybe I will remember if I repeat it to myself like this: 'check <object_name> <index>\n")
+
+		else:
+			print "end"
