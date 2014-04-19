@@ -194,13 +194,13 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 					if obj == self.owner.owner and gotten == False:
 						# print 'cro:' + str(self.owner.owner.currentRoom.objects)
 						self.owner.owner.currentRoom.objects.remove(self.owner.owner)		# remove from the top level currentRoom's objects list the top level of the item
-						print '!self.owner.owner removed!'
+						#print '!self.owner.owner removed!'
 						gotten = True
 					elif obj.name == self.owner.owner.name and gotten == False:
-						print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
+						#print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
 						self.owner.owner.currentRoom.objects.remove(obj)
-						print self.owner.owner.currentRoom.objects
-						print'!'+ obj.name + ' removed!'
+						#print self.owner.owner.currentRoom.objects
+						#print'!'+ obj.name + ' removed!'
 						gotten = True
 
 					elif hasattr(obj, 'kind'):
@@ -212,14 +212,14 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 								for ob in inv:
 									#print "ob:"+ str(ob)
 									if ob == self.owner.owner and gotten == False:
-										print obj.kind.inventory
+										#print obj.kind.inventory
 										obj.kind.inventory.remove(ob)		# remove from the top level currentRoom's objects list the top level of the item
 										gotten = True
-									elif ob.name == self.owner.owner.name and gotten == False:
-										#print obj.kind.inventory
-										print ob
-										obj.kind.inventory.remove(ob)
-										gotten == True
+									# elif ob.name == self.owner.owner.name and gotten == False:
+									# 	#print obj.kind.inventory
+									# 	print ob.name
+									# 	obj.kind.inventory.remove(ob)
+									# 	gotten = True
 			else:
 				# if self.owner.owner in self.owner.owner.spawnContainer.kind.inventory:
 				# 	self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
@@ -234,7 +234,7 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 				if gotten == False:
 					print str(self.owner.owner.name) +'not found.'
 
-			client.send("You picked up %s.\n" %self.owner.owner.name)
+			client.send("You picked up a %s.\n" %self.owner.owner.name)
 
 
 		else:
@@ -282,7 +282,7 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 				#print ob.name
 				if ob == obj.spawnContainer:
 					ob.kind.inventory.append(obj)
-					print ob.kind.inventory
+					#print ob.kind.inventory
 			#print obj.spawnContainer.kind.inventory
 			return True
 		#print "stuff of " + obj.name + " failed"

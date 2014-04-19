@@ -163,13 +163,14 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'tell':
+            elif cmd == 'tell' or cmd == 't':
                 cChat.tell(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
-            elif cmd == 'chat':
+            elif cmd == 'chat' or cmd == 'c':
                 ## If the client sends a 'chat' command echo it to the chat channel
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
+                CLIENT_DATA[str(client.addrport())].replyTo = None
 
             elif cmd == "'":
                 if CLIENT_DATA[client.addrport()].replyTo is None:
@@ -178,8 +179,8 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     args.insert(0, CLIENT_DATA[(CLIENT_DATA[client.addrport()].replyTo).addrport()].name)
                     isOnline = cChat.tell(client, args, CLIENT_LIST, CLIENT_DATA)
                     if isOnline == False:
-                        CLIENT_DATA[client.addrport()].replyTo = None
-                    print CLIENT_DATA[client.addrport()].replyTo
+                        CLIENT_DATA[str(client.addrport())].replyTo = None
+                    #print CLIENT_DATA[client.addrport()].replyTo
 
 
             elif cmd == 'channel':
@@ -347,7 +348,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
             obj = thing
             #print obj
     if obj == None:
-        print ("%s not found." %refobj)
+        print ("Unable to spawn, %s not found." %refobj)
         return
 
     newObject = World.Object(obj.name, obj.description)
@@ -447,7 +448,8 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
     for client in Globals.CLIENT_LIST:
         if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
             if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newObject.currentRoom:      # if a client is in the room object just appeared in, let it know
+                if newObject.spawnContainer is None:
                 # if not stuffed:
-                client.send_cc("^BA %s appeared.^~\n" %newObject.name)
+                    client.send_cc("^BA %s appeared.^~\n" %newObject.name)
 
     return newObject

@@ -7,6 +7,6 @@ longDescription='This stairwell is oddly cleaner than the surrounding rooms.  Th
 
 exits=test:lobby
 
-objects=trash_can, trash_can, rock, rock
+objects=trash_can, trash_can, trash_can, rock, rock, rock
 
-stuffList=rock:trash_can, rock:trash_can
+stuffList=rock:trash_can1, rock:trash_can2, rock:trash_can3

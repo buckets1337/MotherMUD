@@ -1,7 +1,7 @@
 # SysInit.py
 # Initializes various system-based information
 
-import os, shelve
+import os
 import World, Globals
 
 
@@ -71,25 +71,25 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 					#print obj.name
 					if item == obj.name:
 						inventoryItems.append(item)
-						print 'invI:' + str(inventoryItems)
+						#print 'invI:' + str(inventoryItems)
 
 
 	#print currentRoomString
 	if currentRoomString == '':
 		currentRoomString = Globals.startingRoom.region + ":" + Globals.startingRoom.name
 	currentRoomCoord = currentRoomString.split(":")
-	print str(currentRoomCoord)
+	#print str(currentRoomCoord)
 	currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
-	print currentRoomRoom.name
+	#print currentRoomRoom.name
 
 
 	#print Globals.startingRoom.players
 	#print Globals.startingRoom
 	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
-	print newAvatar.currentRoom.players
-	print newAvatar.currentRoom.name
-	print Globals.startingRoom.players
-	print Globals.startingRoom.name
+	# print newAvatar.currentRoom.players
+	# print newAvatar.currentRoom.name
+	# print Globals.startingRoom.players
+	# print Globals.startingRoom.name
 	#print newAvatar.currentRoom
 
 

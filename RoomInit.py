@@ -248,10 +248,10 @@ def loadRoom(file):
 			containersList = Data[16:-1]
 			if containersList != '':
 				containersList = containersList.split(", ")
-				print '***' + str(containersList)
+				#print '***' + str(containersList)
 				for container in containersList:
 					containerDetails = container.split(":")
-					print '***' + str(containerDetails)
+					#print '***' + str(containerDetails)
 					containerSpecs = containerDetails[1].split("-")
 
 					item = containerDetails[0]
@@ -266,28 +266,52 @@ def loadRoom(file):
 		if Data.startswith('stuffList='):
 			stuffList = Data[10:-1]
 			stuffList = stuffList.split(', ')
+
 			for entry in stuffList:
 				if entry != '':
 					stuffDesc = entry.split(':')
 					item = stuffDesc[0]
 					container = stuffDesc[1]
 					#print "container:" + container
-					found = False
+					resultsList = []
+					ID = False
+					objObject = None
 					for obj in newRoom.objects:
-						if obj.name == item and found == False:
-							for ob in newRoom.objects:
-								if hasattr(ob, 'kind'):
-									#print "$$$$$$stuff2kind"
-									if hasattr(ob.kind, 'inventory'):
-										#print "$$$$$stuff2inv"
-										if ob.name == container:
-											#print "$$$$$stuff2cont " + ob.name
-											print newRoom.objects
-											if obj in newRoom.objects:
-												newRoom.objects.remove(obj)
-												found = True
-											ob.kind.inventory.append(obj)
-											#print ob.kind.inventory
+						if obj.name == item:
+							objObject = obj
+						# if hasattr(obj, 'kind'):
+						# 	#print "$$$$$$stuff2kind"
+						# 	if hasattr(obj.kind, 'inventory'):
+						# 		#print "$$$$$stuff2inv"
+						if obj.name == container:
+							#print "$$$$$stuff2cont " + ob.name
+							# print newRoom.objects
+							# if obj in newRoom.objects:
+							# 	newRoom.objects.remove(obj)	
+							# ob.kind.inventory.append(obj)
+							resultsList.append(obj)
+							#print ob.kind.inventory
+						elif obj.name == container[:-1]:
+							resultsList.append(obj)
+							ID = True
+
+					if resultsList != []:
+						# for obj in resultsList:
+						# 	print obj.name
+						# print 'res:' + str(resultsList)
+						# print 'con:' + str(container)
+						# print 'conID:' + str(container[-1:])
+						if ID == True:
+							selected = resultsList[int(container[-1:]) - 1]
+							#print 'id'
+						else:
+							selected = resultsList[0]
+						#print selected
+						if objObject in newRoom.objects:
+							newRoom.objects.remove(objObject)
+						selected.kind.inventory.append(objObject)
+						#print 'inv:' +str(selected.kind.inventory)
+
 
 
 

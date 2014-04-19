@@ -17,7 +17,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 		return
 
 	if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) >= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
-		client.send("You have no more space in your inventory. Drop something first.\n")
+		client.send("I have no more space in your inventory. I should drop something first.\n")
 		return
 
 	for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
@@ -36,7 +36,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 				# print 'argstr = ' + (" ".join(args))
 				# print args
 					# for x in range(len(args[1:])):
-					if len(args) > 0:
+					if len(args) == 1:
 						if ob.name == args[-1]:
 							resultsList.append(ob)
 
@@ -53,17 +53,17 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 			# 	client.send("The %s is locked!\n" %obj.name)
 			# 	return
 
-	print "resultsList:"+str(resultsList)
+	#print "resultsList:"+str(resultsList)
 	if len(resultsList) == 1:
-		print 'len resultsList = 1'
-		print resultsList[0]
-		print resultsList[0].kind
-		print resultsList[0].kind.itemGrabHandler
+		#print 'len resultsList = 1'
+		#print resultsList[0]
+		#print resultsList[0].kind
+		#print resultsList[0].kind.itemGrabHandler
 		if resultsList[0].kind is not None and resultsList[0].kind.itemGrabHandler is not None and hasattr(resultsList[0],'kind') and hasattr(resultsList[0].kind,'itemGrabHandler'):
 			resultsList[0].kind.itemGrabHandler.get(client, CLIENT_DATA[clientDataID].avatar)
 			objectFound = True
 		else:
-			client.send("*sigh* Why would you want to take the '%s'?\n" %resultsList[0].name)
+			client.send("*sigh* Why would I want to take the '%s'?\n" %resultsList[0].name)
 			objectFound = True
 
 	if len(resultsList) > 1:
@@ -86,7 +86,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 					resultsList[int(index) - 1].kind.itemGrabHandler.get(client, CLIENT_DATA[clientDataID].avatar)
 					objectFound = True
 				else:
-					client.send("*sigh* Why would you want to take the '%s'?\n" %resultsList[int(index) - 1].name)
+					client.send("*sigh* Why would I want to take the '%s'?\n" %resultsList[int(index) - 1].name)
 					objectFound = True
 
 		except ValueError:
@@ -215,41 +215,42 @@ def check(client, args, clientDataID, CLIENT_DATA, room):
 				return
 			for thing in pickups:
 				#print CLIENT_DATA[clientDataID]
-				if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) <= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
+				if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) < CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
 					CLIENT_DATA[clientDataID].avatar.kind.inventory.append(thing)
 					resultsList[0].kind.inventory.remove(thing)
 					client.send("I got a " +thing.name + " from the " + resultsList[0].name + "!\n")
 				else:
-					client.send("I was unable to get the" + thing.name + " from the " + resultsList[0].name + " because I couldn't carry any more.\nMaybe I should try dropping something and checking the " + obj.name + " again.\n")
+					client.send("I was unable to get the " + thing.name + " from the " + resultsList[0].name + " because I couldn't carry any more.\n")
 		else:
 			client.send("The " + args[0] + " is locked.\n")
 
 	elif len(resultsList) > 1:
-		print "resList:" + str(resultsList)
+		#print "resList:" + str(resultsList)
 		if len(args) < 2:
 			client.send("You see more than one " + args[0] + " here.  Which one did you want to check?\n")
 		elif len(args) == 2:
 			index = int(args[1]) - 1
-			if index > 1:
-				index = 1
-			print index
+			if index > len(resultsList) - 1:
+				client.send("You only see " +str(len(resultsList))+ " " +str(resultsList[0].name) +" here.\n")
+				return
+			#print index
 			result = resultsList[index]
-			print result
-			print result.kind.isLocked
+			#print result
+			#print result.kind.isLocked
 			if result.kind.isLocked == False:
 				for obj in result.kind.inventory:
-					print obj
+					#print obj
 					pickups.append(obj)		
-				print pickups	
+				#print pickups	
 			else:
 				client.send("The " + args[0] + " is locked.\n")
 			for thing in pickups:
 				if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) <= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
 					CLIENT_DATA[clientDataID].avatar.kind.inventory.append(thing)
 					result.kind.inventory.remove(thing)
-					client.send("I found " + thing.name + " in the " + obj.name + "\n")
+					client.send("I found a " + thing.name + " in the " + result.name + "!\n")
 				else:
-					client.send("I was unable to get " + thing.name + " from the " + obj.name + " because I couldn't carry any more.\nMaybe I should try dropping something and checking the " + obj.name + " again.\n")
+					client.send("I was unable to get the " + thing.name + " from the " + obj.name + " because I couldn't carry any more.\n")
 			if pickups == []:
 				client.send("The " + args[0] + " is empty.\n")
 		elif len(args) > 2:

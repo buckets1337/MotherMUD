@@ -96,6 +96,7 @@ def tell(client, args, CLIENT_LIST, CLIENT_DATA):
                 player.send_cc("^w" + senderName + " tells you: " + message +"^~\n")
                 CLIENT_DATA[clientDataID].replyTo = client
                 success = True
+                print "   <" + str(CLIENT_DATA[clientDataID].name) + '>'+ senderName + ": " + message
             else:
                 client.send_cc('^wYou mutter "' + message + '" to yourself quietly.^~\n')
                 success = True

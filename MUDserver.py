@@ -156,7 +156,7 @@ if __name__ == '__main__':
     with open('data/OPList', 'r') as f:
         OPList = f.readlines()
 
-    print str(Globals.TIMERS)
+    #print str(Globals.TIMERS)
 
     ## Server Loop
     while SERVER_RUN:
