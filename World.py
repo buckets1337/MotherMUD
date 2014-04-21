@@ -376,25 +376,33 @@ class Entity():
 	"""
 	A superclass for all moveable entities in the world.  Mob and Player both subclass this, so only functionality that they share should be here
 	"""
-	def __init__(self, description, currentRoom):
+	def __init__(self, description, currentRoom, name):
 		self.description = description
 		self.currentRoom = currentRoom
+		self.name = name
 
 
 class Mob(Entity):
 	"""
 	This class describes a generic badguy, and holds his information.  Methods will be added in mostly through components
 	"""
-	def __init__(self, description, currentRoom, kind = None, species = None):
-		Entity.__init__(self, description, currentRoom)
+	def __init__(self, description, currentRoom, name, region=None, longDescription = None, speech = None, kind = None, species = None, expirator = None):
+		Entity.__init__(self, description, currentRoom, name)
+		self.region = region
+		self.longDescription = longDescription
+		self.speech = speech
 		self.kind = kind
 		self.species = species
+		self.expirator = expirator
 
 		# let components know what mob they belong to
 		if self.kind:
 			self.kind.owner = self
-		if self.species:
-			self.species.owner = self
+		# if self.species:
+		# 	self.species.owner = self
+		if self.expirator:
+			self.expirator.owner = self
+			self.expirator.Timer.attachedTo = self
 
 
 class Player(Entity):
@@ -402,7 +410,7 @@ class Player(Entity):
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
 	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None):
-		Entity.__init__(self, description, currentRoom)
+		Entity.__init__(self, description, currentRoom, name)
 		self.name = name
 		self.title = title
 		self.client = client
@@ -422,3 +430,18 @@ class mortal:		# 'kind' attribute
 		self.inventory = inventory
 		self.inventorySize = inventorySize
 		self.equipment = equipment
+
+
+class expirator:		# component added to mobs.  Causes the mob to expire and delete after a set period of time, so the world does not fill with mobs
+
+	def __init__(self, time):
+		self.time = time
+		self.Timer = Timer(Globals.TIMERS, 1200, self.selfExpire, [], None, True)
+
+	def checkTimer(self, time):		#checks to see how long it has been since there was contact, and if it has been longer than the time, delete the mob.
+		pass
+
+
+	def selfExpire(self):		#removes self from the game, and then deletes self to free up memory
+		pass
+

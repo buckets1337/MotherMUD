@@ -21,7 +21,7 @@ from miniboa import TelnetServer
 
 from clientInfo import ClientInfo
 
-import Engine, World, SysInit, RoomInit, Rooms
+import Engine, World, SysInit, RoomInit, MobInit, Rooms
 from cMove import alert
 
 import Globals
@@ -145,8 +145,9 @@ if __name__ == '__main__':
     # testTimer = World.Timer(TIMERS, 1, testTimerFunction, [testCounter], respawns = True)
     # print TIMERS
 
-
+    MobInit.loadMobs()
     RoomInit.setup()
+
     Globals.startingRoom = Globals.regionListDict['test']['bullpen']
     print 'startingRoom:' + str(Globals.startingRoom) + Globals.startingRoom.region + Globals.startingRoom.name.capitalize()+'\n'
 

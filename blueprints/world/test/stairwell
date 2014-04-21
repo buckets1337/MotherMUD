@@ -10,3 +10,5 @@ exits=test:lobby
 objects=trash_can, trash_can, trash_can, rock, rock, rock
 
 stuffList=rock:trash_can1, rock:trash_can2, rock:trash_can3
+
+mobs=rat

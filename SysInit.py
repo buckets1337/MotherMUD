@@ -69,7 +69,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 				#print item
 				for obj in Globals.fromFileList:
 					#print obj.name
-					if item == obj.name:
+				 	if item == obj.name:
 						inventoryItems.append(item)
 						#print 'invI:' + str(inventoryItems)
 
@@ -104,10 +104,13 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print "********" + str(inventoryItems)
 
 	for item in inventoryItems:
+		print item.name
 		removed = False
 		newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
 		CLIENT_DATA[clientDataID].avatar.kind.inventory.append(newItem)
+		print newItem.name
 		for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+			print item.name
 			if item.name == newItem.name and removed == False:
 				CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(item)
 				removed = True

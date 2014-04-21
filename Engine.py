@@ -335,7 +335,7 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
 
 
 
-def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnContainer=None):
+def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='cmd', spawnContainer=None):
     # creates a new object based on the attributes of the object fed to the function
 
     obj = None
@@ -448,7 +448,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, whereFrom='cmd', spawnCo
     for client in Globals.CLIENT_LIST:
         if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
             if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newObject.currentRoom:      # if a client is in the room object just appeared in, let it know
-                if newObject.spawnContainer is None:
+                if newObject.spawnContainer is None and alert:
                 # if not stuffed:
                     client.send_cc("^BA %s appeared.^~\n" %newObject.name)
 

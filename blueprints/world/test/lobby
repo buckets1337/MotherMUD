@@ -10,3 +10,5 @@ exits=test:restroom, test:outside, test:stairwell
 objects=potted_plant, desk, desk_drawer, file_cabinet, rusty_key, rock, garden_gnome
 
 stuffList=rusty_key:desk_drawer
+
+mobs=rat, rat

@@ -29,5 +29,6 @@ masterRooms = {}
 regionListDict = {}
 #initializeMasterRooms(RegionsList)
 fromFileList = []
+mobsFromFile = []
 startingRoom = None
 

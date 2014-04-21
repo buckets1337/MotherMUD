@@ -350,6 +350,7 @@ def render_room(client, player, room, CLIENT_DATA):
 	client.send_cc("\n^I[ " + roomName + " ]^~\n")
 	display_description(client, room, CLIENT_DATA)
 	display_objects(client, room, CLIENT_DATA)
+	display_mobs(client, room, CLIENT_DATA)
 	display_other_players(client, room, CLIENT_DATA)
 	display_exits(client, room)
 
@@ -370,6 +371,7 @@ def examine_room(client, player, region, room, CLIENT_DATA):
 	client.send(roomDescription + "\n\n")
 	#display_description(client, room, CLIENT_DATA)
 	display_object_names(client, room, CLIENT_DATA)
+	display_mob_names(client, room, CLIENT_DATA)
 	display_other_players(client, room, CLIENT_DATA, examine=True)
 	display_exits(client, room)
 
@@ -423,3 +425,19 @@ def display_object_names(client, room, CLIENT_DATA):
 				client.send_cc("^cAn item named '%s'^~\n" %obj.name)		
 			elif isinstance(obj.kind, World.container):
 				client.send_cc("^cA container named '%s'^~\n" %obj.name)
+
+def display_mobs(client, room, CLIENT_DATA):
+	region = room.region
+	regionRoom = str(region) + room.name.capitalize()
+	roomMobs = Rooms.master[regionRoom].mobs
+	print 'mobs:' + str(roomMobs)
+	for mob in roomMobs:
+		client.send_cc("^r%s^~\n" %mob.description)
+
+def display_mob_names(client, room, CLIENT_DATA):
+	region = room.region
+	regionRoom = str(region) + room.name.capitalize()
+	roomMobs = Rooms.master[regionRoom].mobs
+	print 'mobs:' + str(roomMobs)
+	for mob in roomMobs:
+		client.send_cc("^rA mob named '%s'.^~\n" %mob.name)	

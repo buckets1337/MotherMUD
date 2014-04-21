@@ -150,6 +150,7 @@ def loadRoom(file):
 	newRoom = regionListDict[fileDetails[0]][fileDetails[1]]
 
 	newRoom.players = []
+	newRoom.mobs = []
 
 	item = ''
 	destRegion = ''
@@ -157,6 +158,7 @@ def loadRoom(file):
 	destContainer = ''
 	hasSpawnContainers = False
 	activesList = []
+	mobs = []
 
 	for Data in fileData:
 
@@ -312,6 +314,24 @@ def loadRoom(file):
 						selected.kind.inventory.append(objObject)
 						#print 'inv:' +str(selected.kind.inventory)
 
+		if Data.startswith('mobs='):
+			print "mobs found in file definition"
+			mobString = Data[5:-1]
+			mobList = mobString.split(", ")
+			for mob in mobList:
+				for proto in Globals.mobsFromFile:
+					if proto.name == mob:
+						protoMob = proto
+				protoInv = []
+				for item in protoMob.kind.inventory:
+					protoInv.append(item)
+				protoEq = {}
+				for item in protoMob.kind.equipment:
+					protoEq.append(item)
+
+				mortalComponent = World.mortal(protoMob.kind.hp, protoMob.kind.exp, protoInv, protoMob.kind.inventorySize, protoEq)
+				newMob = World.Mob(protoMob.description, newRoom, protoMob.name, newRoom.region, protoMob.longDescription, protoMob.speech, mortalComponent, protoMob.species, protoMob.expirator)
+				mobs.append(newMob)
 
 
 
@@ -322,7 +342,9 @@ def loadRoom(file):
 	Globals.masterRooms[labelString] = newRoom
 	Globals.regionListDict[newRoom.region][newRoom.name] = newRoom
 
-
+	for mob in mobs:
+		print mob.name
+		Globals.regionListDict[newRoom.region][newRoom.name].mobs.append(mob)
 
 
 
@@ -352,6 +374,7 @@ def loadRoom(file):
 	print "longDescription" + newRoom.longDescription
 	print "exits=" + str(newRoom.exits)
 	print "objects=" + str(newRoom.objects)
+	print 'mobs=' + str(newRoom.mobs)
 	print "\n"
 
 

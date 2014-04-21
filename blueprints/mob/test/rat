@@ -1,0 +1,15 @@
+mobID=
+name=rat
+species=rodent
+
+description=A smelly rat.
+
+longDescription=This rodent is not incredibly large.  However, it looks very hungry, and seems to have no fear of humans.
+
+speech=*squeak*
+
+kind.hp=10
+kind.exp=10
+kind.inventory=trash_pile
+kind.inventorySize=2
+kind.equipment={}
