@@ -424,7 +424,7 @@ class mortal:		# 'kind' attribute
 	'''
 	A component class for all attributes of mortals (living creatures)
 	'''
-	def __init__(self, hp, exp, inventory=[], inventorySize=16, equipment={}):
+	def __init__(self, hp, exp, inventory, inventorySize=16, equipment={}):
 		self.hp = hp
 		self.exp = exp
 		self.inventory = inventory

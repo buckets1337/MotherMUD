@@ -121,7 +121,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
 
                 # client.send(prompt)
-                mortalComponent = World.mortal(100, 0)
+                mortalComponent = World.mortal(100, 0, [])
                 
                 if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
                     #print "cl:" + str(CLIENT_LIST)
@@ -429,8 +429,8 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
             # print "has object spawner"
             newObject.kind.objectSpawner.active = active      # set the spawned object to active
             #print "active:" + str(newObject.kind.objectSpawner.active)
-
-    spawnLocation.objects.append(newObject)
+    if spawnLocation is not None:
+        spawnLocation.objects.append(newObject)
     symbol = '+'
     if whereFrom == 'cmd':
         symbol = 's'
@@ -438,7 +438,10 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
         symbol = '$'
     if newObject.kind:
         if newObject.kind.objectSpawner:
-            print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
+            if newObject.currentRoom is not None:
+                print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "] (active=" + str(newObject.kind.objectSpawner.active) +")"
+            else:
+                print symbol +"o " + str(newObject) +": " + newObject.name + " @ [None] (active=" + str(newObject.kind.objectSpawner.active) +")"
         else:
             print symbol +"o " + str(newObject) +": " + newObject.name + " @ [" + str(newObject.currentRoom.region) + ":" + str(newObject.currentRoom.name) + "]"
     else:

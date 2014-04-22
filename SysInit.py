@@ -66,12 +66,17 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			inventory = inventory.split(", ")
 
 			for item in inventory:
-				#print item
+				print item
+				found = False
 				for obj in Globals.fromFileList:
 					#print obj.name
-				 	if item == obj.name:
-						inventoryItems.append(item)
-						#print 'invI:' + str(inventoryItems)
+				 	if item == obj.name and found == False:
+						#inventoryItems.append(obj)
+						
+						newItem = cmdSpawnObject(obj.name, None, alert=False, whereFrom='playerinv')
+						inventoryItems.append(newItem)
+						found = True
+						print 'invI:' + str(inventoryItems)
 
 
 	#print currentRoomString
@@ -86,11 +91,14 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print Globals.startingRoom.players
 	#print Globals.startingRoom
 	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
+	newMortal = World.mortal(hp, exp, [])
+	newMortal.inventory = []
 	# print newAvatar.currentRoom.players
 	# print newAvatar.currentRoom.name
 	# print Globals.startingRoom.players
 	# print Globals.startingRoom.name
 	#print newAvatar.currentRoom
+	print 'morinv:' + str(newMortal.inventory)
 
 
 
@@ -100,20 +108,21 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	CLIENT_DATA[clientDataID].prompt = prompt
 	CLIENT_DATA[clientDataID].clientID = clientID
 	CLIENT_DATA[clientDataID].avatar = newAvatar
-	CLIENT_DATA[clientDataID].avatar.kind = kind
+	CLIENT_DATA[clientDataID].avatar.kind = newMortal
 	#print "********" + str(inventoryItems)
 
 	for item in inventoryItems:
-		print item.name
-		removed = False
-		newItem = cmdSpawnObject(item, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
-		CLIENT_DATA[clientDataID].avatar.kind.inventory.append(newItem)
-		print newItem.name
-		for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
-			print item.name
-			if item.name == newItem.name and removed == False:
-				CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(item)
-				removed = True
+		CLIENT_DATA[clientDataID].avatar.kind.inventory.append(item)
+		# print item.name
+		# removed = False
+		# newItem = cmdSpawnObject(item.name, CLIENT_DATA[clientDataID].avatar.currentRoom, alert=False, whereFrom='inv')
+		# CLIENT_DATA[clientDataID].avatar.kind.inventory.append(newItem)
+		# print newItem.name
+		# for item in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
+		# 	print item.name
+		# 	if item.name == newItem.name and removed == False:
+		# 		CLIENT_DATA[clientDataID].avatar.currentRoom.objects.remove(item)
+		# 		removed = True
 	#CLIENT_DATA[clientDataID].avatar.kind.inventory = inventoryItems
 	#CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(newAvatar)
 	CLIENT_DATA[clientDataID].avatar.kind.hp = hp
@@ -133,6 +142,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
 	#print str(Globals.startingRoom.players)
 	CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(CLIENT_DATA[clientDataID].avatar)
+	print CLIENT_DATA[clientDataID].avatar.kind.inventory
 	# print str(Globals.startingRoom.players)
 	# print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
 	# print str(CLIENT_DATA[clientDataID].avatar.currentRoom) + ":" + str(Globals.startingRoom)

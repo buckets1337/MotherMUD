@@ -147,6 +147,7 @@ if __name__ == '__main__':
 
     MobInit.loadMobs()
     RoomInit.setup()
+    MobInit.loadSavedMobs()
 
     Globals.startingRoom = Globals.regionListDict['test']['bullpen']
     print 'startingRoom:' + str(Globals.startingRoom) + Globals.startingRoom.region + Globals.startingRoom.name.capitalize()+'\n'
@@ -179,6 +180,7 @@ if __name__ == '__main__':
             #print engineState
             SysInit.dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS)
             RoomInit.saveAllRooms()
+            MobInit.saveMobs()
             SERVER_RUN = False
 
     print("<< Server shutdown.")
