@@ -54,6 +54,13 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 		if data.startswith("currentRoom="):
 			currentRoomString = data[12:-1]
 			#print "crs=" + currentRoomString
+				#print currentRoomString
+		if currentRoomString == '':
+			currentRoomString = Globals.startingRoom.region + ":" + Globals.startingRoom.name
+		currentRoomCoord = currentRoomString.split(":")
+		#print str(currentRoomCoord)
+		currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
+		#print currentRoomRoom.name
 		if data.startswith("hp="):
 			hp = int(data[3:-1])
 		if data.startswith("exp="):
@@ -66,26 +73,20 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			inventory = inventory.split(", ")
 
 			for item in inventory:
-				print item
+				#print item
 				found = False
 				for obj in Globals.fromFileList:
 					#print obj.name
 				 	if item == obj.name and found == False:
 						#inventoryItems.append(obj)
 						
-						newItem = cmdSpawnObject(obj.name, None, alert=False, whereFrom='playerinv')
+						newItem = cmdSpawnObject(obj.name, currentRoomRoom, alert=False, whereFrom='playerinv')
 						inventoryItems.append(newItem)
 						found = True
-						print 'invI:' + str(inventoryItems)
+						#print 'invI:' + str(inventoryItems)
 
 
-	#print currentRoomString
-	if currentRoomString == '':
-		currentRoomString = Globals.startingRoom.region + ":" + Globals.startingRoom.name
-	currentRoomCoord = currentRoomString.split(":")
-	#print str(currentRoomCoord)
-	currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
-	#print currentRoomRoom.name
+
 
 
 	#print Globals.startingRoom.players
@@ -98,7 +99,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	# print Globals.startingRoom.players
 	# print Globals.startingRoom.name
 	#print newAvatar.currentRoom
-	print 'morinv:' + str(newMortal.inventory)
+	#print 'morinv:' + str(newMortal.inventory)
 
 
 
@@ -142,7 +143,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
 	#print str(Globals.startingRoom.players)
 	CLIENT_DATA[clientDataID].avatar.currentRoom.players.append(CLIENT_DATA[clientDataID].avatar)
-	print CLIENT_DATA[clientDataID].avatar.kind.inventory
+	#print CLIENT_DATA[clientDataID].avatar.kind.inventory
 	# print str(Globals.startingRoom.players)
 	# print '&&' + str(CLIENT_DATA[clientDataID].avatar.currentRoom.players)
 	# print str(CLIENT_DATA[clientDataID].avatar.currentRoom) + ":" + str(Globals.startingRoom)
@@ -491,7 +492,10 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 				TI.write(str(timerID) + " time=" + str(TIMER.time) + "\n")
 				TI.write(str(timerID) + " actionFunction=" + str(TIMER.actionFunction) + "\n")
 				TI.write(str(timerID) + " actionArgs=" + str(TIMER.actionArgs) + "\n")
-				TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
+				if hasattr(TIMER.attachedTo.owner, 'owner'):
+					TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
+				elif hasattr(TIMER.attachedTo, 'owner'):
+					TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.name + "\n")
 				TI.write(str(timerID) + " respawns=" + str(TIMER.respawns) + "\n")
 				TI.write(str(timerID) + " currentTime=" + str(TIMER.currentTime) + "\n")
 				TI.write(" \n")

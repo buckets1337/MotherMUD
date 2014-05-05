@@ -39,6 +39,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		client.send_cc("\n^I[ %s ]^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
 		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_objects(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
 		looked = True
@@ -430,14 +431,14 @@ def display_mobs(client, room, CLIENT_DATA):
 	region = room.region
 	regionRoom = str(region) + room.name.capitalize()
 	roomMobs = Rooms.master[regionRoom].mobs
-	print 'mobs:' + str(roomMobs)
+	#print 'mobs:' + str(roomMobs)
 	for mob in roomMobs:
-		client.send_cc("^r%s^~\n" %mob.description)
+		client.send_cc("^y%s^~\n" %mob.description)
 
 def display_mob_names(client, room, CLIENT_DATA):
 	region = room.region
 	regionRoom = str(region) + room.name.capitalize()
 	roomMobs = Rooms.master[regionRoom].mobs
-	print 'mobs:' + str(roomMobs)
+	#print 'mobs:' + str(roomMobs)
 	for mob in roomMobs:
-		client.send_cc("^rA mob named '%s'.^~\n" %mob.name)	
+		client.send_cc("^yA mob named '%s'.^~\n" %mob.name)	

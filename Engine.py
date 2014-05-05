@@ -55,7 +55,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
             # Command Definitions
             #---------------------
 
-            if CLIENT_DATA[clientDataID].name == "none":     # client just logged in and doesn't have a name assigned.  Accept the first input and assign it to the client as it's name.
+            if CLIENT_DATA[clientDataID].name == "none" or CLIENT_DATA[clientDataID].name == '':     # client just logged in and doesn't have a name assigned.  Accept the first input and assign it to the client as it's name.
                 CLIENT_DATA[clientDataID].name = str(msg)
 
                 path = "data/client/" + CLIENT_DATA[clientDataID].name
@@ -83,10 +83,6 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     # print CLIENT_DATA[clientDataID].password
                     # print "pwl:" + str(len(CLIENT_DATA[clientDataID].password))
 
-
-                    with  open(path, 'w') as f:
-                        f.write(str(CLIENT_DATA[clientDataID].password) + '\n')
-                        # print CLIENT_DATA[clientDataID].password
                     CLIENT_DATA[clientDataID].authSuccess = True
 
                 else:
@@ -136,6 +132,11 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                     Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                     # print 'starting;' + str(Globals.startingRoom.players)
+                    
+                    with  open(path, 'w') as f:
+                        f.write(str(CLIENT_DATA[clientDataID].password) + '\n')
+                        # print CLIENT_DATA[clientDataID].password
+
                 player = CLIENT_DATA[clientDataID].avatar
                 for playerName in OPList:
                     #print str(CLIENT_DATA[clientDataID].name)
@@ -364,6 +365,10 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
     if newObject.kind is not None and hasattr(newObject, 'kind'):
         newObject.kind.owner = newObject
     newObject.TIMERS = obj.TIMERS
+    if obj.mobSpawner is not None:
+        mobSpawner = obj.mobSpawner
+    else:
+        mobSpawner = None
     # if newObject.TIMERS:
     #     newObject.TIMERS.owner = newObject
 
@@ -405,6 +410,7 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
             if newObject.kind.objectSpawner:
                 newObject.kind.objectSpawner.owner = newObject.kind
 
+
         if newObject.kind.itemGrabHandler is not None:
             if obj.kind.itemGrabHandler.notDroppable is not None:
                 newObject.kind.itemGrabHandler.notDroppable = obj.kind.itemGrabHandler.notDroppable
@@ -423,12 +429,22 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
             newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, newObject.kind.respawns)
             newObject.kind.objectSpawner.startingLocation = spawnLocation,
 
-
     if newObject.kind:
         if newObject.kind.objectSpawner:
             # print "has object spawner"
             newObject.kind.objectSpawner.active = active      # set the spawned object to active
             #print "active:" + str(newObject.kind.objectSpawner.active)
+
+    if mobSpawner is not None:
+        newObject.mobSpawner = World.mobSpawner(newObject)
+        newObject.mobSpawner.TIMERS = mobSpawner.TIMERS
+        newObject.mobSpawner.time = mobSpawner.time
+        newObject.mobSpawner.mob = mobSpawner.mob
+        newObject.mobSpawner.oddsList = mobSpawner.oddsList
+        newObject.mobSpawner.mode = mobSpawner.mode
+        newObject.mobSpawner.cycles = mobSpawner.cycles
+        newObject.mobSpawner.active = mobSpawner.active
+
     if spawnLocation is not None:
         spawnLocation.objects.append(newObject)
     symbol = '+'
@@ -456,3 +472,4 @@ def cmdSpawnObject(refobj, spawnLocation, active=False, alert=True, whereFrom='c
                     client.send_cc("^BA %s appeared.^~\n" %newObject.name)
 
     return newObject
+

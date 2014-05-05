@@ -24,6 +24,14 @@ def loadMobs():
 	for file in fileList:
 		loadMobFromFile(file)
 
+	for region in Globals.regionListDict:
+		for room in Globals.regionListDict[region]:
+			for obj in Globals.regionListDict[region][room].objects:
+				if obj.mobSpawner is not None:
+					for Amob in Globals.mobsFromFile:
+						if Amob.name == obj.mobSpawner.mob:
+							obj.mobSpawner.mob = Amob
+
 
 def loadSavedMobs():
 	for region in Globals.regionListDict:

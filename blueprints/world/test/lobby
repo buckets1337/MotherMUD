@@ -7,8 +7,6 @@ longDescription='This lobby is dingy and poorly lit.  It looks like it has not b
 
 exits=test:restroom, test:outside, test:stairwell
 
-objects=potted_plant, desk, desk_drawer, file_cabinet, rusty_key, rock, garden_gnome, files
+objects=potted_plant, desk, desk_drawer, file_cabinet, rusty_key, files, rat_nest
 
 stuffList=rusty_key:desk_drawer, files:file_cabinet
-
-mobs=rat, rat

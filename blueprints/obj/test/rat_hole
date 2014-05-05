@@ -1,0 +1,16 @@
+name='rat_hole'
+
+description='A rat-sized hole in the wall.'
+
+longDescription='You are almost certain a family of rats lives here.  Rat families are huge!'
+
+isVisible=False
+
+mobSpawner=True
+mobSpawner.mobFile=test/rat
+mobSpawner.time=30
+mobSpawner.oddsList=True:1,False:10
+mobSpawner.mode=cont
+mobSpawner.cycles=1
+mobSpawner.active=False
+

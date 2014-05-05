@@ -143,7 +143,7 @@ if __name__ == '__main__':
     #     args[0] += 1
 
     # testTimer = World.Timer(TIMERS, 1, testTimerFunction, [testCounter], respawns = True)
-    # print TIMERS
+    #print TIMERS
 
     MobInit.loadMobs()
     RoomInit.setup()
@@ -154,6 +154,7 @@ if __name__ == '__main__':
 
     print(">> Listening for connections on port %d.  CTRL-C to break."
         % telnet_server.port)
+    #print TIMERS
 
     with open('data/OPList', 'r') as f:
         OPList = f.readlines()

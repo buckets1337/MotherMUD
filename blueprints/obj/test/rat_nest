@@ -1,0 +1,16 @@
+name='rat_nest'
+
+description='A place where rats live.'
+
+longDescription='A collection of sticks and bits of string, perfect for rat-naps.'
+
+isVisible=False
+
+mobSpawner=True
+mobSpawner.mobFile=test/rat
+mobSpawner.time=30
+mobSpawner.oddsList=True:1,False:10
+mobSpawner.mode=thresh
+mobSpawner.cycles=5
+mobSpawner.active=False
+

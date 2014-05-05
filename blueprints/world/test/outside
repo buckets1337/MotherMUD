@@ -9,6 +9,6 @@ exits=test:lobby
 
 actives=garden_gnome
 
-objects=rock, garden_gnome
+objects=rock, garden_gnome, rat_hive
 
 

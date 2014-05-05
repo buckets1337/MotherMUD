@@ -67,10 +67,15 @@ def buildObjectFromFile(file):
 	objectSpawnerComponent = None
 	itemGrabHandlerComponent = None
 	itemComponent = None
+	mobActive = None
+	mobCycles = None
+	mobMode = None
+	mobSpawnOdds = None
+	mobTime = None
+	mobFile = None
+	mobSpawner = None
 
 	for Data in fileData:
-
-
 
 		if Data.startswith('name='):
 			newObject.name = Data[6:-2]
@@ -148,7 +153,8 @@ def buildObjectFromFile(file):
 			if text == 'None':
 				container = None
 			else:
-				container = text		# this should be a reference to another object
+				container = text[1:-1]		# this should be a reference to another object
+				container = container.split(', ')
 		if Data.startswith('kind.objectSpawner.cycles='):
 			cycles = int(Data[26:-1])
 		if Data.startswith('kind.objectSpawner.repeat='):
@@ -183,6 +189,46 @@ def buildObjectFromFile(file):
 			elif text == 'False':
 				notDroppable = False
 
+		if Data.startswith('mobSpawner='):
+			text = Data[11:-1]
+			if text == 'True':
+				mobSpawner = True
+			elif text == 'False':
+				mobSpawner = False
+		if Data.startswith('mobSpawner.mobFile='):
+			text = Data[19:-1]
+			mobFile = text
+		if Data.startswith('mobSpawner.time='):
+			text = Data[16:-1]
+			mobTime = int(text)
+		if Data.startswith('mobSpawner.oddsList='):
+			text = Data[20:-1]
+			oddsList = text.split(',')
+			#print "oddsList:" + str(oddsList)
+			nestedOddsList = []
+			for odds in oddsList:
+				nestedOddsList.append(odds.split(':'))
+			for oddsEntry in nestedOddsList:
+				oddsEntry[1] = int(oddsEntry[1])
+				if oddsEntry[0] == 'True':
+					oddsEntry[0] = True
+				elif oddsEntry[0] == 'False':
+					oddsEntry[0] = False
+			#print nestedOddsList
+			mobSpawnOdds = nestedOddsList
+		if Data.startswith('mobSpawner.mode='):
+			text = Data[16:-1]
+			print "mobModeff:" + text
+			mobMode = text
+		if Data.startswith('mobSpawner.cycles='):
+			text = Data[18:-1]
+			mobCycles = int(text)
+		if Data.startswith('mobSpawner.active='):
+			text = Data[18:-1]
+			if text == 'True':
+				mobActive = True
+			elif text == 'False':
+				mobActive = False
 	#print kind
 	if kind == 'item':
 		# print itemGrabHandler
@@ -203,6 +249,18 @@ def buildObjectFromFile(file):
 		itemGrabHandlerComponent = World.itemGrabHandler(notDroppable)
 	else:
 		itemGrabHandlerComponent = None
+
+	if mobSpawner:
+		mobFileMod = mobFile.split("/")
+		# print mobFileMod
+		# print Globals.mobsFromFile
+		# for mob in Globals.mobsFromFile:
+		# 	if mob.name == mobFileMod[1]:
+		# 		mobref = mob
+		#print mobMode
+		mobSpawnerComponent = World.mobSpawner(newObject, Globals.TIMERS, mobTime, mobFileMod[1], mobSpawnOdds, mobCycles, mode=mobMode, active=mobActive)
+	else:
+		mobSpawnerComponent = None
 
 
 	#print kind
@@ -229,6 +287,12 @@ def buildObjectFromFile(file):
 
 	if kind is not None:
 		newObject.kind = itemComponent
+
+	if mobSpawner:
+		newObject.mobSpawner = mobSpawnerComponent
+	else:
+		newObject.mobSpawner = None
+
 	#print newObject.kind
 	fromFileList.append(newObject)
 
@@ -269,6 +333,14 @@ def buildObjectFromFile(file):
 			print "kind.objectSpawner.active:" + str(newObject.kind.objectSpawner.active)
 			print "kind.objectSpawner.timer:" + str(newObject.kind.objectSpawner.timer)
 			print "kind.objectSpawner.startingLocation:" + str(newObject.kind.objectSpawner.startingLocation)
+	print "mobSpawner:" + str(newObject.mobSpawner)
+	if newObject.mobSpawner is not None:
+		#print "mobSpawner.mobFile:" + str(newObject.mobSpawner.mobFile)
+		print "mobSpawner.time:" + str(newObject.mobSpawner.time)
+		print "mobSpawner.oddsList:" + str(newObject.mobSpawner.oddsList)
+		print "mobSpawner.mode:" + str(newObject.mobSpawner.mode)
+		print "mobSpawner.cycles:" + str(newObject.mobSpawner.cycles)
+		print "mobSpawner.active:" + str(newObject.mobSpawner.active)
 	print "\n"
 
 

@@ -1,0 +1,16 @@
+name='rat_hive'
+
+description='A mound of rat nests.'
+
+longDescription='A truly disgusting mound of rat-homes.  Gross!'
+
+isVisible=False
+
+mobSpawner=True
+mobSpawner.mobFile=test/rat
+mobSpawner.time=30
+mobSpawner.oddsList=True:1,False:10
+mobSpawner.mode=pack
+mobSpawner.cycles=3
+mobSpawner.active=False
+

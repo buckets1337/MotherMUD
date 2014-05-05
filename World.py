@@ -5,6 +5,7 @@ describes the classes for objects that will be in the world
 
 import Engine
 import Globals
+import random
 
 
 
@@ -369,6 +370,96 @@ class objectSpawner:		# for 'kind' components, a component that, when placed in 
 		#print "\n"
 
 
+class mobSpawner:		# for Objects, a component that, when placed on an object in a room, randomly spawns mobs at a given interval into that room
+	def __init__(self, owner, TIMERS = None, time = 0, mob = None, oddsList = None, cycles=1, mode = None, active = True):
+		self.owner = owner
+		self.TIMERS = TIMERS
+		self.owner.TIMERS = self.TIMERS
+		self.time = time
+		self.mob = mob
+		self.oddsList = oddsList
+		self.cycles = cycles
+		self.mode = mode
+		self.active = active
+		if self.active:
+			timer = Timer(Globals.TIMERS, time, self.spawn, [], self, False)
+		else:
+			timer = None
+		self.timer = timer
+		#print "obj in:" + str(self.owner.owner.currentRoom)
+		self.startingLocation = self.owner.currentRoom,
+
+
+
+
+	def spawn(self):
+
+		winner = Engine.selector(self.oddsList)
+
+		if winner[0]:
+
+			#print "winner"
+
+			for mob in Globals.mobsFromFile:
+				if mob.name == self.mob:
+					refmob = mob.name
+					ob = mob
+				elif hasattr(self.mob, 'name') and mob.name == self.mob.name:
+					refmob = mob.name
+					ob = mob
+
+			if self.mode == 'pack':		# spawns a group of mobs, the maximum size of which is determined by self.cycles. Always spawns at least one mob.
+				iters = 0
+				maxNum = random.randint(1, self.cycles)
+				#print str(iters) + ":" + str(maxNum)
+				while iters < maxNum:
+					#print str(iters) + ":" + str(maxNum)
+					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
+					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+					self.owner.currentRoom.mobs.append(newMob)
+					newMob.currentRoom = self.owner.currentRoom
+					print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" +newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (pack)"
+					for client in Globals.CLIENT_LIST:
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+							if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
+								client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+					iters += 1
+
+			elif self.mode == 'cont':	 	# always spawns exactly one mob
+				newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
+				newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+				self.owner.currentRoom.mobs.append(newMob)
+				newMob.currentRoom = self.owner.currentRoom
+				print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" + newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (cont)"
+				for client in Globals.CLIENT_LIST:
+					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
+							client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+
+			elif self.mode == 'thresh':		# spawns mobs until the number of mobs in the room equals self.cycles
+				resultsList = []
+				for mob in self.owner.currentRoom.mobs:
+					if mob.name == self.mob:
+						resultsList.append(mob)
+				numPresent = len(resultsList)
+				#print numPresent
+				if numPresent < self.cycles:
+					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
+					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+					self.owner.currentRoom.mobs.append(newMob)
+					newMob.currentRoom = self.owner.currentRoom
+					print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" + newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (thresh)"
+					for client in Globals.CLIENT_LIST:
+						if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
+							if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
+								client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+				#else:
+					#print "limit reached"
+
+		self.timer.currentTime = self.time
+		self.TIMERS.append(self.timer)
+		#print "spawned"
+		#print self.TIMERS
 
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------
