@@ -8,6 +8,8 @@ longDescription=This rodent is not incredibly large.  However, it looks very hun
 
 speech=*squeak*
 
+expirator=30
+
 kind.hp=10
 kind.exp=10
 kind.inventory=trash_pile

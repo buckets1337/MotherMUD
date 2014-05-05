@@ -415,26 +415,32 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 				while iters < maxNum:
 					#print str(iters) + ":" + str(maxNum)
 					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
-					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+					if hasattr(ob, 'expirator') and ob.expirator != None:
+						newExpirator = expirator(newMob, ob.expirator.startingTime)
+						newMob.expirator = newExpirator
 					self.owner.currentRoom.mobs.append(newMob)
 					newMob.currentRoom = self.owner.currentRoom
 					print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" +newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (pack)"
 					for client in Globals.CLIENT_LIST:
 						if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
 							if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
-								client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+								client.send_cc("^yA %s appeared.^~\n" %newMob.name)
 					iters += 1
 
 			elif self.mode == 'cont':	 	# always spawns exactly one mob
 				newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
-				newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+				newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+				if hasattr(ob, 'expirator') and ob.expirator != None:
+					newExpirator = expirator(newMob, ob.expirator.startingTime)
+					newMob.expirator = newExpirator
 				self.owner.currentRoom.mobs.append(newMob)
 				newMob.currentRoom = self.owner.currentRoom
 				print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" + newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (cont)"
 				for client in Globals.CLIENT_LIST:
 					if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
 						if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
-							client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+							client.send_cc("^yA %s appeared.^~\n" %newMob.name)
 
 			elif self.mode == 'thresh':		# spawns mobs until the number of mobs in the room equals self.cycles
 				resultsList = []
@@ -445,14 +451,17 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 				#print numPresent
 				if numPresent < self.cycles:
 					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
-					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, ob.expirator)
+					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+					if hasattr(ob, 'expirator') and ob.expirator != None:
+						newExpirator = expirator(newMob, ob.expirator.startingTime)
+						newMob.expirator = newExpirator
 					self.owner.currentRoom.mobs.append(newMob)
 					newMob.currentRoom = self.owner.currentRoom
 					print "$m " +str(newMob) + " " + newMob.name + " @ " + "[" + newMob.currentRoom.region + ":" + newMob.currentRoom.name + "] (thresh)"
 					for client in Globals.CLIENT_LIST:
 						if Globals.CLIENT_DATA[str(client.addrport())].avatar is not None:
 							if Globals.CLIENT_DATA[str(client.addrport())].avatar.currentRoom == newMob.currentRoom:      # if a client is in the room object just appeared in, let it know
-								client.send_cc("^BA %s appeared.^~\n" %newMob.name)
+								client.send_cc("^yA %s appeared.^~\n" %newMob.name)
 				#else:
 					#print "limit reached"
 
@@ -493,7 +502,8 @@ class Mob(Entity):
 		# 	self.species.owner = self
 		if self.expirator:
 			self.expirator.owner = self
-			self.expirator.Timer.attachedTo = self
+			if self.expirator.Timer != None:
+				self.expirator.Timer.attachedTo = self
 
 
 class Player(Entity):
@@ -525,14 +535,33 @@ class mortal:		# 'kind' attribute
 
 class expirator:		# component added to mobs.  Causes the mob to expire and delete after a set period of time, so the world does not fill with mobs
 
-	def __init__(self, time):
+	def __init__(self, owner, time):
+		self.owner = owner
 		self.time = time
-		self.Timer = Timer(Globals.TIMERS, 1200, self.selfExpire, [], None, True)
+		self.startingTime = time
+		self.Timer = Timer(Globals.TIMERS, self.time, self.selfExpire, [], None, True)
 
-	def checkTimer(self, time):		#checks to see how long it has been since there was contact, and if it has been longer than the time, delete the mob.
-		pass
-
+	# def checkTimer(self):		#checks to see how long it has been since there was contact, and if it has been longer than the time, delete the mob.
+	# 	if self.Timer.time <= 0:
+	# 		self.selfExpire()
 
 	def selfExpire(self):		#removes self from the game, and then deletes self to free up memory
-		pass
+		for player in Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].players:
+			player.client.send_cc("^y%s disappeared.^~\n" %self.owner.name.capitalize())
 
+		print("-m " + str(self.owner)+ " " + str(self.owner.name) + " @ [" + str(self.owner.currentRoom.region) + ":" + str(self.owner.currentRoom.name)+ "] (expired)")
+
+		if self.owner in Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].mobs:
+			Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].mobs.remove(self.owner)
+
+
+	def resetTimer(self):		#if a player enters the same room as the mob, reset the timer continuously until the player leaves
+		self.time = self.startingTime
+		self.Timer.time = self.startingTime
+		self.Timer.currentTime = self.startingTime
+		for timer in Globals.TIMERS:
+			if timer == self.Timer:
+				timer.time = self.startingTime
+				timer.currentTime = self.startingTime
+				timerID = timer
+		print ('#m ' + str(self.owner)+ " " + str(self.owner.name) + " @ [" + str(self.owner.currentRoom.region) + ":" + str(self.owner.currentRoom.name)+ "] (" + str(timerID.time) +")")

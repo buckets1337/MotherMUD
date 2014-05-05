@@ -67,7 +67,13 @@ def loadSavedMobs():
 												Globals.regionListDict[region][room].objects.remove(invObj)
 												found = True
 									newMortal = World.mortal(protoMob.kind.hp, protoMob.kind.exp, inventoryList, protoMob.kind.inventorySize, protoMob.kind.equipment)
-									newMob = World.Mob(protoMob.description, Globals.regionListDict[region][room], protoMob.name, Globals.regionListDict[region][room].region, protoMob.longDescription, protoMob.speech, newMortal, protoMob.species, protoMob.expirator)
+
+									newMob = World.Mob(protoMob.description, Globals.regionListDict[region][room], protoMob.name, Globals.regionListDict[region][room].region, protoMob.longDescription, protoMob.speech, newMortal, protoMob.species, None)
+
+									if hasattr(protoMob, 'expirator') and protoMob.expirator != None:
+										newExpirator = World.expirator(newMob, protoMob.expirator.startingTime)
+										newMob.expirator = newExpirator
+
 									Globals.regionListDict[region][room].mobs.append(newMob)
 									print Globals.regionListDict[region][room].mobs
 
@@ -135,6 +141,10 @@ def loadMobFromFile(file):
 			newMob.longDescription = Data[16:-1]
 		if Data.startswith('speech='):
 			newMob.speech = Data[7:-1]
+		if Data.startswith('expirator='):
+			expirator = Data[10:-1]
+			if expirator != '':
+				expirator = int(expirator)
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -161,6 +171,10 @@ def loadMobFromFile(file):
 		# newMob.currentRoom = Globals.regionListDict[newMob.region]['bullpen']
 		newMob.currentRoom = None
 
+	if expirator != None and expirator != '':
+		expiratorComponent = World.expirator(newMob, expirator)
+		newMob.expirator = expiratorComponent
+
 	print 'invItems:' + str(inventoryItems)
 	for item in inventoryItems:
 		print 'invitem:' + str(item)
@@ -175,6 +189,11 @@ def loadMobFromFile(file):
 
 	if newMob.currentRoom is not None:
 		newMob.currentRoom.mobs.append(newMob)
+
+	if expirator != None and expirator != '':
+		Globals.TIMERS.remove(newMob.expirator.Timer)
+		newMob.expirator.Timer = None
+
 	Globals.mobsFromFile.append(newMob)
 
 
@@ -242,6 +261,10 @@ def loadSavedMobFromFile(file, path):
 			newMob.longDescription = Data[16:-1]
 		if Data.startswith('speech='):
 			newMob.speech = Data[7:-1]
+		if Data.startswith('expirator='):
+			expirator = Data[10:-1]
+			if expirator != '':
+				expirator = int(expirator)
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -267,6 +290,10 @@ def loadSavedMobFromFile(file, path):
 	else:
 		newMob.currentRoom = Globals.regionListDict[newMob.region]['bullpen']
 
+	if expirator != None and expirator != '':
+		expiratorComponent = World.expirator(newMob, expirator)
+		newMob.expirator = expiratorComponent
+
 	for item in inventoryItems:
 		#print item
 		removed = False
@@ -277,6 +304,11 @@ def loadSavedMobFromFile(file, path):
 				newMob.currentRoom.objects.remove(obj)
 
 	newMob.currentRoom.mobs.append(newMob)
+
+	# if expirator != None and expirator != '':
+	# 	Globals.TIMERS.remove(newMob.expirator.Timer)
+	# 	newMob.expirator.Timer = None
+
 	Globals.mobsFromFile.append(newMob)
 
 
@@ -327,6 +359,9 @@ def saveMobToFile(mob, path):
 		f.write('\n')
 		f.write('speech=%s\n' %mob.speech)
 		f.write('\n')
+		if mob.expirator != None:
+			f.write('expirator=%s\n' %mob.expirator.startingTime)
+		f.write('\n')
 		f.write('kind.hp=%s\n' %str(mob.kind.hp))
 		f.write('kind.exp=%s\n' %str(mob.kind.exp))
 		f.write('kind.inventory=',)
@@ -334,8 +369,9 @@ def saveMobToFile(mob, path):
 		for item in mob.kind.inventory:
 			invString += (item.name + ', ')
 		if invString.endswith(', '):
-			invString = invString[:-2]+'\n'
+			invString = invString[:-2]
 		f.write(invString)
+		f.write('\n')
 		f.write('kind.inventorySize=%s\n' %str(mob.kind.inventorySize))
 		f.write('kind.equipment=%s\n' %str(mob.kind.equipment))
 

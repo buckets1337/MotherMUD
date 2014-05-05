@@ -72,10 +72,10 @@ def chat(client, args, CLIENT_LIST, CLIENT_DATA):
 
     for guest in CLIENT_LIST:
         if guest != client:
-            guest.send_cc('^Y<chat> %s: "%s"^~\n' % (CLIENT_DATA[clientDataID].name, message))
+            guest.send_cc('^Y<^~chat^Y> %s^~: "%s"^~\n' % (CLIENT_DATA[clientDataID].name, message))
                 # guest.send(prompt)
         else:
-            guest.send_cc('^y<chat> %s: %s^~\n' % (CLIENT_DATA[clientDataID].name, message))
+            guest.send_cc('^Y<^~chat^Y> ^I%s^~: %s^~\n' % (CLIENT_DATA[clientDataID].name, message))
             # guest.send(prompt)
 
 

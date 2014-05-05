@@ -8,7 +8,7 @@ isVisible=False
 
 mobSpawner=True
 mobSpawner.mobFile=test/rat
-mobSpawner.time=30
+mobSpawner.time=10
 mobSpawner.oddsList=True:1,False:10
 mobSpawner.mode=pack
 mobSpawner.cycles=3

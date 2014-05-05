@@ -132,7 +132,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                     Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                     # print 'starting;' + str(Globals.startingRoom.players)
-                    
+
                     with  open(path, 'w') as f:
                         f.write(str(CLIENT_DATA[clientDataID].password) + '\n')
                         # print CLIENT_DATA[clientDataID].password
@@ -148,7 +148,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                         #print "op true"
                     #print CLIENT_DATA[clientDataID].op
 
-                cMove.alert(client, CLIENT_DATA, ("\n^g%s appeared.^~\n" %player.name))
+                cMove.alert(client, CLIENT_DATA, ("\n^g^!%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
                 cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA=CLIENT_DATA)
                 CLIENT_DATA[clientDataID].loadFinish = True

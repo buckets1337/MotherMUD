@@ -215,7 +215,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 			f.write("hp=" + hp + "\n")
 			f.write("exp=" + exp + "\n")
-			f.write("inventorySize=" + inventorySize + "\n\n")
+			f.write("inventorySize=" + inventorySize + "\n")
 
 			f.write("\ninventory=")
 
@@ -492,10 +492,12 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 				TI.write(str(timerID) + " time=" + str(TIMER.time) + "\n")
 				TI.write(str(timerID) + " actionFunction=" + str(TIMER.actionFunction) + "\n")
 				TI.write(str(timerID) + " actionArgs=" + str(TIMER.actionArgs) + "\n")
-				if hasattr(TIMER.attachedTo.owner, 'owner'):
-					TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
-				elif hasattr(TIMER.attachedTo, 'owner'):
-					TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.name + "\n")
+				if hasattr(TIMER, 'attachedTo'):
+					if TIMER.attachedTo != None:
+						if hasattr(TIMER.attachedTo.owner, 'owner'):
+							TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
+						elif hasattr(TIMER.attachedTo, 'owner'):
+							TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.name + "\n")
 				TI.write(str(timerID) + " respawns=" + str(TIMER.respawns) + "\n")
 				TI.write(str(timerID) + " currentTime=" + str(TIMER.currentTime) + "\n")
 				TI.write(" \n")

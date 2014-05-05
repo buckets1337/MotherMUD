@@ -30,9 +30,13 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 	for item in player.kind.inventory:
 		item.currentRoom = player.currentRoom
 
+	for mob in player.currentRoom.mobs:
+		if mob.expirator != None:
+			mob.expirator.resetTimer()
+
 	cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
 
-	alert(client, CLIENT_DATA, ("\n^g%s has entered.^~\n" %player.name))
+	alert(client, CLIENT_DATA, ("\n^g^!%s has entered.^~\n" %player.name))
 
 
 def alert(client, CLIENT_DATA, messageString):
