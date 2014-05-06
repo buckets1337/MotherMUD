@@ -3,7 +3,7 @@
 describes the classes for objects that will be in the world
 """
 
-import Engine
+import Engine, aiMove
 import Globals
 import random
 
@@ -419,6 +419,18 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 					#print str(iters) + ":" + str(maxNum)
 					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
 					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+					if hasattr(ob, 'aiMove'):
+						newAIComponent = aiMove.movementAI(newMob, ob.aiMove.time)
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.basicRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.basicRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.introvertRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.introvertRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.extrovertRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.extrovertRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.doNotMove:
+							newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
+					newMob.aiMove = newAIComponent
+
 					if hasattr(ob, 'expirator') and ob.expirator != None:
 						newExpirator = expirator(newMob, ob.expirator.startingTime)
 						newMob.expirator = newExpirator
@@ -434,6 +446,17 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 			elif self.mode == 'cont':	 	# always spawns exactly one mob
 				newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
 				newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+				if hasattr(ob, 'aiMove'):
+					newAIComponent = aiMove.movementAI(newMob, ob.aiMove.time)
+					if ob.aiMove.Timer.actionFunction == ob.aiMove.basicRandom:
+						newAIComponent.Timer.actionFunction = newAIComponent.basicRandom
+					if ob.aiMove.Timer.actionFunction == ob.aiMove.introvertRandom:
+						newAIComponent.Timer.actionFunction = newAIComponent.introvertRandom
+					if ob.aiMove.Timer.actionFunction == ob.aiMove.extrovertRandom:
+						newAIComponent.Timer.actionFunction = newAIComponent.extrovertRandom
+					if ob.aiMove.Timer.actionFunction == ob.aiMove.doNotMove:
+						newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
+				newMob.aiMove = newAIComponent
 				if hasattr(ob, 'expirator') and ob.expirator != None:
 					newExpirator = expirator(newMob, ob.expirator.startingTime)
 					newMob.expirator = newExpirator
@@ -455,6 +478,17 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 				if numPresent < self.cycles:
 					newMortal = mortal(ob.kind.hp, ob.kind.exp, [], ob.kind.inventorySize, {})
 					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
+					if hasattr(ob, 'aiMove'):
+						newAIComponent = aiMove.movementAI(newMob, ob.aiMove.time)
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.basicRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.basicRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.introvertRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.introvertRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.extrovertRandom:
+							newAIComponent.Timer.actionFunction = newAIComponent.extrovertRandom
+						if ob.aiMove.Timer.actionFunction == ob.aiMove.doNotMove:
+							newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
+					newMob.aiMove = newAIComponent
 					if hasattr(ob, 'expirator') and ob.expirator != None:
 						newExpirator = expirator(newMob, ob.expirator.startingTime)
 						newMob.expirator = newExpirator

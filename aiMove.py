@@ -2,20 +2,72 @@
 # various movement AI scripts for mobs
 
 import random
-import World, Globals
+import Globals
 
 
 
 
 
+class Timer:		# this was copied directly from World.py, and should be exactly the same at all times.
+    """
+    A timer is an object that, when spawned, will count down until zero, and then perform and action and possibly respawn itself
+    """
+    def __init__(self, TIMERS, time, actionFunction, actionArgs = [], attachedTo = None, respawns = False):
+        self.TIMERS = TIMERS
+        self.time = time
+        self.actionFunction = actionFunction
+        self.actionArgs = actionArgs
+        self.attachedTo = attachedTo
+        self.respawns = respawns
 
+        self.currentTime = float(time)
+
+        self.count = 0
+
+        self.TIMERS.append(self)
+
+        # self.initialTime = time.clock()
+        # self.lastTime = 0
+
+    def tick(self, deltaTime):     
+        """tick should be called once each game loop"""
+        #timePassed = (time.clock() - self.initialTime) - self.lastTime
+
+        self.currentTime -= deltaTime
+        #print self.currentTime
+        #print "tick"
+        self.count += 1
+        #print str(self.count) + self.attachedTo.owner.owner.name
+
+        if self.currentTime <= 0:
+
+			#print "time out. " + str(self.attachedTo.owner.owner.name) + " " + str(self)
+			if self in Globals.TIMERS:
+				Globals.TIMERS.remove(self)
+			elif self in Globals.MoveTIMERS:
+				Globals.MoveTIMERS.remove(self)
+
+			#print "removed " + str(self)
+
+			if self.actionArgs != []:
+				self.actionFunction(self.actionArgs)
+			else:
+			    self.actionFunction()
+
+
+			#print "timers:" + str(Globals.TIMERS)
+
+
+			# if self.respawns == True:
+			#     self.currentTime = self.time
+			#     Globals.TIMERS.append(self)
 #---------------------------------------------------------
 
 class movementAI:
 	def __init__(self, mob, time):
 		self.mob = mob
 		self.time = time
-		self.Timer = World.Timer(Globals.MoveTIMERS, self.time, None, None, self, True)
+		self.Timer = Timer(Globals.MoveTIMERS, self.time, None, None, self, True)
 		
 
 	def selector(self, oddsList):     # pick a random selection from an odds list and return it.
