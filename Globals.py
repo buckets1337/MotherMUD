@@ -21,6 +21,7 @@ CLIENT_LIST = []
 SERVER_RUN = True
 CLIENT_DATA = {}
 TIMERS = []
+MoveTIMERS = []
 
 OPList = []
 

@@ -70,7 +70,7 @@ class Timer:
         self.attachedTo = attachedTo
         self.respawns = respawns
 
-        self.currentTime = time
+        self.currentTime = float(time)
 
         self.count = 0
 
@@ -92,8 +92,10 @@ class Timer:
         if self.currentTime <= 0:
 
 			#print "time out. " + str(self.attachedTo.owner.owner.name) + " " + str(self)
-
-			Globals.TIMERS.remove(self)
+			if self in Globals.TIMERS:
+				Globals.TIMERS.remove(self)
+			elif self in Globals.MoveTIMERS:
+				Globals.MoveTIMERS.remove(self)
 
 			#print "removed " + str(self)
 
@@ -106,8 +108,9 @@ class Timer:
 			#print "timers:" + str(Globals.TIMERS)
 
 
-            # if self.respawns == True:
-            #     newTimer = Timer(self.TIMERS, self.time, self.actionFunction, self.actionArgs, self.attachedTo, self.respawns)
+			# if self.respawns == True:
+			#     self.currentTime = self.time
+			#     Globals.TIMERS.append(self)
 
 
 
@@ -486,7 +489,7 @@ class Mob(Entity):
 	"""
 	This class describes a generic badguy, and holds his information.  Methods will be added in mostly through components
 	"""
-	def __init__(self, description, currentRoom, name, region=None, longDescription = None, speech = None, kind = None, species = None, expirator = None):
+	def __init__(self, description, currentRoom, name, region=None, longDescription = None, speech = None, kind = None, species = None, expirator = None, aiMove = None):
 		Entity.__init__(self, description, currentRoom, name)
 		self.region = region
 		self.longDescription = longDescription
@@ -494,6 +497,7 @@ class Mob(Entity):
 		self.kind = kind
 		self.species = species
 		self.expirator = expirator
+		self.aiMove = aiMove
 
 		# let components know what mob they belong to
 		if self.kind:
@@ -539,7 +543,7 @@ class expirator:		# component added to mobs.  Causes the mob to expire and delet
 		self.owner = owner
 		self.time = time
 		self.startingTime = time
-		self.Timer = Timer(Globals.TIMERS, self.time, self.selfExpire, [], None, True)
+		self.Timer = Timer(Globals.TIMERS, self.time, self.selfExpire, [], None, False)
 
 	# def checkTimer(self):		#checks to see how long it has been since there was contact, and if it has been longer than the time, delete the mob.
 	# 	if self.Timer.time <= 0:
@@ -553,6 +557,10 @@ class expirator:		# component added to mobs.  Causes the mob to expire and delet
 
 		if self.owner in Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].mobs:
 			Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].mobs.remove(self.owner)
+
+		#Globals.TIMERS.remove(self.Timer)
+		if self.owner.aiMove != None:
+			Globals.MoveTIMERS.remove(self.owner.aiMove.Timer)
 
 
 	def resetTimer(self):		#if a player enters the same room as the mob, reset the timer continuously until the player leaves

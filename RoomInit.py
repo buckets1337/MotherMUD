@@ -1,7 +1,7 @@
 # RoomInit.py
 # handles loading in all the rooms in all the regions in the world.
 
-import Globals, Engine, Rooms, World
+import Globals, Engine, Rooms, World, aiMove
 import os
 
 
@@ -342,7 +342,20 @@ def loadRoom(file):
 						protoEq.append(item)
 
 					mortalComponent = World.mortal(protoMob.kind.hp, protoMob.kind.exp, protoInv, protoMob.kind.inventorySize, protoEq)
+
 					newMob = World.Mob(protoMob.description, newRoom, protoMob.name, newRoom.region, protoMob.longDescription, protoMob.speech, mortalComponent, protoMob.species, protoMob.expirator)
+
+					moveAIComponent = aiMove.movementAI(newMob, int(protoMob.aiMove.time))
+					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.basicRandom:
+						moveAIComponent.Timer.actionFunction = moveAIComponent.basicRandom
+					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.introvertRandom:
+						moveAIComponent.Timer.actionFunction = moveAIComponent.introvertRandom
+					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.extrovertRandom:
+						moveAIComponent.Timer.actionFunction = moveAIComponent.extrovertRandom
+					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.doNotMove:
+						moveAIComponent.Timer.actionFunction = moveAIComponent.doNotMove
+					newMob.aiMove = moveAIComponent
+
 					mobs.append(newMob)
 
 

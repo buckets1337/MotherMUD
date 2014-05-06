@@ -5,6 +5,7 @@ import os
 
 import Globals
 import Engine, World
+import aiMove
 
 
 mobsFromFile = Globals.mobsFromFile
@@ -118,6 +119,7 @@ def loadMobFromFile(file):
 	expirator = None
 	inventoryItems = []
 	currentRoomString = ''
+	moveAI = None
 
 	newMob.kind = World.mortal(0,0, [])
 	newMob.kind.inventory = []
@@ -133,18 +135,26 @@ def loadMobFromFile(file):
 			newMob.name = Data[5:-1]
 		if Data.startswith('species='):
 			newMob.species = Data[8:-1]
+
 		if Data.startswith('currentRoom='):
 			currentRoomString = Data[12:-1]
+
 		if Data.startswith('description='):
 			newMob.description = Data[12:-1]
+
 		if Data.startswith('longDescription='):
 			newMob.longDescription = Data[16:-1]
+
 		if Data.startswith('speech='):
 			newMob.speech = Data[7:-1]
+
 		if Data.startswith('expirator='):
 			expirator = Data[10:-1]
 			if expirator != '':
 				expirator = int(expirator)
+		if Data.startswith('moveAI='):
+			text = Data[7:-1]
+			moveAI = text.split(":")
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -174,6 +184,21 @@ def loadMobFromFile(file):
 	if expirator != None and expirator != '':
 		expiratorComponent = World.expirator(newMob, expirator)
 		newMob.expirator = expiratorComponent
+
+	if moveAI != None and moveAI != []:
+		newMoveAI = aiMove.movementAI(newMob, int(moveAI[1]))
+		if moveAI[0] == 'basicRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.basicRandom
+		elif moveAI[0] == 'introvertRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.introvertRandom
+		elif moveAI[0] == 'extrovertRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.extrovertRandom
+		elif moveAI[0] == 'doNotMove':
+			newMoveAI.Timer.actionFunction = newMoveAI.doNotMove
+
+		newMob.aiMove = newMoveAI
+		Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
+
 
 	print 'invItems:' + str(inventoryItems)
 	for item in inventoryItems:
