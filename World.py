@@ -557,11 +557,14 @@ class expirator:		# component added to mobs.  Causes the mob to expire and delet
 
 	def resetTimer(self):		#if a player enters the same room as the mob, reset the timer continuously until the player leaves
 		self.time = self.startingTime
-		self.Timer.time = self.startingTime
-		self.Timer.currentTime = self.startingTime
+		found = False
+		if self.Timer != None:
+			self.Timer.time = self.startingTime
+			self.Timer.currentTime = self.startingTime
 		for timer in Globals.TIMERS:
 			if timer == self.Timer:
 				timer.time = self.startingTime
 				timer.currentTime = self.startingTime
 				timerID = timer
-		print ('#m ' + str(self.owner)+ " " + str(self.owner.name) + " @ [" + str(self.owner.currentRoom.region) + ":" + str(self.owner.currentRoom.name)+ "] (" + str(timerID.time) +")")
+				print ('#m ' + str(self.owner)+ " " + str(self.owner.name) + " @ [" + str(self.owner.currentRoom.region) + ":" + str(self.owner.currentRoom.name)+ "] (" + str(timerID.time) +")")
+

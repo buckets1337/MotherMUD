@@ -82,6 +82,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 						
 						newItem = cmdSpawnObject(obj.name, currentRoomRoom, alert=False, whereFrom='playerinv')
 						inventoryItems.append(newItem)
+						currentRoomRoom.objects.remove(newItem)
 						found = True
 						#print 'invI:' + str(inventoryItems)
 
