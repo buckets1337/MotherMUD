@@ -593,7 +593,7 @@ class expirator:		# component added to mobs.  Causes the mob to expire and delet
 			Globals.regionListDict[self.owner.currentRoom.region][self.owner.currentRoom.name].mobs.remove(self.owner)
 
 		#Globals.TIMERS.remove(self.Timer)
-		if self.owner.aiMove != None:
+		if self.owner.aiMove != None and (self.owner.aiMove.Timer in Globals.MoveTIMERS):
 			Globals.MoveTIMERS.remove(self.owner.aiMove.Timer)
 
 

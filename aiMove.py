@@ -99,6 +99,7 @@ class movementAI:
 		# else:
 		# 	print "  moveCheck - " + str(self.mob.name) + " " + str(winner)
 		if winner[0] == 'True' or winner[0] == True:
+			newRoom = None
 			if self.mob.currentRoom != None:
 				randRange = len(self.mob.currentRoom.exits) - 1
 				selection = random.randint(0, randRange)
@@ -144,6 +145,7 @@ class movementAI:
 		# else:
 		# 	print "  moveCheck - " + str(self.mob.name) + " " + str(winner)
 		if winner[0] == 'True' or winner[0] == True:
+			newRoom = None
 			if self.mob.currentRoom != None:
 				randRange = len(self.mob.currentRoom.exits) - 1
 				selection = random.randint(0, randRange)
@@ -164,9 +166,13 @@ class movementAI:
 				oldMobRoom = self.mob.currentRoom
 
 				if newRoom != None:
-					self.mob.currentRoom.mobs.remove(self.mob)
-					self.mob.currentRoom = newRoom
-					newRoom.mobs.append(self.mob)
+					if self.mob in self.mob.currentRoom.mobs:
+						self.mob.currentRoom.mobs.remove(self.mob)
+						self.mob.currentRoom = newRoom
+						newRoom.mobs.append(self.mob)
+					else:
+						if self.Timer in Globals.MoveTIMERS:
+							Globals.MoveTIMERS.remove(self.Timer)
 
 				print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
 

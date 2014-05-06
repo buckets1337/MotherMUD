@@ -39,11 +39,13 @@ def loadSavedMobs():
 		for room in Globals.regionListDict[region]:
 			path = 'data/world/'+region+'/mobs/'+room+'/'
 			if os.path.exists(path):
-				print path + " exists."
-				print Globals.regionListDict[region][room].mobs
+				# print path + " exists."
+				# print Globals.regionListDict[region][room].mobs
+				for mob in Globals.regionListDict[region][room].mobs:
+					Globals.MoveTIMERS.remove(mob.aiMove.Timer)
 				Globals.regionListDict[region][room].mobs = []
-				print Globals.regionListDict[region][room].mobs
-				print Globals.masterRooms
+				# print Globals.regionListDict[region][room].mobs
+				# print Globals.masterRooms
 				#Globals.masterRooms[(region+room.capitalize())].mobs = []
 				# Globals.masterRooms = {}
 				mobFiles = os.listdir(path)
@@ -53,32 +55,45 @@ def loadSavedMobs():
 						if mob.endswith('~'):
 							pass
 						else:
-							loadSavedMobFromFile(mob, path)
+							newMob = loadSavedMobFromFile(mob, path)
 
-							for protoMob in Globals.mobsFromFile:
-								if protoMob.mobID == str(mob):
-									inventoryList = []
-									for item in protoMob.kind.inventory:
-										found = False
-										for obj in Globals.fromFileList:
-											if item.name == obj.name and found == False:
-												# inventoryList.append(obj)	# not the right way to handle this, should be forming new objects 
-												invObj = Engine.cmdSpawnObject(obj.name, Globals.regionListDict[region][room], alert=False, whereFrom='mobinv')
-												inventoryList.append(invObj)
-												Globals.regionListDict[region][room].objects.remove(invObj)
-												found = True
-									newMortal = World.mortal(protoMob.kind.hp, protoMob.kind.exp, inventoryList, protoMob.kind.inventorySize, protoMob.kind.equipment)
+							# protoMob = newMob
+							# inventoryList = []
+							# for item in protoMob.kind.inventory:
+							# 	found = False
+							# 	for obj in Globals.fromFileList:
+							# 		if item.name == obj.name and found == False:
+							# 			# inventoryList.append(obj)	# not the right way to handle this, should be forming new objects 
+							# 			invObj = Engine.cmdSpawnObject(obj.name, Globals.regionListDict[region][room], alert=False, whereFrom='mobinv')
+							# 			inventoryList.append(invObj)
+							# 			Globals.regionListDict[region][room].objects.remove(invObj)
+							# 			found = True
+							# newMortal = World.mortal(protoMob.kind.hp, protoMob.kind.exp, inventoryList, protoMob.kind.inventorySize, protoMob.kind.equipment)
 
-									newMob = World.Mob(protoMob.description, Globals.regionListDict[region][room], protoMob.name, Globals.regionListDict[region][room].region, protoMob.longDescription, protoMob.speech, newMortal, protoMob.species, None)
+							# newMob = World.Mob(protoMob.description, Globals.regionListDict[region][room], protoMob.name, Globals.regionListDict[region][room].region, protoMob.longDescription, protoMob.speech, newMortal, protoMob.species, None)
+							# newMoveAI = aiMove.movementAI(newMob, protoMob.aiMove.Timer.time)
+							# if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.basicRandom:
+							# 	newMoveAI.Timer.actionFunction = newMoveAI.basicRandom
+							# elif protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.introvertRandom:
+							# 	newMoveAI.Timer.actionFunction = newMoveAI.introvertRandom
+							# elif protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.extrovertRandom:
+							# 	newMoveAI.Timer.actionFunction = newMoveAI.extrovertRandom
+							# elif protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.donotMove:
+							# 	newMoveAI.Timer.actionFunction = newMoveAI.doNotMove
 
-									if hasattr(protoMob, 'expirator') and protoMob.expirator != None:
-										newExpirator = World.expirator(newMob, protoMob.expirator.startingTime)
-										newMob.expirator = newExpirator
+							# newMob.aiMove = newMoveAI
+							# Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
 
-									Globals.regionListDict[region][room].mobs.append(newMob)
-									print Globals.regionListDict[region][room].mobs
+							# if hasattr(protoMob, 'expirator') and protoMob.expirator != None:
+							# 	newExpirator = World.expirator(newMob, protoMob.expirator.startingTime)
+							# 	newMob.expirator = newExpirator
 
-								Globals.mobsFromFile.remove(protoMob)
+							# Globals.regionListDict[region][room].mobs.append(newMob)
+							# print Globals.regionListDict[region][room].mobs
+
+							#Globals.mobsFromFile.remove(protoMob)
+
+							#Globals.MoveTIMERS.remove(protoMob.aiMove.Timer)
 
 
 def loadMobFromFile(file):
@@ -290,6 +305,9 @@ def loadSavedMobFromFile(file, path):
 			expirator = Data[10:-1]
 			if expirator != '':
 				expirator = int(expirator)
+		if Data.startswith('moveAI='):
+			text = Data[7:-1]
+			moveAI = text.split(":")
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -319,6 +337,20 @@ def loadSavedMobFromFile(file, path):
 		expiratorComponent = World.expirator(newMob, expirator)
 		newMob.expirator = expiratorComponent
 
+	if moveAI != None and moveAI != []:
+		newMoveAI = aiMove.movementAI(newMob, int(moveAI[1]))
+		if moveAI[0] == 'basicRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.basicRandom
+		elif moveAI[0] == 'introvertRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.introvertRandom
+		elif moveAI[0] == 'extrovertRandom':
+			newMoveAI.Timer.actionFunction = newMoveAI.extrovertRandom
+		elif moveAI[0] == 'doNotMove':
+			newMoveAI.Timer.actionFunction = newMoveAI.doNotMove
+
+		newMob.aiMove = newMoveAI
+		#Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
+
 	for item in inventoryItems:
 		#print item
 		removed = False
@@ -336,8 +368,10 @@ def loadSavedMobFromFile(file, path):
 
 	Globals.mobsFromFile.append(newMob)
 
+	return newMob
 
-	print 'region:' + str(newMob.region)
+
+	#print 'region:' + str(newMob.region)
 
 
 
@@ -386,6 +420,16 @@ def saveMobToFile(mob, path):
 		f.write('\n')
 		if mob.expirator != None:
 			f.write('expirator=%s\n' %mob.expirator.startingTime)
+		if mob.aiMove != None:
+			if mob.aiMove.Timer.actionFunction == mob.aiMove.basicRandom:
+				actionFunction = 'basicRandom'
+			elif mob.aiMove.Timer.actionFunction == mob.aiMove.introvertRandom:
+				actionFunction = 'introvertRandom'
+			elif mob.aiMove.Timer.actionFunction == mob.aiMove.extrovertRandom:
+				actionFunction = 'extrovertRandom'
+			elif mob.aiMove.Timer.actionFunction == mob.aiMove.doNotMove:
+				actionFunction = 'doNotMove'
+			f.write('moveAI=%s:%s\n' %(actionFunction, mob.aiMove.Timer.time))
 		f.write('\n')
 		f.write('kind.hp=%s\n' %str(mob.kind.hp))
 		f.write('kind.exp=%s\n' %str(mob.kind.exp))
