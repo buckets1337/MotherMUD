@@ -1,7 +1,7 @@
 # cInteractions
 # handles various commands that modify the world in some manner
 
-import World
+import World, Globals, Rooms, cInfo
 
 def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# targetsList = []
@@ -116,6 +116,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# else:
 	# 	client.send("Target not found.\n")
 
+
 def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# drop items from inventory
 	inventory = CLIENT_DATA[clientDataID].avatar.kind.inventory
@@ -180,7 +181,6 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 
 	if found == False:
 		client.send("I have nothing to drop!\n")
-
 
 
 def check(client, args, clientDataID, CLIENT_DATA, room):
@@ -258,3 +258,102 @@ def check(client, args, clientDataID, CLIENT_DATA, room):
 
 		else:
 			print "end"
+
+
+def startBattle(client, args, clientDataID, CLIENT_DATA, room):
+	if len(args) == 0:
+		client.send_cc("Who do I want to fight?\n")
+		return
+
+	playerAvatar = CLIENT_DATA[clientDataID].avatar
+	#print playerAvatar
+	mobToBattle = None
+
+	mobList = []
+	for mob in room.mobs:
+		if args[0] == mob.name:
+			mobList.append(mob)
+
+	if len(args) == 1:
+		if len(mobList) != 0:
+			mobToBattle = mobList[0]
+		else:
+			client.send_cc("You don't see a %s\n" %args[0])
+
+	elif len(args) == 2:
+		if int(args[1]) > len(args):
+			client.send_cc("I don't see %s %s(s) here!\n" %(args[1], args[0]))
+		else:
+			mobToBattle = mobList[int(args[1])-1]
+
+	room.players.remove(playerAvatar)
+	room.mobs.remove(mobToBattle)
+
+	roomCount = 0
+	battleRoomName = 'Battle@' + room.name
+	for battleRoom in Globals.battleRooms:
+		if battleRoom.name == battleRoomName:
+			roomCount += 1
+	if roomCount > 0:
+		battleRoomName = 'Battle@' + room.name + "(" + str(roomCount+1) + ")"
+
+	playerAvatarName = playerAvatar.name
+
+	battleRoomDescription = '^RA battle between ' + playerAvatarName + ' and a ' + mobToBattle.name + '.^c'
+	battleRoomLongDescription = playerAvatarName.capitalize() + ' is ferociously fighting a ' + mobToBattle.name + ' here.'
+
+	battleRoom = World.Room(region='battles', name=battleRoomName, description=battleRoomDescription, longDescription=battleRoomLongDescription, players=[playerAvatar], objects=[], mobs=[mobToBattle])
+	battleRoom.attachedTo = room
+
+	Rooms.master['battles'+battleRoomName] = battleRoom
+	playerAvatar.currentRoom = battleRoom
+	CLIENT_DATA[clientDataID].battleRoom = battleRoom
+	mobToBattle.currentRoom = battleRoom
+	Globals.MoveTIMERS.remove(mobToBattle.aiMove.Timer)
+	if mobToBattle.expirator != None:
+		if mobToBattle.expirator.Timer in Globals.TIMERS:
+			Globals.TIMERS.remove(mobToBattle.expirator.Timer)
+	Globals.battleRooms.append(battleRoom)
+
+	for player in room.players:
+		if CLIENT_DATA[player.clientDataID].gameState != 'battle':
+			CLIENT_DATA[player.clientDataID].client.send_cc("%s and %s began fighting.\n" %(playerAvatar.name.capitalize(), mobToBattle.name))
+
+	battleObjectName = "^r" +playerAvatar.name + "_vs_" + mobToBattle.name + "^c"
+	battleObject = World.Object(name=battleObjectName, description=battleRoomDescription, currentRoom=room, isVisible=True, longDescription=battleRoomLongDescription)
+	room.objects.append(battleObject)
+
+	print "+B " + str(playerAvatar) +  " " + str(playerAvatar.name) + " vs. " + str(mobToBattle.name) + " @ [" + room.region + ":" + room.name + "]" 
+
+	cInfo.battleLook(client, [], Globals.CLIENT_LIST, CLIENT_DATA)
+
+def stopBattle(battleRoom):
+	'''
+	ends a battle in progress, returning the mobs and the player to the room they came from
+	'''
+	for mob in battleRoom.mobs:
+		battleRoom.mobs.remove(mob)
+		battleRoom.attachedTo.mobs.append(mob)
+		mob.currentRoom = battleRoom.attachedTo
+		Globals.MoveTIMERS.append(mob.aiMove.Timer)
+		if mob.expirator.Timer is not None:
+			Globals.TIMERS.append(mob.expirator.Timer)
+
+	for player in battleRoom.players:
+		battleRoom.players.remove(player)
+		battleRoom.attachedTo.players.append(player)
+		player.currentRoom = battleRoom.attachedTo
+		for obj in battleRoom.attachedTo.objects:
+			if obj.name.startswith('^r'+player.name):
+				battleRoom.attachedTo.objects.remove(obj)
+		Globals.CLIENT_DATA[str(player.client.addrport())].gameState = 'normal'
+		cInfo.render_room(player.client, player, battleRoom.attachedTo, Globals.CLIENT_DATA)
+
+
+
+
+	Globals.battleRooms.remove(battleRoom)
+	label = str(battleRoom.region)+str(battleRoom.name)
+	if label in Globals.masterRooms:
+		del Globals.masterRooms[label]
+

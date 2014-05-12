@@ -3,6 +3,7 @@
 
 import os
 import World, Globals
+import RoomInit, MobInit
 
 
 
@@ -36,6 +37,10 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	exp = None
 	inventorySize = None
 	inventoryItems = []
+	gameState = None
+	currentRoomRoom = None
+	battleRoom = None
+	battleRoomAttachedTo = None
 
 	#print fileData
 	for data in fileData:
@@ -45,6 +50,13 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			op = data[3:-1]
 		if data.startswith("prompt="):
 			prompt = data[7:-1]
+		if data.startswith('gameState='):
+			gameState = data[10:-1]
+		if data.startswith("battleRoom="):
+			battleRoom = data[11:-1]
+		if data.startswith("battleRoom.attachedTo="):
+			battleRoomAttachedTo = data[22:-1]
+			battleRoomAttachedTo = battleRoomAttachedTo.split(":")
 		if data.startswith("clientID="):
 			clientID= data[9:-1]
 		if data.startswith("title="):
@@ -59,7 +71,11 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			currentRoomString = Globals.startingRoom.region + ":" + Globals.startingRoom.name
 		currentRoomCoord = currentRoomString.split(":")
 		#print str(currentRoomCoord)
-		currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
+		for region in Globals.regionListDict:
+			for room in Globals.regionListDict[region]:
+				if room == currentRoomCoord[1]:
+					currentRoomRoom = Globals.regionListDict[currentRoomCoord[0]][currentRoomCoord[1]]
+
 		#print currentRoomRoom.name
 		if data.startswith("hp="):
 			hp = int(data[3:-1])
@@ -111,7 +127,19 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	CLIENT_DATA[clientDataID].clientID = clientID
 	CLIENT_DATA[clientDataID].avatar = newAvatar
 	CLIENT_DATA[clientDataID].avatar.kind = newMortal
+	CLIENT_DATA[clientDataID].gameState = gameState
 	#print "********" + str(inventoryItems)
+
+	if battleRoom != 'None' and battleRoom != '' and battleRoom != None:
+		newBattleRoom = RoomInit.loadBattleRoom('battles/'+str(battleRoom))
+		newBattleRoom.attachedTo = Globals.regionListDict[battleRoomAttachedTo[0]][battleRoomAttachedTo[1]]
+		Globals.battleRooms.append(newBattleRoom)
+		CLIENT_DATA[clientDataID].battleRoom = newBattleRoom
+		currentRoomRoom = newBattleRoom
+
+	for room in Globals.battleRooms:
+		if room.name == currentRoomCoord[1]:
+			currentRoomRoom = room
 
 	for item in inventoryItems:
 		CLIENT_DATA[clientDataID].avatar.kind.inventory.append(item)
@@ -173,12 +201,22 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 	player = CLIENT_DATA[clientDataID]
 	CLIENT = clientDataID
 
+	if not os.path.exists('data'):
+		os.mkdir('data')
+	if not os.path.exists('data/world'):
+		os.mkdir('data/world')
+	if not os.path.exists('data/world/battles'):
+		os.mkdir('data/world/battles')
+
 
 	try:
 
 		name = player.name
 		op = player.op
 		prompt = player.prompt
+		gameState = player.gameState
+		battleRoom = str(player.battleRoom.name)
+		attachedTo = player.battleRoom.attachedTo
 		#client = str(player.client)		# should be recreated on reload, not saved
 		clientID = str(player.clientID)
 		avatar = player.avatar 			# should be recreated on reload, not saved
@@ -206,6 +244,9 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("op=" + str(op) + "\n")
 			f.write("prompt=" + prompt + "\n")
 			#f.write("client=" + client + "\n")
+			f.write("gameState=" + gameState + "\n")
+			f.write("battleRoom=" + battleRoom + "\n")
+			f.write("battleRoom.attachedTo=" + attachedTo.region + ":" + attachedTo.name + "\n")
 			f.write("clientID=" + clientID + "\n\n")
 			#f.write("avatar=" + avatar + "\n")
 
@@ -313,6 +354,17 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 				# location += 1
 
 			f.write("\nequipment=\n")
+
+			# if battleRoom != None and battleRoom != 'None' and battleRoom != '':
+			# 	RoomInit.saveRoom(player.battleRoom)
+			RoomInit.saveRoom(player.battleRoom)
+
+			if not os.path.exists('data/world/battles/mobs'):
+				os.mkdir('data/world/battles/mobs')
+			if not os.path.exists('data/world/battles/mobs/'+player.battleRoom.name+'/'):
+				os.mkdir('data/world/battles/mobs/'+player.battleRoom.name+'/')
+			for mob in player.battleRoom.mobs:
+				MobInit.saveMobToFile(mob, 'data/world/battles/mobs/'+player.battleRoom.name+'/')
 
 	except:
 		print "!! Failed to save CLIENT " + Globals.CLIENT_DATA[clientDataID].name

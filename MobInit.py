@@ -240,7 +240,7 @@ def loadMobFromFile(file):
 	#print 'region:' + str(newMob.region)
 
 
-def loadSavedMobFromFile(file, path):
+def loadSavedMobFromFile(file, path, isBattle=False):
 	'''
 	handles loading a single mob from a given mob definition file into the world
 	'''
@@ -328,14 +328,19 @@ def loadSavedMobFromFile(file, path):
 
 
 	if currentRoomString != '':
-		currentRoomCoords = currentRoomString.split(":")
-		newMob.currentRoom = Globals.regionListDict[currentRoomCoords[0]][currentRoomCoords[1]]
+		if isBattle == False:
+			currentRoomCoords = currentRoomString.split(":")
+			newMob.currentRoom = Globals.regionListDict[currentRoomCoords[0]][currentRoomCoords[1]]
+		else:
+			currentRoomCoords = currentRoomString.split(":")
+			newMob.currentRoom = Globals.regionListDict['battles'][currentRoomCoords[1]]
 	else:
 		newMob.currentRoom = Globals.regionListDict[newMob.region]['bullpen']
 
 	if expirator != None and expirator != '':
 		expiratorComponent = World.expirator(newMob, expirator)
 		newMob.expirator = expiratorComponent
+		#newMob.expirator.Timer.attachedTo = newMob.expirator
 
 	if moveAI != None and moveAI != []:
 		newMoveAI = aiMove.movementAI(newMob, int(moveAI[1]))
@@ -359,6 +364,12 @@ def loadSavedMobFromFile(file, path):
 		for obj in newMob.currentRoom.objects:
 			if obj.name == item:
 				newMob.currentRoom.objects.remove(obj)
+
+	if isBattle == True:
+		if newMob.expirator.Timer in Globals.TIMERS:
+			Globals.TIMERS.remove(newMob.expirator.Timer)
+		if newMob.aiMove.Timer in Globals.MoveTIMERS:
+			Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
 
 	newMob.currentRoom.mobs.append(newMob)
 

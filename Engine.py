@@ -50,7 +50,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
             
 
-
+            commandSuccess = False
             #---------------------
             # Command Definitions
             #---------------------
@@ -152,26 +152,31 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 #print Rooms.startingRoom.players
                 cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA=CLIENT_DATA)
                 CLIENT_DATA[clientDataID].loadFinish = True
+                commandSuccess = True
 
 
             elif cmd == 'say':
                 ## If the client sends a 'say' command echo it to the room
                 cChat.say(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
 
 
             elif cmd == 'shout':
                 ## If the client sends a 'shout' command echo it to the region
                 cChat.shout(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
 
 
             elif cmd == 'tell' or cmd == 't':
                 cChat.tell(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
 
 
             elif cmd == 'chat' or cmd == 'c':
                 ## If the client sends a 'chat' command echo it to the chat channel
                 cChat.chat(client, args, CLIENT_LIST, CLIENT_DATA)
                 CLIENT_DATA[str(client.addrport())].replyTo = None
+                commandSuccess = True
 
             elif cmd == "'":
                 if CLIENT_DATA[client.addrport()].replyTo is None:
@@ -182,67 +187,31 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     if isOnline == False:
                         CLIENT_DATA[str(client.addrport())].replyTo = None
                     #print CLIENT_DATA[client.addrport()].replyTo
+                commandSuccess = True
 
 
             elif cmd == 'channel':
                 ## if the client sends a 'channel' command, create a new chat channel
                 cChat.Channel()
+                commandSuccess = True
 
 
             elif cmd == 'who':
                 ## display who is online
                 cInfo.who(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
 
 
             elif cmd == 'title':
                 ## set player title to args
                 cPersonal.title(client,args,CLIENT_LIST,CLIENT_DATA)
-
-
-            elif cmd == 'look' or cmd == 'l':
-                ## If the client sends a 'look' command, send back the description
-                cInfo.look(client, args, CLIENT_LIST, CLIENT_DATA)
-
-            elif cmd == 'lh':
-                ## alias for 'look harder'
-                cInfo.look(client, ['harder'], CLIENT_LIST, CLIENT_DATA)
-
-
-            elif cmd == 'examine' or cmd == 'ex':
-                ## If the client sends an 'examine' command, send back the long description
-                cInfo.examine(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
 
 
             elif cmd == 'inventory' or cmd == 'i':
                 ## If the client sends an 'inventory' command, display the contents of the client avatar's inventory
                 cInfo.inventory(client, args, CLIENT_LIST, CLIENT_DATA)
-
-
-            elif cmd in CLIENT_DATA[clientDataID].avatar.currentRoom.exits: 
-                ## player used a room exit name as a command, move to room associated with the exit
-                cMove.move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom.exits)
-
-
-            elif cmd == 'get':
-                ## pick up an item in the room
-                cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
-
-            elif cmd == 'check':
-                cInteractions.check(client, args, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom)
-
-
-            elif cmd == 'drop':
-                ## drop an item in the room
-                cInteractions.drop(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
-
-
-            elif cmd == 'quit':
-                ## client is disconnecting
-                client.send("Disconnected.")
-                #CLIENT_LIST.remove(client)
-                client.active = False
-
-
+                commandSuccess = True
 
 
             elif CLIENT_DATA[clientDataID].op == True:        # OP-only commands.
@@ -290,12 +259,91 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                             #                 newObject.kind.objectSpawner.container = item
                             #             item.kind.inventory.append(newObject)
                             #             CLIENT_DATA[clientDataID].avatar.currentRoom.objects.inventory.remove(newObject)
-
+                    commandSuccess = True
 
                 elif cmd == 'shutdown':
                     ## shutdown the server (needs to be protected or removed)
                     print "** Shutdown request received from %s." % CLIENT_DATA[clientDataID].name
                     return 'shutdown'
+                    commandSuccess = True
+
+
+            # State-dependant commands
+
+            if CLIENT_DATA[clientDataID].gameState == 'normal':
+                if cmd in CLIENT_DATA[clientDataID].avatar.currentRoom.exits: 
+                    ## player used a room exit name as a command, move to room associated with the exit
+                    cMove.move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom.exits)
+
+                elif cmd == 'get':
+                    ## pick up an item in the room
+                    cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
+
+                elif cmd == 'check':
+                    cInteractions.check(client, args, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom)
+
+                elif cmd == 'drop':
+                    ## drop an item in the room
+                    cInteractions.drop(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
+
+                elif cmd == 'fight' or cmd == 'f':
+                    ## start a battle with a mob
+                    cInteractions.startBattle(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
+                    CLIENT_DATA[clientDataID].gameState = 'battle'
+
+                elif cmd == 'look' or cmd == 'l':
+                    ## If the client sends a 'look' command, send back the description
+                    cInfo.look(client, args, CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'lh':
+                    ## alias for 'look harder'
+                    cInfo.look(client, ['harder'], CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'examine' or cmd == 'ex':
+                    ## If the client sends an 'examine' command, send back the long description
+                    cInfo.examine(client, args, CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'quit':
+                    ## client is disconnecting
+                    client.send("Disconnected.")
+                    #CLIENT_LIST.remove(client)
+                    client.active = False
+
+
+                elif cmd == '':
+                    ## client just send a return ony, with no information at all
+                    client.send("\nDid you mean to tell me something?\n\n")
+
+
+                elif commandSuccess == False:
+                    ## command does not exist or is badly formed
+                    client.send("\nHuh?  I don't know what '%s' means.\n\n" % msg)
+
+
+
+
+            elif CLIENT_DATA[clientDataID].gameState == 'battle':
+                if cmd == 'look' or cmd == 'l':
+                    cInfo.battleLook(client, args, CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'examine' or cmd == 'ex':
+                    cInfo.battleExamine(client, args, CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'lh':
+                    cInfo.battleExamine(client, ['lh'], CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd == 'flee':
+                    cMove.fleeBattle(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
+                elif cmd == '':
+                    ## client just send a return ony, with no information at all
+                    client.send("\nDid you mean to tell me something?\n\n")
+
+
+                elif commandSuccess == False:
+                    ## command does not exist or is badly formed
+                    client.send("\nI can't '%s' in a battle.\n\n" % msg)
 
 
 
@@ -305,7 +353,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 client.send("\nDid you mean to tell me something?\n\n")
 
 
-            else:
+            elif commandSuccess == False:
                 ## command does not exist or is badly formed
                 client.send("\nHuh?  I don't know what '%s' means.\n\n" % msg)
 

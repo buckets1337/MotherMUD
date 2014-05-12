@@ -86,7 +86,7 @@ def kick_idle():
     """
     ## Who hasn't been typing?
     for client in CLIENT_LIST:
-        if client.idle() > IDLE_TIMEOUT:
+        if client.idle() > IDLE_TIMEOUT and CLIENT_DATA[str(client.addrport())].gameState != 'battle':
             print('>> Kicking idle lobby client from %s' % client.addrport())
             SysInit.clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS)
             client.active = False

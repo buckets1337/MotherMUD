@@ -138,6 +138,117 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		else:
 			client.send("You didn't say what you want to look at.\n")
 
+def battleLook(client, args, CLIENT_LIST, CLIENT_DATA):
+	"""
+	Gives more information about the room.  Without arguments, it displays description of the room.  With an argument, it displays the description of whatever item is named by the arguments
+	"""
+	clientDataID = str(client.addrport())
+	looked = False
+	objectList = []
+	inventory = False
+	#print args
+
+	if args == []:
+		client.send_cc("\n^I[ %s ]^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
+		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		looked = True
+
+	elif args[0] == 'inventory' or args[0] == 'i':
+		#print args[0]
+		args = args[1:]
+		inventory = True
+
+	elif args[0] == 'harder':
+		battleExamine(client, ['lh'], CLIENT_LIST, CLIENT_DATA)
+		return
+
+	# handle looking at an object
+	if inventory == False:
+		objectList = CLIENT_DATA[clientDataID].avatar.currentRoom.objects
+	else:
+		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
+
+	resultsList = []
+
+	for obj in objectList:
+		if obj.name == "_".join(args) or obj.name == "_".join(args[:-1]) or obj.name == "_".join(args[:-2]):
+			resultsList.append(obj)
+			#print resultsList
+
+		elif isinstance(obj.kind, World.container):
+			if obj.kind.isLocked == False:
+				for ob in obj.kind.inventory:
+					if len(args) > 0:
+						if args[-1] == ob.name: 
+							resultsList.append(ob)
+					elif len(args) > 1:
+						if args[-2] == ob.name:
+							resultsList.append(ob)
+			# else:
+			# 	client.send("The %s is locked!\n" %obj.name)
+			# 	return
+
+	if len(resultsList) > 1:
+		#print "args " + str(args)
+		#print "arglen " + str(len(args))
+
+		if len(args) >= 2:
+
+			# numlist = [(x in range(0,99))]
+			# if args[2] in numlist:
+			try:
+				if len(resultsList) >= int(args[1]):
+					client.send_cc("^c%s^~\n" %resultsList[int(args[1]) - 1].description)
+					looked = True
+
+					if isinstance(resultsList[int(args[1]) - 1].kind, World.container):
+						for ob in resultsList[int(args[1]) - 1].kind.inventory:
+							# if ob.name == " ".join(args):
+							client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.description))
+			except ValueError:
+				client.send("Object index must be an integer! I mean, it only makes sense.  Duh.\n")
+
+		else:
+			#print resultsList
+			for obj in objectList:
+				if obj.name == "_".join(args):
+					client.send_cc("^c%s^~\n" %obj.description)
+					looked = True
+					
+
+					if isinstance(obj.kind, World.container):
+						for ob in resultsList[obj].kind.inventory:
+							if ob.name == " ".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.description))
+
+	elif len(resultsList) == 1:
+		#print resultsList
+		for obj in resultsList:
+			# if obj.name == "_".join(args):
+			client.send_cc("^c%s^~\n" %obj.description)
+			looked = True
+			
+
+			if isinstance(obj.kind, World.container):
+				for ob in obj.kind.inventory:
+					if ob.name == "_".join(args):
+						client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.description))
+
+
+	# handle looking at a player
+
+	# handle looking at a mob
+
+
+
+	if looked == False:
+		if len(args) > 0:
+			client.send("I don't see a '%s'. I like to 'look harder' to help me with the names of things!\n" %(" ".join(args)))
+		else:
+			client.send("You didn't say what you want to look at.\n")
+
 
 
 def examine(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -302,7 +413,167 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 		else:
 			client.send("I am not sure what I wanted to examine.\n")
 
+def battleExamine(client, args, CLIENT_LIST, CLIENT_DATA):
+	"""
+	More detailed info than look.  Without arguments, it shows the long description of the current room.  With arguments, it shows the long description of the item that is named by the arguments
+	"""
+	clientDataID = str(client.addrport())
+	objectList = []
+	examined = False
+	inventory = False
 
+	if args == []:
+		# examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
+		client.send("What did I want to examine again?\n")
+		examined = True
+
+
+	elif args[0] == 'inventory' or args[0] == 'i':
+		#print args[0]
+		args = args[1:]
+		inventory = True
+
+	elif args[0] == 'lh':
+		battle_examine_room(client, CLIENT_DATA[clientDataID].avatar, CLIENT_DATA[clientDataID].avatar.currentRoom.region, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA )
+		args.pop(0)
+		examined = True
+
+	# handle examining at an object
+	if inventory == False:
+		objectList = CLIENT_DATA[clientDataID].avatar.currentRoom.objects
+	else:
+		objectList = CLIENT_DATA[clientDataID].avatar.kind.inventory
+
+
+	resultsList = []
+
+	for obj in objectList:
+		if obj.name == "_".join(args) or obj.name == "_".join(args[:-1]) or obj.name == "_".join(args[:-2]):
+			resultsList.append(obj)
+			#print resultsList
+		elif isinstance(obj.kind, World.container):
+			if obj.kind.isLocked == False:
+				for ob in obj.kind.inventory:
+					if len(args) > 0:
+						if args[-1] == ob.name: 
+							resultsList.append(ob)
+					elif len(args) > 1:
+						if args[-2] == ob.name:
+							resultsList.append(ob)
+			# else:
+			# 	client.send("The %s is locked!\n" %obj.name)
+			# 	return
+
+	if len(resultsList) > 1:
+		# print "args " + str(args)
+		# print "arglen " + str(len(args))
+
+		if len(args) >= 2:
+
+			# numlist = []
+			# for x in range(99):
+			# 	numlist.append(x)
+			# if args[1] in numlist:
+			try:
+				if len(resultsList) >= int(args[-1]):
+					client.send_cc("^c%s^~\n" %resultsList[int(args[-1]) - 1].longDescription)
+					examined = True
+
+					if isinstance(resultsList[int(args[-1]) - 1].kind, World.container):
+						#print"has inv"
+						#print "isLocked: " + str(resultsList[int(args[-1]) - 1].kind.isLocked)
+						if resultsList[int(args[-1]) - 1].kind.isLocked == False:
+							for ob in resultsList[int(args[-1]) - 1].kind.inventory:
+								# if ob.name == "_".join(args):
+								client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+							if resultsList[int(args[-1]) - 1].kind.inventory == []:
+								client.send_cc("^c[In %s]:^~\n" %resultsList[int(args[1]) - 1].name)
+						else:
+							client.send_cc("^cThe %s is locked.^~\n" %resultsList[int(args[1]) - 1].name)
+			except ValueError:
+				client.send("Object index must be an integer! My mother always said!\n")
+
+			# for obj in resultsList:
+			# 	if args[-1] == obj.name or args[-2] == obj.name:
+			# 		examine(client, [obj.name], CLIENT_LIST, CLIENT_DATA)
+					
+
+
+		else:
+			#print resultsList
+			for obj in resultsList:
+				# if obj.name == "_".join(args):
+				client.send_cc("^c%s^~\n" %obj.longDescription)
+				examined = True
+
+				if isinstance(obj.kind, World.container):
+					#print "*******"
+					if obj.kind.isLocked == False:
+						for ob in obj.kind.inventory:
+							#print ob.name,
+							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
+						if obj.kind.inventory == []:
+							client.send_cc("^c[In %s]:^~\n" %obj.name)
+					else:
+						client.send_cc("^cThe %s is locked.^~\n" %obj.name)	
+
+
+
+	elif len(resultsList) == 1:
+		#print resultsList
+		for obj in resultsList:
+			#print "result: " + str(obj)
+			client.send_cc("^c%s^~\n" %obj.longDescription)
+			examined = True
+
+			#print obj.kind
+			#print 'ob.inv: ' + str(obj.kind.inventory)
+
+			if hasattr(obj.kind, 'inventory'):
+				#print"&&&&&&&&&&&&&&"
+				if obj.kind.isLocked == False:
+					for ob in obj.kind.inventory:
+						client.send_cc("^c[In %s]: A %s^~\n" %(obj.name, ob.name))
+					if obj.kind.inventory == []:
+						client.send_cc("^c[In %s]:^~\n" %obj.name)
+				else:
+					client.send_cc("^cThe %s is locked.^~\n" %obj.name)					
+
+
+
+
+
+	# for obj in objectList:
+	# 	if obj.name == "_".join(args):
+	# 		client.send_cc("^c%s^~\n" %obj.longDescription)
+	# 		examined = True
+
+	# 		if isinstance(obj.kind, World.container):	# is a container, display the inventory
+	# 			client.send_cc("^c^UContents^u: ")
+	# 			for ob in obj.kind.inventory:
+	# 				if len(obj.kind.inventory) == 1:
+	# 					client.send_cc( "%s " %ob.name)
+	# 				else:
+	# 					client.send_cc( "%s, " %ob.name)
+	# 			client.send_cc("^~\n")
+
+	# 	elif isinstance(obj.kind, World.container):		# check container inventory for argument
+	# 		for ob in obj.kind.inventory:
+	# 			if ob.name == " ".join(args):
+	# 				client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.longDescription))
+	# 				examined = True
+
+	# handle examining a player
+
+	# handle examining a mob
+
+
+
+	if examined == False:
+		if len(args) > 0:
+			client.send("I don't see a '%s'. I seem to recall the names of things better when I 'look harder'!\n" %(" ".join(args)))
+		else:
+			client.send("I am not sure what I wanted to examine.\n")
 
 def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
@@ -377,14 +648,31 @@ def examine_room(client, player, region, room, CLIENT_DATA):
 	display_exits(client, room)
 
 
+def battle_examine_room(client, player, region, room, CLIENT_DATA):
+	"""
+	Displays more information than render_room
+	"""
+	regionRoom = str(region)+room.name.capitalize()
+	roomDescription = Rooms.master[regionRoom].longDescription
+	roomName = Rooms.master[regionRoom].name
+	# roomMobs = Rooms.master[regionRoom].mobs
+	# roomContainers = Rooms.master[regionRoom].containers
+	# roomPlayers = Rooms.master[regionRoom].players
+	# roomExits = Rooms.master[regionRoom].exits.keys()
 
+	# client.send_cc("\n^I[ Region: " + region +" ]\n")
+	client.send_cc("^I\n[ Room Name: " + roomName + " ]\n^~\n")
+	client.send(roomDescription + "\n\n")
+	#display_description(client, room, CLIENT_DATA)
+	display_mob_names(client, room, CLIENT_DATA)
+	display_other_players(client, room, CLIENT_DATA, examine=True)
 
 def display_description(client, room, CLIENT_DATA):
 	#print display_description
 	region =  room.region
 	regionRoom = str(region)+room.name.capitalize()
 	roomDescription = Rooms.master[regionRoom].description
-	client.send("\n" + str(roomDescription) + "\n\n")
+	client.send_cc("\n" + str(roomDescription) + "\n\n")
 
 
 def display_exits(client, room):

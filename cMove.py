@@ -5,7 +5,7 @@ This file describes all of the movement-related commands.
 
 import Regions
 import Rooms
-import cInfo
+import cInfo, cInteractions
 
 
 
@@ -49,3 +49,9 @@ def alert(client, CLIENT_DATA, messageString):
 	for guest in player.currentRoom.players:
 		if player.currentRoom == guest.currentRoom and player != guest:
 			guest.client.send_cc(messageString)
+
+def fleeBattle(client, args, CLIENT_LIST, CLIENT_DATA):
+	'''
+	tries to escape from a battle room
+	'''
+	cInteractions.stopBattle(CLIENT_DATA[str(client.addrport())].avatar.currentRoom)

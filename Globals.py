@@ -28,6 +28,7 @@ OPList = []
 RegionsList = ['test', 'Onette']
 masterRooms = {}
 regionListDict = {}
+battleRooms = []
 #initializeMasterRooms(RegionsList)
 fromFileList = []
 mobsFromFile = []
