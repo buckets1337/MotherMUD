@@ -25,6 +25,7 @@ def who(client, args, CLIENT_LIST, CLIENT_DATA):
 	elif len(CLIENT_LIST) == 1:
 		client.send("\n%s player online.\n\n" %len(CLIENT_LIST))
 
+
 def look(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	Gives more information about the room.  Without arguments, it displays description of the room.  With an argument, it displays the description of whatever item is named by the arguments
@@ -138,6 +139,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		else:
 			client.send("You didn't say what you want to look at.\n")
 
+
 def battleLook(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	Gives more information about the room.  Without arguments, it displays description of the room.  With an argument, it displays the description of whatever item is named by the arguments
@@ -151,8 +153,10 @@ def battleLook(client, args, CLIENT_LIST, CLIENT_DATA):
 	if args == []:
 		client.send_cc("\n^I[ %s ]^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
 		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
-		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA, isBattle=True)
+		client.send("\n")
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_player_status(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		looked = True
 
 	elif args[0] == 'inventory' or args[0] == 'i':
@@ -248,7 +252,6 @@ def battleLook(client, args, CLIENT_LIST, CLIENT_DATA):
 			client.send("I don't see a '%s'. I like to 'look harder' to help me with the names of things!\n" %(" ".join(args)))
 		else:
 			client.send("You didn't say what you want to look at.\n")
-
 
 
 def examine(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -413,6 +416,7 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 		else:
 			client.send("I am not sure what I wanted to examine.\n")
 
+
 def battleExamine(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	More detailed info than look.  Without arguments, it shows the long description of the current room.  With arguments, it shows the long description of the item that is named by the arguments
@@ -575,6 +579,7 @@ def battleExamine(client, args, CLIENT_LIST, CLIENT_DATA):
 		else:
 			client.send("I am not sure what I wanted to examine.\n")
 
+
 def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 	"""
 	Display the contents of the player avatar's inventory
@@ -600,6 +605,57 @@ def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 	client.send("\n")
 
 
+def status(client, args, CLIENT_LIST, CLIENT_DATA):
+	'''displays stats about the player'''
+	clientDataID = str(client.addrport())
+	avatar = CLIENT_DATA[clientDataID].avatar
+	divspc1=0
+	divspc2=0
+	divspc3=0
+	divspc4=0
+	divspc5=0
+
+	if avatar.kind.offense<10:
+		divspc1=2
+	elif avatar.kind.offense<100:
+		divspc1=1
+
+	if avatar.kind.vitality<10:
+		divscp2=2
+	elif avatar.kind.vitality<100:
+		divspc2=1
+
+	if avatar.kind.speed<10:
+		divspc3=2
+	elif avatar.kind.speed<100:
+		divspc3=1
+
+	if avatar.kind.IQ<10:
+		divscp4=2
+	elif avatar.kind.IQ<100:
+		divspc4=1
+
+	client.send_cc("    _____________________^I[ Status ]^~____________________\n")
+	client.send_cc("    |"+ (" "*49) + "|\n")
+	client.send_cc("  ^I  ^~| ^!" + str(avatar.name) + "^~, " + str(avatar.title) +(" "*(48-len(str(avatar.name))-2-len(str(avatar.title))))+ "|\n")
+	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
+	client.send_cc("  ^I  ^~| Level: " + str(avatar.kind.level)+ (" "*(48-7-len(str(avatar.kind.level)))) + "|\n")
+	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
+	client.send_cc("  ^I  ^~| ^GHP:^~ " + str(avatar.kind.hp) + "/" + str(avatar.kind.maxHp) +(" "*(48-4-len(str(avatar.kind.hp))-1-len(str(avatar.kind.maxHp))))+"|\n")
+	client.send_cc("  ^I  ^~| ^CPP:^~ " + str(avatar.kind.pp) + "/" + str(avatar.kind.maxPp) +(" "*(48-4-len(str(avatar.kind.pp))-1-len(str(avatar.kind.maxPp))))+ "|\n")
+	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
+	client.send_cc("  ^I  ^~| Offense: " + str(avatar.kind.offense) + "      " +(" "*divspc1)+ "Defense: " + str(avatar.kind.defense) +(" "*(47-9-6-divspc1-9-len(str(avatar.kind.defense))))+"|\n")
+	client.send_cc("  ^I  ^~| Vitality: " + str(avatar.kind.vitality) + "       " +(" "*divspc2)+ "Guts: " + str(avatar.kind.guts) +(" "*(47-10-7-divspc2-6-len(str(avatar.kind.guts))))+ "|\n")
+	client.send_cc("  ^I  ^~| Speed: " + str(avatar.kind.speed) + "        " + (" "*divspc3) + "Luck: "+ str(avatar.kind.luck) +(" "*(47-7-8-divspc3-6-len(str(avatar.kind.luck))))+ "|\n")
+	client.send_cc("  ^I  ^~| IQ: " + str(avatar.kind.IQ) + "           " + (" "*divspc4) +(" "*(47-4-11-divspc4-0+1-len(str(avatar.kind.IQ))))+ "|\n")
+	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n") 
+	client.send_cc("  ^I  ^~| Money: $" + str(avatar.kind.money) +(" "*(47-8-0-divspc5-0+1-len(str(avatar.kind.money))))+ "|\n")
+	client.send_cc("  ^I  ^~|_________________________________________________|\n")
+	client.send_cc("  ^I                                                  ^~\n")
+	client.send_cc("\n")
+
+
+#-------------------------------------------------------------------
 
 
 def render_room(client, player, room, CLIENT_DATA):
@@ -664,8 +720,10 @@ def battle_examine_room(client, player, region, room, CLIENT_DATA):
 	client.send_cc("^I\n[ Room Name: " + roomName + " ]\n^~\n")
 	client.send(roomDescription + "\n\n")
 	#display_description(client, room, CLIENT_DATA)
-	display_mob_names(client, room, CLIENT_DATA)
+	display_mob_names(client, room, CLIENT_DATA, isBattle=True)
+	client.send("\n")
 	display_other_players(client, room, CLIENT_DATA, examine=True)
+	display_player_status(client, room, CLIENT_DATA)
 
 def display_description(client, room, CLIENT_DATA):
 	#print display_description
@@ -715,18 +773,116 @@ def display_object_names(client, room, CLIENT_DATA):
 			elif isinstance(obj.kind, World.container):
 				client.send_cc("^cA container named '%s'^~\n" %obj.name)
 
-def display_mobs(client, room, CLIENT_DATA):
+def display_mobs(client, room, CLIENT_DATA, isBattle=False):
 	region = room.region
 	regionRoom = str(region) + room.name.capitalize()
 	roomMobs = Rooms.master[regionRoom].mobs
 	#print 'mobs:' + str(roomMobs)
 	for mob in roomMobs:
-		client.send_cc("^y%s^~\n" %mob.description)
 
-def display_mob_names(client, room, CLIENT_DATA):
+		if isBattle:
+			mobhealthratio = (float(mob.kind.hp)/float(mob.kind.maxHp))
+			if mobhealthratio == 1.0:
+				healthmessage = '(healthy)'
+			elif mobhealthratio >= 0.63:
+				healthmessage = '(a few scratches)'
+			elif mobhealthratio >= 0.33:
+				healthmessage = '(bruised and battered)'
+			elif mobhealthratio >= 0.1:
+				healthmessage = '(pretty beat up and bleeding)'
+			else:
+				healthmessage = '(barely living)'
+
+		if not isBattle:
+			client.send_cc("^y%s^~\n" %mob.description)
+		else:
+			client.send_cc("^y" + mob.description + " " + healthmessage + "^~\n")
+
+def display_mob_names(client, room, CLIENT_DATA, isBattle=False):
 	region = room.region
 	regionRoom = str(region) + room.name.capitalize()
 	roomMobs = Rooms.master[regionRoom].mobs
 	#print 'mobs:' + str(roomMobs)
 	for mob in roomMobs:
-		client.send_cc("^yA mob named '%s'.^~\n" %mob.name)	
+
+		if isBattle:
+			mobhealthratio = (float(mob.kind.hp)/float(mob.kind.maxHp))
+			if mobhealthratio == 1.0:
+				healthmessage = '(healthy)'
+			elif mobhealthratio >= 0.63:
+				healthmessage = '(a few scratches)'
+			elif mobhealthratio >= 0.33:
+				healthmessage = '(bruised and battered)'
+			elif mobhealthratio >= 0.1:
+				healthmessage = '(pretty beat up and bleeding)'
+			else:
+				healthmessage = '(barely living)'
+
+		if not isBattle:		
+			client.send_cc("^yA mob named '%s'.^~\n" %mob.name)	
+		else:
+			client.send_cc("^yA mob named '" + mob.name + "'. " + healthmessage + "^~\n")
+
+
+def display_player_status(client, room, CLIENT_DATA):
+	clientDataID = str(client.addrport())
+	avatar = CLIENT_DATA[clientDataID].avatar
+	hpcolor='^G'
+	ppcolor='^C'
+
+	hpratio = float(avatar.kind.hp)/float(avatar.kind.maxHp)
+	if avatar.kind.hp != avatar.kind.maxHp:
+		hpcolor='^g'
+	if hpratio <= 0.66:
+		hpcolor='^y'
+	if hpratio < 0.33:
+		hpcolor='^r'
+
+	ppratio = float(avatar.kind.pp)/float(avatar.kind.maxPp)
+	if avatar.kind.pp != avatar.kind.maxPp:
+		ppcolor='^c'
+	if ppratio <= 0.66:
+		ppcolor='^y'
+	if ppratio < 0.33:
+		ppcolor='^r'
+
+
+	hpstring="^I" + hpcolor + "[          " + str(avatar.kind.hp) + "/" + str(avatar.kind.maxHp) + " ]^~\n"
+
+	hpstringlength = len(hpstring)
+	print hpstringlength
+	if hpstringlength <= 40:
+		hpstringfiller = 40-hpstringlength
+	else:
+		hpstringfiller = 0
+	print hpstringfiller
+	hpstring = hpstring[:-5] + (" "*hpstringfiller)+ hpstring[-5:]
+
+	hpremratio = int((1.0-hpratio)*40)
+	if hpremratio > 0:
+		hpstring = hpstring[:-(hpremratio)] + "^~" + hpstring[-(hpremratio):]
+
+	hpstring = "\n ^GHP: ^~" + hpstring
+
+
+
+	ppstring="^I"+ ppcolor +"[          " + str(avatar.kind.pp) + "/"+ str(avatar.kind.maxPp) + " ]^~\n"
+
+	ppstringlength = len(ppstring)
+	print ppstringlength
+	if ppstringlength <= 40:
+		ppstringfiller = 40-ppstringlength
+	else:
+		ppstringfiller = 0
+	print ppstringfiller
+	ppstring = ppstring[:-5] + (" "*ppstringfiller)+ ppstring[-5:]
+
+	ppremratio = int((1.0-ppratio)*40)
+	if ppremratio > 0:
+		ppstring = ppstring[:-(ppremratio)] + "^~" + ppstring[-(ppremratio):]
+
+	ppstring = " ^CPP: ^~" + ppstring
+
+
+	client.send_cc("\n^!^I^w               " + avatar.name + (" "*(11+len(avatar.name)))+ "^~")
+	client.send_cc(hpstring + ppstring+"\n")

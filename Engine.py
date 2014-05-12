@@ -117,7 +117,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
 
                 # client.send(prompt)
-                mortalComponent = World.mortal(100, 0, [])
+                mortalComponent = World.mortal(hp=100,maxHp=100,pp=10,maxPp=10,level=1,exp=0,money=0,offense=1,defense=1,speed=1,guts=1,luck=1,vitality=1,IQ=1,inventory=[])
                 
                 if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
                     #print "cl:" + str(CLIENT_LIST)
@@ -211,6 +211,10 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
             elif cmd == 'inventory' or cmd == 'i':
                 ## If the client sends an 'inventory' command, display the contents of the client avatar's inventory
                 cInfo.inventory(client, args, CLIENT_LIST, CLIENT_DATA)
+                commandSuccess = True
+
+            elif cmd == 'status' or cmd == 'st':
+                cInfo.status(client, args, CLIENT_LIST, CLIENT_DATA)
                 commandSuccess = True
 
 

@@ -136,7 +136,7 @@ def loadMobFromFile(file):
 	currentRoomString = ''
 	moveAI = None
 
-	newMob.kind = World.mortal(0,0, [])
+	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[])
 	newMob.kind.inventory = []
 	newMob.region = splitFile[0]
 
@@ -173,8 +173,32 @@ def loadMobFromFile(file):
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
+		if Data.startswith('kind.maxHp='):
+			newMob.kind.maxHp = int(Data[11:-1])
+		if Data.startswith('kind.pp='):
+			newMob.kind.pp = int(Data[8:-1])
+		if Data.startswith('kind.maxPp='):
+			newMob.kind.maxPp = int(Data[11:-1])
+		if Data.startswith('kind.level='):
+			newMob.kind.level = int(Data[11:-1])
 		if Data.startswith('kind.exp='):
 			newMob.kind.exp = int(Data[9:-1])
+		if Data.startswith('kind.money='):
+			newMob.kind.money = int(Data[11:-1])
+		if Data.startswith('kind.offense='):
+			newMob.kind.offense = int(Data[13:-1])
+		if Data.startswith('kind.defense='):
+			newMob.kind.defense = int(Data[13:-1])
+		if Data.startswith('kind.speed='):
+			newMob.kind.speed = int(Data[11:-1])
+		if Data.startswith('kind.guts='):
+			newMob.kind.guts = int(Data[10:-1])
+		if Data.startswith('kind.luck='):
+			newMob.kind.luck = int(Data[10:-1])
+		if Data.startswith('kind.vitality='):
+			newMob.kind.vitality = int(Data[14:-1])
+		if Data.startswith('kind.IQ='):
+			newMob.kind.IQ = int(Data[8:-1])
 		if Data.startswith('kind.inventory='):
 			invString = Data[15:-1]
 			if invString != '':
@@ -280,7 +304,7 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 	inventoryItems = []
 	currentRoomString = ''
 
-	newMob.kind = World.mortal(0,0, [])
+	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[])
 	newMob.region = splitFile[0]
 
 	for Data in fileData:
@@ -311,8 +335,32 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
+		if Data.startswith('kind.maxHp='):
+			newMob.kind.maxHp = int(Data[11:-1])
+		if Data.startswith('kind.pp='):
+			newMob.kind.pp = int(Data[8:-1])
+		if Data.startswith('kind.maxPp='):
+			newMob.kind.maxPp = int(Data[11:-1])
+		if Data.startswith('kind.level='):
+			newMob.kind.level = int(Data[11:-1])
 		if Data.startswith('kind.exp='):
 			newMob.kind.exp = int(Data[9:-1])
+		if Data.startswith('kind.money='):
+			newMob.kind.money = int(Data[11:-1])
+		if Data.startswith('kind.offense='):
+			newMob.kind.offense = int(Data[13:-1])
+		if Data.startswith('kind.defense='):
+			newMob.kind.defense = int(Data[13:-1])
+		if Data.startswith('kind.speed='):
+			newMob.kind.speed = int(Data[11:-1])
+		if Data.startswith('kind.guts='):
+			newMob.kind.guts = int(Data[10:-1])
+		if Data.startswith('kind.luck='):
+			newMob.kind.luck = int(Data[10:-1])
+		if Data.startswith('kind.vitality='):
+			newMob.kind.vitality = int(Data[14:-1])
+		if Data.startswith('kind.IQ='):
+			newMob.kind.IQ = int(Data[8:-1])
 		if Data.startswith('kind.inventory='):
 			invString = Data[15:-1]
 			if invString != '':
@@ -443,7 +491,19 @@ def saveMobToFile(mob, path):
 			f.write('moveAI=%s:%s\n' %(actionFunction, mob.aiMove.Timer.time))
 		f.write('\n')
 		f.write('kind.hp=%s\n' %str(mob.kind.hp))
+		f.write('kind.maxHp=%s\n' %str(mob.kind.maxHp))
+		f.write('kind.pp=%s\n' %str(mob.kind.pp))
+		f.write('kind.maxPp=%s\n' %str(mob.kind.maxPp))
+		f.write('kind.level=%s\n' %str(mob.kind.level))
 		f.write('kind.exp=%s\n' %str(mob.kind.exp))
+		f.write('kind.money=%s\n' %str(mob.kind.money))
+		f.write('kind.offense=%s\n' %str(mob.kind.offense))
+		f.write('kind.defense=%s\n' %str(mob.kind.defense))
+		f.write('kind.speed=%s\n' %str(mob.kind.speed))
+		f.write('kind.guts=%s\n' %str(mob.kind.guts))
+		f.write('kind.luck=%s\n' %str(mob.kind.luck))
+		f.write('kind.vitality=%s\n' %str(mob.kind.vitality))
+		f.write('kind.IQ=%s\n' %str(mob.kind.IQ))
 		f.write('kind.inventory=',)
 		invString = ''
 		for item in mob.kind.inventory:

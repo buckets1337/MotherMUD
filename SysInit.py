@@ -34,7 +34,19 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	description = ''
 	currentRoomString = ''
 	hp = None
+	maxHp = None
+	pp = None
+	maxPp = None
+	level = None
 	exp = None
+	money = None
+	offense = None
+	defense = None
+	speed = None
+	guts = None
+	luck = None
+	vitality = None
+	IQ = None
 	inventorySize = None
 	inventoryItems = []
 	gameState = None
@@ -79,8 +91,32 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 		#print currentRoomRoom.name
 		if data.startswith("hp="):
 			hp = int(data[3:-1])
+		if data.startswith("maxHp="):
+			maxHp = int(data[6:-1])
+		if data.startswith("pp="):
+			pp = int(data[3:-1])
+		if data.startswith("maxPp="):
+			maxPp = int(data[6:-1])
+		if data.startswith("level="):
+			level = int(data[6:-1])
 		if data.startswith("exp="):
 			exp = int(data[4:-1])
+		if data.startswith("money="):
+			money = int(data[6:-1])
+		if data.startswith("offense="):
+			offense = int(data[8:-1])
+		if data.startswith("defense="):
+			defense = int(data[8:-1])
+		if data.startswith("speed="):
+			speed = int(data[6:-1])
+		if data.startswith("guts="):
+			guts = int(data[5:-1])
+		if data.startswith("luck="):
+			luck = int(data[5:-1])
+		if data.startswith("vitality="):
+			vitality = int(data[9:-1])
+		if data.startswith("IQ="):
+			IQ = int(data[3:-1])
 		if data.startswith("inventorySize="):
 			inventorySize = int(data[14:-1])
 
@@ -109,7 +145,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print Globals.startingRoom.players
 	#print Globals.startingRoom
 	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
-	newMortal = World.mortal(hp, exp, [])
+	newMortal = World.mortal(hp, maxHp, pp, maxPp, level, exp, money, offense, defense, speed, guts, luck, vitality, IQ, [])
 	newMortal.inventory = []
 	# print newAvatar.currentRoom.players
 	# print newAvatar.currentRoom.name
@@ -215,8 +251,14 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		op = player.op
 		prompt = player.prompt
 		gameState = player.gameState
-		battleRoom = str(player.battleRoom.name)
-		attachedTo = player.battleRoom.attachedTo
+		if player.battleRoom is not None:
+			battleRoom = str(player.battleRoom.name)
+		else:
+			battleRoom = ''
+		if player.battleRoom is not None:
+			attachedTo = player.battleRoom.attachedTo
+		else:
+			attachedTo = ''
 		#client = str(player.client)		# should be recreated on reload, not saved
 		clientID = str(player.clientID)
 		avatar = player.avatar 			# should be recreated on reload, not saved
@@ -230,7 +272,19 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		kind = avatar.kind
 
 		hp = str(kind.hp)
+		maxHp = str(kind.maxHp)
+		pp = str(kind.pp)
+		maxPp = str(kind.maxPp)
+		level = str(kind.level)
 		exp = str(kind.exp)
+		money = str(kind.money)
+		offense = str(kind.offense)
+		defense = str(kind.defense)
+		speed = str(kind.speed)
+		guts = str(kind.guts)
+		luck = str(kind.luck)
+		vitality = str(kind.vitality)
+		IQ = str(kind.IQ)
 		inventory = kind.inventory
 		inventorySize = str(kind.inventorySize)
 		equipment = kind.equipment
@@ -246,7 +300,10 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			#f.write("client=" + client + "\n")
 			f.write("gameState=" + gameState + "\n")
 			f.write("battleRoom=" + battleRoom + "\n")
-			f.write("battleRoom.attachedTo=" + attachedTo.region + ":" + attachedTo.name + "\n")
+			if battleRoom != '':
+				f.write("battleRoom.attachedTo=" + attachedTo.region + ":" + attachedTo.name + "\n")
+			else:
+				f.write("battleRoom.attachedTo=\n")
 			f.write("clientID=" + clientID + "\n\n")
 			#f.write("avatar=" + avatar + "\n")
 
@@ -256,7 +313,19 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("currentRoom=" + currentRoom + "\n\n")
 
 			f.write("hp=" + hp + "\n")
+			f.write("maxHp=" + maxHp + "\n")
+			f.write("pp=" + pp + "\n")
+			f.write("maxPp=" + maxPp + "\n")
+			f.write("level=" + level + "\n")
 			f.write("exp=" + exp + "\n")
+			f.write("money=" + money + "\n")
+			f.write("offense=" + offense + "\n")
+			f.write("defense=" + defense + "\n")
+			f.write("speed=" + speed + "\n")
+			f.write("guts=" + guts + "\n")
+			f.write("luck=" + luck + "\n")
+			f.write("vitality=" + vitality + "\n")
+			f.write("IQ=" + IQ + "\n")
 			f.write("inventorySize=" + inventorySize + "\n")
 
 			f.write("\ninventory=")
@@ -357,14 +426,15 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 			# if battleRoom != None and battleRoom != 'None' and battleRoom != '':
 			# 	RoomInit.saveRoom(player.battleRoom)
-			RoomInit.saveRoom(player.battleRoom)
+			if battleRoom != '':
+				RoomInit.saveRoom(player.battleRoom)
 
-			if not os.path.exists('data/world/battles/mobs'):
-				os.mkdir('data/world/battles/mobs')
-			if not os.path.exists('data/world/battles/mobs/'+player.battleRoom.name+'/'):
-				os.mkdir('data/world/battles/mobs/'+player.battleRoom.name+'/')
-			for mob in player.battleRoom.mobs:
-				MobInit.saveMobToFile(mob, 'data/world/battles/mobs/'+player.battleRoom.name+'/')
+				if not os.path.exists('data/world/battles/mobs'):
+					os.mkdir('data/world/battles/mobs')
+				if not os.path.exists('data/world/battles/mobs/'+player.battleRoom.name+'/'):
+					os.mkdir('data/world/battles/mobs/'+player.battleRoom.name+'/')
+				for mob in player.battleRoom.mobs:
+					MobInit.saveMobToFile(mob, 'data/world/battles/mobs/'+player.battleRoom.name+'/')
 
 	except:
 		print "!! Failed to save CLIENT " + Globals.CLIENT_DATA[clientDataID].name

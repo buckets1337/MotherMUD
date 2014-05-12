@@ -343,6 +343,7 @@ def stopBattle(battleRoom):
 		battleRoom.players.remove(player)
 		battleRoom.attachedTo.players.append(player)
 		player.currentRoom = battleRoom.attachedTo
+		player.battleRoom = None
 		for obj in battleRoom.attachedTo.objects:
 			if obj.name.startswith('^r'+player.name):
 				battleRoom.attachedTo.objects.remove(obj)

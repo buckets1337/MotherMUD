@@ -633,7 +633,7 @@ def loadRoom(file):
 					for item in protoMob.kind.equipment:
 						protoEq.append(item)
 
-					mortalComponent = World.mortal(protoMob.kind.hp, protoMob.kind.exp, protoInv, protoMob.kind.inventorySize, protoEq)
+					mortalComponent = World.mortal(hp=int(protoMob.kind.hp), maxHp=int(protoMob.kind.maxHp), pp=int(protoMob.kind.pp), maxPp=int(protoMob.kind.maxPp), level=int(protoMob.kind.level), exp=int(protoMob.kind.exp), money=int(protoMob.kind.money), offense=int(protoMob.kind.offense), defense=int(protoMob.kind.defense), speed=int(protoMob.kind.speed), guts=int(protoMob.kind.guts), luck=int(protoMob.kind.luck), vitality=int(protoMob.kind.vitality), IQ=int(protoMob.kind.IQ), inventory=protoInv, inventorySize=int(protoMob.kind.inventorySize), equipment=protoEq)
 
 					newMob = World.Mob(protoMob.description, newRoom, protoMob.name, newRoom.region, protoMob.longDescription, protoMob.speech, mortalComponent, protoMob.species, protoMob.expirator)
 
