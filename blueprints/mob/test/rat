@@ -13,8 +13,8 @@ moveAI=extrovertRandom:10
 
 kind.hp=10
 kind.maxHp=10
-kind.pp=0
-kind.maxPp=0
+kind.pp=1
+kind.maxPp=1
 kind.level=1
 kind.exp=10
 kind.money=1

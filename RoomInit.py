@@ -420,6 +420,7 @@ def loadBattleRoom(file):
 	#print newRoom
 	return newRoom
 
+
 def loadRoom(file):
 	'''
 	loads the contents of one room definition file into the world, and initializes the room with all required items and exits
@@ -634,8 +635,7 @@ def loadRoom(file):
 						protoEq.append(item)
 
 					mortalComponent = World.mortal(hp=int(protoMob.kind.hp), maxHp=int(protoMob.kind.maxHp), pp=int(protoMob.kind.pp), maxPp=int(protoMob.kind.maxPp), level=int(protoMob.kind.level), exp=int(protoMob.kind.exp), money=int(protoMob.kind.money), offense=int(protoMob.kind.offense), defense=int(protoMob.kind.defense), speed=int(protoMob.kind.speed), guts=int(protoMob.kind.guts), luck=int(protoMob.kind.luck), vitality=int(protoMob.kind.vitality), IQ=int(protoMob.kind.IQ), inventory=protoInv, inventorySize=int(protoMob.kind.inventorySize), equipment=protoEq)
-
-					newMob = World.Mob(protoMob.description, newRoom, protoMob.name, newRoom.region, protoMob.longDescription, protoMob.speech, mortalComponent, protoMob.species, protoMob.expirator)
+					newMob = World.Mob(description=protoMob.description, currentRoom=newRoom, name=protoMob.name, region=newRoom.region, longDescription=protoMob.longDescription, speech=protoMob.speech, kind=mortalComponent, species=protoMob.species, expirator=protoMob.expirator)
 
 					moveAIComponent = aiMove.movementAI(newMob, int(protoMob.aiMove.time))
 					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.basicRandom:

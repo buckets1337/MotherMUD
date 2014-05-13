@@ -136,8 +136,7 @@ def loadMobFromFile(file):
 	currentRoomString = ''
 	moveAI = None
 
-	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[])
-	newMob.kind.inventory = []
+	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[],inventorySize=0,equipment={})
 	newMob.region = splitFile[0]
 
 	for Data in fileData:
@@ -209,6 +208,8 @@ def loadMobFromFile(file):
 					for ob in Globals.fromFileList:
 						if item == ob.name:
 							inventoryItems.append(item)
+			else:
+				inventoryItems = []
 		if Data.startswith('kind.inventorySize='):
 			newMob.kind.inventorySize = int(Data[19:-1])
 
@@ -239,9 +240,9 @@ def loadMobFromFile(file):
 		Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
 
 
-	print 'invItems:' + str(inventoryItems)
+	#print 'invItems:' + str(inventoryItems)
 	for item in inventoryItems:
-		print 'invitem:' + str(item)
+		#print 'invitem:' + str(item)
 		removed = False
 		newItem = Engine.cmdSpawnObject(item, newMob.currentRoom, alert=False, whereFrom='mobinv')
 		newMob.kind.inventory.append(newItem)
@@ -256,7 +257,7 @@ def loadMobFromFile(file):
 
 	if expirator != None and expirator != '':
 		Globals.TIMERS.remove(newMob.expirator.Timer)
-		newMob.expirator.Timer = None
+		#newMob.expirator.Timer = None
 
 	Globals.mobsFromFile.append(newMob)
 
@@ -304,7 +305,7 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 	inventoryItems = []
 	currentRoomString = ''
 
-	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[])
+	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[],inventorySize=0,equipment={})
 	newMob.region = splitFile[0]
 
 	for Data in fileData:

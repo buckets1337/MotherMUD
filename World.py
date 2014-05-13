@@ -444,7 +444,7 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 					iters += 1
 
 			elif self.mode == 'cont':	 	# always spawns exactly one mob
-				newMortal = mortal(ob.kind.hp, ob.kind.pp, ob.kind.level, ob.kind.exp, ob.kind.money, ob.kind.offense, ob.kind.defense, ob.kind.speed, ob.kind.guts, ob.kind.luck, ob.kind.vitality, ob.kind.IQ, [], ob.kind.inventorySize, {})
+				newMortal = newMortal = mortal(hp=int(ob.kind.hp), maxHp=int(ob.kind.maxHp), pp=int(ob.kind.pp), maxPp=int(ob.kind.maxPp), level=int(ob.kind.level), exp=int(ob.kind.exp), money=int(ob.kind.money), offense=int(ob.kind.offense), defense=int(ob.kind.defense), speed=int(ob.kind.speed), guts=int(ob.kind.guts), luck=int(ob.kind.luck), vitality=int(ob.kind.vitality), IQ=int(ob.kind.IQ), inventory=[], inventorySize=int(ob.kind.inventorySize), equipment={})
 				newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
 				if hasattr(ob, 'aiMove'):
 					newAIComponent = aiMove.movementAI(newMob, ob.aiMove.time)
@@ -476,7 +476,7 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 				numPresent = len(resultsList)
 				#print numPresent
 				if numPresent < self.cycles:
-					newMortal = mortal(ob.kind.hp, ob.kind.maxHp, ob.kind.pp, ob.kind.maxPp, ob.kind.level, ob.kind.exp, ob.kind.money, ob.kind.offense, ob.kind.defense, ob.kind.speed, ob.kind.guts, ob.kind.luck, ob.kind.vitality, ob.kind.IQ, [], ob.kind.inventorySize, {})
+					newMortal = newMortal = mortal(hp=int(ob.kind.hp), maxHp=int(ob.kind.maxHp), pp=int(ob.kind.pp), maxPp=int(ob.kind.maxPp), level=int(ob.kind.level), exp=int(ob.kind.exp), money=int(ob.kind.money), offense=int(ob.kind.offense), defense=int(ob.kind.defense), speed=int(ob.kind.speed), guts=int(ob.kind.guts), luck=int(ob.kind.luck), vitality=int(ob.kind.vitality), IQ=int(ob.kind.IQ), inventory=[], inventorySize=int(ob.kind.inventorySize), equipment={})
 					newMob = Mob(ob.description, ob.currentRoom, ob.name, ob.region, ob.longDescription, ob.speech, newMortal, ob.species, None)
 					if hasattr(ob, 'aiMove'):
 						newAIComponent = aiMove.movementAI(newMob, ob.aiMove.time)
