@@ -53,6 +53,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	currentRoomRoom = None
 	battleRoom = None
 	battleRoomAttachedTo = None
+	battleCommands = None
 
 	#print fileData
 	for data in fileData:
@@ -117,6 +118,9 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			vitality = int(data[9:-1])
 		if data.startswith("IQ="):
 			IQ = int(data[3:-1])
+		if data.startswith("battleCommands="):
+			battleCommands = data[15:-1]
+			battleCommands = battleCommands.split(', ')
 		if data.startswith("inventorySize="):
 			inventorySize = int(data[14:-1])
 
@@ -164,6 +168,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	CLIENT_DATA[clientDataID].avatar = newAvatar
 	CLIENT_DATA[clientDataID].avatar.kind = newMortal
 	CLIENT_DATA[clientDataID].gameState = gameState
+	CLIENT_DATA[clientDataID].avatar.battleCommands = battleCommands
 	#print "********" + str(inventoryItems)
 
 	if battleRoom != 'None' and battleRoom != '' and battleRoom != None:
@@ -285,6 +290,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		luck = str(kind.luck)
 		vitality = str(kind.vitality)
 		IQ = str(kind.IQ)
+		battleCommands = avatar.battleCommands
 		inventory = kind.inventory
 		inventorySize = str(kind.inventorySize)
 		equipment = kind.equipment
@@ -326,6 +332,13 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("luck=" + luck + "\n")
 			f.write("vitality=" + vitality + "\n")
 			f.write("IQ=" + IQ + "\n")
+			commandList = ''
+			for command in battleCommands:
+				commandList += (str(command) + ", ")
+			if str(commandList).endswith(", "):
+				commandList = commandList[:-2]
+
+			f.write("battleCommands=" + str(commandList) + "\n")
 			f.write("inventorySize=" + inventorySize + "\n")
 
 			f.write("\ninventory=")

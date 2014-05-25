@@ -156,7 +156,9 @@ def battleLook(client, args, CLIENT_LIST, CLIENT_DATA):
 		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA, isBattle=True)
 		client.send("\n")
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		client.send("\n")
 		display_player_status(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_battle_commands(client, CLIENT_DATA)
 		looked = True
 
 	elif args[0] == 'inventory' or args[0] == 'i':
@@ -703,7 +705,6 @@ def examine_room(client, player, region, room, CLIENT_DATA):
 	display_other_players(client, room, CLIENT_DATA, examine=True)
 	display_exits(client, room)
 
-
 def battle_examine_room(client, player, region, room, CLIENT_DATA):
 	"""
 	Displays more information than render_room
@@ -723,7 +724,10 @@ def battle_examine_room(client, player, region, room, CLIENT_DATA):
 	display_mob_names(client, room, CLIENT_DATA, isBattle=True)
 	client.send("\n")
 	display_other_players(client, room, CLIENT_DATA, examine=True)
+	client.send("\n")
+
 	display_player_status(client, room, CLIENT_DATA)
+	display_battle_commands(client, CLIENT_DATA)
 
 def display_description(client, room, CLIENT_DATA):
 	#print display_description
@@ -850,12 +854,12 @@ def display_player_status(client, room, CLIENT_DATA):
 	hpstring="^I" + hpcolor + "[          " + str(avatar.kind.hp) + "/" + str(avatar.kind.maxHp) + " ]^~\n"
 
 	hpstringlength = len(hpstring)
-	print hpstringlength
+	# print hpstringlength
 	if hpstringlength <= 40:
 		hpstringfiller = 40-hpstringlength
 	else:
 		hpstringfiller = 0
-	print hpstringfiller
+	# print hpstringfiller
 	hpstring = hpstring[:-5] + (" "*hpstringfiller)+ hpstring[-5:]
 
 	hpremratio = int((1.0-hpratio)*40)
@@ -869,12 +873,12 @@ def display_player_status(client, room, CLIENT_DATA):
 	ppstring="^I"+ ppcolor +"[          " + str(avatar.kind.pp) + "/"+ str(avatar.kind.maxPp) + " ]^~\n"
 
 	ppstringlength = len(ppstring)
-	print ppstringlength
+	# print ppstringlength
 	if ppstringlength <= 40:
 		ppstringfiller = 40-ppstringlength
 	else:
 		ppstringfiller = 0
-	print ppstringfiller
+	# print ppstringfiller
 	ppstring = ppstring[:-5] + (" "*ppstringfiller)+ ppstring[-5:]
 
 	ppremratio = int((1.0-ppratio)*40)
@@ -886,3 +890,7 @@ def display_player_status(client, room, CLIENT_DATA):
 
 	client.send_cc("\n^!^I^w               " + avatar.name + (" "*(11+len(avatar.name)))+ "^~")
 	client.send_cc(hpstring + ppstring+"\n")
+
+def display_battle_commands(client, CLIENT_DATA):
+	clientDataID = str(client.addrport())
+	client.send_cc('^UCommands^~: ' + str(CLIENT_DATA[clientDataID].avatar.battleCommands) + "\n")

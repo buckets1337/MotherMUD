@@ -548,7 +548,7 @@ class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
-	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None):
+	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = ['bash','flee']):
 		Entity.__init__(self, description, currentRoom, name)
 		self.name = name
 		self.title = title
@@ -557,6 +557,7 @@ class Player(Entity):
 		self.kind = kind
 		if self.kind:
 			self.kind.owner = self
+		self.battleCommands = battleCommands
 
 
 class mortal:		# 'kind' attribute 

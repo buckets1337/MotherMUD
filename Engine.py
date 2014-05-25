@@ -6,7 +6,7 @@ import time, random, os
 
 from passlib.hash import sha256_crypt
 
-import cChat, cMove, cInfo, cInteractions, cPersonal
+import cChat, cMove, cInfo, cInteractions, cPersonal, battleCommands
 import Rooms
 import World
 import Objects
@@ -338,6 +338,11 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 elif cmd == 'flee':
                     cMove.fleeBattle(client, args, CLIENT_LIST, CLIENT_DATA)
+
+                elif cmd in CLIENT_DATA[clientDataID].avatar.battleCommands:
+                    if cmd == 'bash':
+                        commandFunction = battleCommands.bash
+                    commandFunction(client, args, CLIENT_LIST, CLIENT_DATA)
 
 
                 elif cmd == '':
