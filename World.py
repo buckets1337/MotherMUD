@@ -3,7 +3,7 @@
 describes the classes for objects that will be in the world
 """
 
-import Engine, aiMove
+import Engine, aiMove, cMove
 import Globals
 import random
 
@@ -431,6 +431,9 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 							newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
 					newMob.aiMove = newAIComponent
 
+					if hasattr(ob, 'aiBattle'):
+						newMob.aiBattle = ob.aiBattle
+
 					if hasattr(ob, 'expirator') and ob.expirator != None:
 						newExpirator = expirator(newMob, ob.expirator.startingTime)
 						newMob.expirator = newExpirator
@@ -457,6 +460,10 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 					if ob.aiMove.Timer.actionFunction == ob.aiMove.doNotMove:
 						newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
 				newMob.aiMove = newAIComponent
+
+				if hasattr(ob, 'aiBattle'):
+					newMob.aiBattle = ob.aiBattle
+
 				if hasattr(ob, 'expirator') and ob.expirator != None:
 					newExpirator = expirator(newMob, ob.expirator.startingTime)
 					newMob.expirator = newExpirator
@@ -489,6 +496,10 @@ class mobSpawner:		# for Objects, a component that, when placed on an object in 
 						if ob.aiMove.Timer.actionFunction == ob.aiMove.doNotMove:
 							newAIComponent.Timer.actionFunction = newAIComponent.doNotMove
 					newMob.aiMove = newAIComponent
+
+					if hasattr(ob, 'aiBattle'):
+						newMob.aiBattle = ob.aiBattle
+
 					if hasattr(ob, 'expirator') and ob.expirator != None:
 						newExpirator = expirator(newMob, ob.expirator.startingTime)
 						newMob.expirator = newExpirator
@@ -523,7 +534,7 @@ class Mob(Entity):
 	"""
 	This class describes a generic badguy, and holds his information.  Methods will be added in mostly through components
 	"""
-	def __init__(self, description, currentRoom, name, region=None, longDescription = None, speech = None, kind = None, species = None, expirator = None, aiMove = None):
+	def __init__(self, description, currentRoom, name, region=None, longDescription = None, speech = None, kind = None, species = None, expirator = None, aiMove = None, aiBattle = None):
 		Entity.__init__(self, description, currentRoom, name)
 		self.region = region
 		self.longDescription = longDescription
@@ -532,6 +543,7 @@ class Mob(Entity):
 		self.species = species
 		self.expirator = expirator
 		self.aiMove = aiMove
+		self.aiBattle = aiBattle
 
 		# let components know what mob they belong to
 		if self.kind:
@@ -543,12 +555,21 @@ class Mob(Entity):
 			if self.expirator.Timer != None:
 				self.expirator.Timer.attachedTo = self
 
+	def battleDeath(self, attackingPlayer):
+		'''
+		run when a mob dies.  Adds the mob's xp and money to the totals for the battle that the player will be awarded
+		'''
+		attackingPlayer.rewardExp += self.kind.exp
+		attackingPlayer.rewardMoney += self.kind.money
+		Globals.CLIENT_DATA[attackingPlayer.clientDataID].battleRoom.mobs.remove(self)
+		attackingPlayer.client.send_cc("^!You killed " + self.name + "!^~\n")
+
 
 class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
-	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = ['bash','flee']):
+	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = ['bash','flee'], spawnRoom = None):
 		Entity.__init__(self, description, currentRoom, name)
 		self.name = name
 		self.title = title
@@ -558,6 +579,77 @@ class Player(Entity):
 		if self.kind:
 			self.kind.owner = self
 		self.battleCommands = battleCommands
+		self.spawnRoom = spawnRoom
+
+		self.spawnRoom = Globals.regionListDict['test']['bullpen']
+
+		self.rewardExp = 0
+		self.rewardMoney = 0
+
+
+	def battleDeath(self, killingMob):
+		'''
+		run when the player dies in battle.  Moves the player from the battleRoom to their spawnRoom and resets player hp to 1
+		'''
+
+		self.client.send_cc("\n^!You were killed by " + killingMob.name + "!\n")
+		self.client.send_cc("You lose all sense of balance and direction.\n")
+		self.client.send_cc("Reality seems less important by the second.\n")
+		self.client.send_cc("Suddenly, you hear an impossibly deep gong and see a bright flash of white light.\n")
+		self.client.send_cc("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
+		self.rewardExp = 0
+
+		Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)		
+		self.kind.hp = 1
+		for player in Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.players:
+			if player != self:
+				player.client.send_cc("^R" +self.name.capitalize() + " was killed by " + killingMob.name + "!^~\n")
+
+		print Globals.CLIENT_DATA[self.clientDataID].battleRoom.players
+		Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)
+
+		self.currentRoom = self.spawnRoom
+
+		self.currentRoom.players.append(self)
+
+		for player in self.currentRoom.players:
+			if player != self:
+				player.client.send_cc("^c" + self.name.capitalize() + " appeared.^~\n")
+
+		print "-B " + str(self) + " " + self.name + " (player death)"
+
+
+
+	def battleWin(self):
+		'''
+		run when the player wins a battle.  Moves the player from the battleRoom back to the currentRoom
+		'''
+		#print Globals.CLIENT_DATA[self.clientDataID].battleRoom.name
+		#print Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name
+		Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)
+		#Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.players.append(self)
+		self.currentRoom = Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo
+		
+		for obj in self.currentRoom.objects:
+			if obj.name.startswith("^r" + self.name):
+				self.currentRoom.objects.remove(obj)
+
+		self.client.send_cc("\n^!^U^IVICTORY!^~\n")
+		self.kind.exp += self.rewardExp
+
+		self.client.send_cc("You gained ^Y^!" + str(self.rewardExp) + " experience.^~\n")
+
+		self.rewardExp = 0
+
+		#print self.currentRoom.name
+		cMove.move(client=self.client, cmd=Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name, args=[], CLIENT_LIST=Globals.CLIENT_LIST, CLIENT_DATA=Globals.CLIENT_DATA, exits={Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name:Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo}, fromBattle=True)
+
+		Globals.CLIENT_DATA[self.clientDataID].gameState = 'normal'
+
+		print "-B " + str(self) + " " + self.name + " (victory)"
+
+
 
 
 class mortal:		# 'kind' attribute 

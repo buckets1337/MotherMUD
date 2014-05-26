@@ -647,6 +647,7 @@ def loadRoom(file):
 					if protoMob.aiMove.Timer.actionFunction == protoMob.aiMove.doNotMove:
 						moveAIComponent.Timer.actionFunction = moveAIComponent.doNotMove
 					newMob.aiMove = moveAIComponent
+					newMob.aiBattle = protoMob.aiBattle
 
 					mobs.append(newMob)
 
@@ -697,6 +698,7 @@ def loadRoom(file):
 
 	#print newRoom
 	return newRoom
+
 
 def setSpawnContainers(newRoom):
 	for obj in newRoom.objects:

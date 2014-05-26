@@ -9,7 +9,7 @@ import cInfo, cInteractions
 
 
 
-def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
+def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False):
 	"""
 	moves from one room to the next.
 	"""
@@ -23,7 +23,8 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 
 	alert(client, CLIENT_DATA, ("\n^g%s left.^~\n" %player.name))
 
-	player.currentRoom.players.remove(player)
+	if player in player.currentRoom.players:
+		player.currentRoom.players.remove(player)
 	player.currentRoom = exits[cmd]
 	player.currentRoom.players.append(player)
 
@@ -35,8 +36,10 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits):
 			mob.expirator.resetTimer()
 
 	cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
-
-	alert(client, CLIENT_DATA, ("\n^g^!%s has entered.^~\n" %player.name))
+	if fromBattle == False:
+		alert(client, CLIENT_DATA, ("\n^g^!%s has entered.^~\n" %player.name))
+	elif fromBattle:
+		alert(client, CLIENT_DATA, ("\n^g^!%s has arrived from battle.^~\n" %player.name))
 
 
 def alert(client, CLIENT_DATA, messageString):

@@ -5,7 +5,7 @@ import os
 
 import Globals
 import Engine, World
-import aiMove
+import aiMove, aiBattle
 
 
 mobsFromFile = Globals.mobsFromFile
@@ -135,6 +135,7 @@ def loadMobFromFile(file):
 	inventoryItems = []
 	currentRoomString = ''
 	moveAI = None
+	battleAI = None
 
 	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[],inventorySize=0,equipment={})
 	newMob.region = splitFile[0]
@@ -169,6 +170,12 @@ def loadMobFromFile(file):
 		if Data.startswith('moveAI='):
 			text = Data[7:-1]
 			moveAI = text.split(":")
+		if Data.startswith('battleAI='):
+			text = Data[9:-1]
+			if text == 'basicBash':
+				battleAI = aiBattle.basicBash
+			else:
+				battleAI = ''
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -239,6 +246,8 @@ def loadMobFromFile(file):
 		newMob.aiMove = newMoveAI
 		Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
 
+	if battleAI != None:
+		newMob.aiBattle = battleAI
 
 	#print 'invItems:' + str(inventoryItems)
 	for item in inventoryItems:
@@ -304,6 +313,8 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 	expirator = None
 	inventoryItems = []
 	currentRoomString = ''
+	moveAI = None
+	battleAI = None
 
 	newMob.kind = World.mortal(hp=0,maxHp=0,pp=0,maxPp=0,level=0,exp=0,money=0,offense=0,defense=0,speed=0,guts=0,luck=0,vitality=0,IQ=0,inventory=[],inventorySize=0,equipment={})
 	newMob.region = splitFile[0]
@@ -333,6 +344,12 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 		if Data.startswith('moveAI='):
 			text = Data[7:-1]
 			moveAI = text.split(":")
+		if Data.startswith('battleAI='):
+			text = Data[9:-1]
+			if text == 'basicBash':
+				battleAI = aiBattle.basicBash
+			else:
+				battleAI = ''
 
 		if Data.startswith('kind.hp='):
 			newMob.kind.hp = int(Data[8:-1])
@@ -404,6 +421,8 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 
 		newMob.aiMove = newMoveAI
 		#Globals.MoveTIMERS.remove(newMob.aiMove.Timer)
+	if battleAI != None:
+		newMob.aiBattle = battleAI
 
 	for item in inventoryItems:
 		#print item

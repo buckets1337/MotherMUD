@@ -339,9 +339,14 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 elif cmd == 'flee':
                     cMove.fleeBattle(client, args, CLIENT_LIST, CLIENT_DATA)
 
+                elif cmd == 'bash' or cmd == 'b':
+                    battleCommands.bash(client, args, CLIENT_LIST, CLIENT_DATA)
+
+
                 elif cmd in CLIENT_DATA[clientDataID].avatar.battleCommands:
-                    if cmd == 'bash':
-                        commandFunction = battleCommands.bash
+                    if cmd == 'identify':
+                        commandFunction = battleCommands.identify
+
                     commandFunction(client, args, CLIENT_LIST, CLIENT_DATA)
 
 

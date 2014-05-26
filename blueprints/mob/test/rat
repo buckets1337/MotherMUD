@@ -10,6 +10,7 @@ speech=*squeak*
 
 expirator=30
 moveAI=extrovertRandom:10
+battleAI=basicBash
 
 kind.hp=10
 kind.maxHp=10

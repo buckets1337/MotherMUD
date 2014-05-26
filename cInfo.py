@@ -684,6 +684,7 @@ def render_room(client, player, room, CLIENT_DATA):
 	display_other_players(client, room, CLIENT_DATA)
 	display_exits(client, room)
 
+
 def examine_room(client, player, region, room, CLIENT_DATA):
 	"""
 	Displays more information than render_room
@@ -704,6 +705,7 @@ def examine_room(client, player, region, room, CLIENT_DATA):
 	display_mob_names(client, room, CLIENT_DATA)
 	display_other_players(client, room, CLIENT_DATA, examine=True)
 	display_exits(client, room)
+
 
 def battle_examine_room(client, player, region, room, CLIENT_DATA):
 	"""
@@ -728,6 +730,8 @@ def battle_examine_room(client, player, region, room, CLIENT_DATA):
 
 	display_player_status(client, room, CLIENT_DATA)
 	display_battle_commands(client, CLIENT_DATA)
+
+#-------------------------------------------------------------------------------
 
 def display_description(client, room, CLIENT_DATA):
 	#print display_description
@@ -777,6 +781,7 @@ def display_object_names(client, room, CLIENT_DATA):
 			elif isinstance(obj.kind, World.container):
 				client.send_cc("^cA container named '%s'^~\n" %obj.name)
 
+
 def display_mobs(client, room, CLIENT_DATA, isBattle=False):
 	region = room.region
 	regionRoom = str(region) + room.name.capitalize()
@@ -788,19 +793,20 @@ def display_mobs(client, room, CLIENT_DATA, isBattle=False):
 			mobhealthratio = (float(mob.kind.hp)/float(mob.kind.maxHp))
 			if mobhealthratio == 1.0:
 				healthmessage = '(healthy)'
-			elif mobhealthratio >= 0.63:
+			elif mobhealthratio >= 0.75:
 				healthmessage = '(a few scratches)'
-			elif mobhealthratio >= 0.33:
+			elif mobhealthratio >= 0.50:
 				healthmessage = '(bruised and battered)'
-			elif mobhealthratio >= 0.1:
-				healthmessage = '(pretty beat up and bleeding)'
+			elif mobhealthratio >= 0.25:
+				healthmessage = '(injured and bleeding)'
 			else:
-				healthmessage = '(barely living)'
+				healthmessage = '(barely alive)'
 
 		if not isBattle:
 			client.send_cc("^y%s^~\n" %mob.description)
 		else:
 			client.send_cc("^y" + mob.description + " " + healthmessage + "^~\n")
+
 
 def display_mob_names(client, room, CLIENT_DATA, isBattle=False):
 	region = room.region
@@ -846,9 +852,9 @@ def display_player_status(client, room, CLIENT_DATA):
 	if avatar.kind.pp != avatar.kind.maxPp:
 		ppcolor='^c'
 	if ppratio <= 0.66:
-		ppcolor='^y'
+		ppcolor='^B'
 	if ppratio < 0.33:
-		ppcolor='^r'
+		ppcolor='^b'
 
 
 	hpstring="^I" + hpcolor + "[          " + str(avatar.kind.hp) + "/" + str(avatar.kind.maxHp) + " ]^~\n"
@@ -864,7 +870,17 @@ def display_player_status(client, room, CLIENT_DATA):
 
 	hpremratio = int((1.0-hpratio)*40)
 	if hpremratio > 0:
-		hpstring = hpstring[:-(hpremratio)] + "^~" + hpstring[-(hpremratio):]
+		lowHealthMod = ''
+		separator = '^~'
+		cutoff = -(hpremratio) - 2
+		if cutoff <= -36:
+			cutoff = -36
+		if hpratio < 0.1:
+			lowHealthMod = '^r'
+			separator = ''
+			hpstring = hpstring[4:]
+		hpstring = lowHealthMod + hpstring[:cutoff] + separator + hpstring[cutoff:]
+		#print hpstring
 
 	hpstring = "\n ^GHP: ^~" + hpstring
 
@@ -883,13 +899,24 @@ def display_player_status(client, room, CLIENT_DATA):
 
 	ppremratio = int((1.0-ppratio)*40)
 	if ppremratio > 0:
-		ppstring = ppstring[:-(ppremratio)] + "^~" + ppstring[-(ppremratio):]
+		lowPPMod = ''
+		separator = '^~'
+		cutoff = -(ppremratio) - 2
+		if cutoff <= -36:
+			cutoff = -36
+		if ppratio < 0.1:
+			lowPPMod = '^b'
+			separator = ''
+			ppstring = ppstring[4:]
+		ppstring = lowPPMod + ppstring[:cutoff] + separator + ppstring[cutoff:]
+		#print ppstring
 
 	ppstring = " ^CPP: ^~" + ppstring
 
 
 	client.send_cc("\n^!^I^w               " + avatar.name + (" "*(11+len(avatar.name)))+ "^~")
 	client.send_cc(hpstring + ppstring+"\n")
+
 
 def display_battle_commands(client, CLIENT_DATA):
 	clientDataID = str(client.addrport())

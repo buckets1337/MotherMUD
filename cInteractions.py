@@ -358,3 +358,5 @@ def stopBattle(battleRoom):
 	if label in Globals.masterRooms:
 		del Globals.masterRooms[label]
 
+	print "-B " + str(player) + " " + player.name + " (flee)"
+
