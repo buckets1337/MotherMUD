@@ -20,11 +20,28 @@ def checkIfPlayerAlive(playerAvatar, attackingMob):
 
 			for player in Globals.regionListDict[Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.region][Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.name].players:
 				if player != playerAvatar:
-					player.client.send_cc("^y" +mob.name + " arrived from battle.^~\n")
+					player.client.send_cc("^y" +mob.name + ", finished with battle, seems to suddenly notice you.^~\n")
+
+		print Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.name
+		print Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.objects
+		for obj in Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.objects:
+			if obj.name.startswith("^r" + playerAvatar.name):
+				Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo.objects.remove(obj)
 
 		playerAvatar.battleDeath(attackingMob)
 
-		Globals.battleRooms.remove(playerAvatar.battleRoom)
+		Globals.battleRooms.remove(Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom)
+
+		label = str(Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.region)+str(Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.name)
+		if label in Globals.masterRooms:
+			del Globals.masterRooms[label]
+
+		
+		Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom.attachedTo = None
+		Globals.CLIENT_DATA[playerAvatar.clientDataID].battleRoom = None
+		Globals.CLIENT_DATA[playerAvatar.clientDataID].gameState = 'normal'
+
+		#cInfo.render_room(playerAvatar.client, playerAvatar, playerAvatar.currentRoom, Globals.CLIENT_DATA)
 
 		#Globals.regionListDict[playerAvatar.currentRoom.region][playerAvatar.currentRoom.name].objects.remove()
 
@@ -62,7 +79,7 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 
 	target.kind.hp -= damage
 
-	client.send_cc("\n^Y*^Ubonk^~^Y*^~ You ^!bash " + target.name + "^~ for ^!" + str(damage) + " damage^~.\n\n")
+	client.send_cc("\n^Y*^Ubonk^~^Y*^~ You ^!bash " + target.name + "^~ for ^!" + str(damage) + " damage^~.\n")
 
 	mobLifeStatus = checkIfMobAlive(target, playerAvatar)
 
@@ -71,10 +88,18 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 	playerLifeStatus = ''
 	for mob in room.mobs:
 		hurt = mob.aiBattle(playerAvatar, target, room, CLIENT_DATA)
+		client.send_cc("\n^Y*^Ublam^~^Y*^~ ^!" + mob.name.capitalize() + " hits^~ you for ^!" + str(hurt) + " damage^~.\n")
 		playerAvatar.kind.hp -= hurt
 		playerLifeStatus = checkIfPlayerAlive(playerAvatar, mob)
+	#client.send_cc("\n")
+	if playerLifeStatus == 'dead':
+		cInfo.render_room(playerAvatar.client, playerAvatar, playerAvatar.currentRoom, Globals.CLIENT_DATA)
+		
 
 	if playerLifeStatus != 'dead' and mobLifeStatus != 'victory':
+		client.send_cc("______________________________________\n\n")
+		cInfo.display_mobs(client, room, CLIENT_DATA, isBattle=True)
+		client.send("\n\n")
 		cInfo.display_player_status(client, room, CLIENT_DATA)
 		cInfo.display_battle_commands(client, CLIENT_DATA)
 

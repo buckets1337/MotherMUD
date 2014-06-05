@@ -921,3 +921,4 @@ def display_player_status(client, room, CLIENT_DATA):
 def display_battle_commands(client, CLIENT_DATA):
 	clientDataID = str(client.addrport())
 	client.send_cc('^UCommands^~: ' + str(CLIENT_DATA[clientDataID].avatar.battleCommands) + "\n")
+	client.send_cc("______________________________________\n\n")

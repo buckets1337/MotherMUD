@@ -109,25 +109,27 @@ class movementAI:
 				# print exitList
 
 				selectedExit = exitList[selection]
+				if self.mob.currentRoom.name == selectedExit:
+					selectedExit = None
 
 				for room in Globals.regionListDict[self.mob.currentRoom.region]:
 					if Globals.regionListDict[self.mob.currentRoom.region][room].name == selectedExit:
 						newRoom = Globals.regionListDict[self.mob.currentRoom.region][room]
 
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
-
-				oldMobRoom = self.mob.currentRoom
-
 				if newRoom != None:
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
+
+					oldMobRoom = self.mob.currentRoom
+
 					self.mob.currentRoom.mobs.remove(self.mob)
 					self.mob.currentRoom = newRoom
 					newRoom.mobs.append(self.mob)
 
-				print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
+					print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
 
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
 
 		self.resetTimer()
 
@@ -155,29 +157,34 @@ class movementAI:
 				# print exitList
 
 				selectedExit = exitList[selection]
+				if self.mob.currentRoom.name == selectedExit:
+					selectedExit = None
 
 				for room in Globals.regionListDict[self.mob.currentRoom.region]:
 					if Globals.regionListDict[self.mob.currentRoom.region][room].name == selectedExit:
 						newRoom = Globals.regionListDict[self.mob.currentRoom.region][room]
 
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
-
-				oldMobRoom = self.mob.currentRoom
-
 				if newRoom != None:
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
+
+					oldMobRoom = self.mob.currentRoom
+
 					if self.mob in self.mob.currentRoom.mobs:
 						self.mob.currentRoom.mobs.remove(self.mob)
 						self.mob.currentRoom = newRoom
 						newRoom.mobs.append(self.mob)
-					else:
-						if self.Timer in Globals.MoveTIMERS:
-							Globals.MoveTIMERS.remove(self.Timer)
 
-				print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
+					print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
 
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
+
+				else:
+					if self.Timer in Globals.MoveTIMERS:
+						Globals.MoveTIMERS.remove(self.Timer)
+
+				
 
 		self.resetTimer()
 
@@ -212,17 +219,20 @@ class movementAI:
 				# print exitList
 
 				selectedExit = exitList[selection]
+				if self.mob.currentRoom.name == selectedExit:
+					selectedExit = None
 
 				for room in Globals.regionListDict[self.mob.currentRoom.region]:
 					if Globals.regionListDict[self.mob.currentRoom.region][room].name == selectedExit:
 						newRoom = Globals.regionListDict[self.mob.currentRoom.region][room]
-				
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
 
-				oldMobRoom = self.mob.currentRoom
+				if newRoom != None:				
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^y%s left.^~\n" %self.mob.name.capitalize())
 
-				if newRoom != None:
+					oldMobRoom = self.mob.currentRoom
+
+
 					self.mob.currentRoom.mobs.remove(self.mob)
 					self.mob.currentRoom = newRoom
 					newRoom.mobs.append(self.mob)
@@ -230,10 +240,10 @@ class movementAI:
 
 				# print oldMobRoom
 				# print self.mob.currentRoom
-				print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
+					print "Mm " + str(self.mob) + " " + str(self.mob.name) + ": from [" + str(oldMobRoom.region) +":"+ str(oldMobRoom.name) + "] to [" + str(self.mob.currentRoom.region) +":"+ str(self.mob.currentRoom.name) + "]"
 
-				for player in self.mob.currentRoom.players:
-					player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
+					for player in self.mob.currentRoom.players:
+						player.client.send_cc("^yA %s has entered.^~\n" %self.mob.name)
 
 		self.resetTimer()
 

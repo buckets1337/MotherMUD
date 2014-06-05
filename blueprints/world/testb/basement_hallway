@@ -1,0 +1,14 @@
+name=basement_hallway
+region=testb
+
+description='A dark hallway at the foot of the stairs.'
+
+longDescription='It is very dark here.  You can't really make out the details of your environment.'
+
+exits=test:stairwell
+
+objects=trash_can, spider_web
+
+stuffList=
+
+mobs=spider

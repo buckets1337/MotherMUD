@@ -25,7 +25,7 @@ MoveTIMERS = []
 
 OPList = []
 
-RegionsList = ['test', 'Onette']
+RegionsList = ['test', 'testb', 'Onette']
 masterRooms = {}
 regionListDict = {}
 battleRooms = []

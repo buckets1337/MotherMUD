@@ -1,0 +1,16 @@
+name='spider_web'
+
+description='A spider's web.'
+
+longDescription='I bet there is a spider around somewhere...'
+
+isVisible=False
+
+mobSpawner=True
+mobSpawner.mobFile=testb/spider
+mobSpawner.time=10
+mobSpawner.oddsList=True:1,False:1
+mobSpawner.mode=thresh
+mobSpawner.cycles=1
+mobSpawner.active=False
+

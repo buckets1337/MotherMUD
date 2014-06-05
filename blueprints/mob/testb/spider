@@ -1,0 +1,31 @@
+mobID=
+name=spider
+species=arachnid
+
+description=A small spider.
+
+longDescription=This spider is not large. Still, spiders...ugh.
+
+speech=*skitter*
+
+expirator=30
+moveAI=introvertRandom:10
+battleAI=basicBash
+
+kind.hp=15
+kind.maxHp=15
+kind.pp=1
+kind.maxPp=1
+kind.level=1
+kind.exp=12
+kind.money=0
+kind.offense=2
+kind.defense=1
+kind.speed=1
+kind.guts=1
+kind.luck=1
+kind.vitality=1
+kind.IQ=1
+kind.inventory=
+kind.inventorySize=2
+kind.equipment={}

@@ -606,8 +606,8 @@ class Player(Entity):
 			if player != self:
 				player.client.send_cc("^R" +self.name.capitalize() + " was killed by " + killingMob.name + "!^~\n")
 
-		print Globals.CLIENT_DATA[self.clientDataID].battleRoom.players
-		Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)
+		#print Globals.CLIENT_DATA[self.clientDataID].battleRoom.players
+		#Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)
 
 		self.currentRoom = self.spawnRoom
 
@@ -615,7 +615,7 @@ class Player(Entity):
 
 		for player in self.currentRoom.players:
 			if player != self:
-				player.client.send_cc("^c" + self.name.capitalize() + " appeared.^~\n")
+				player.client.send_cc("^c" + self.name.capitalize() + " fell in battle.^~\n")
 
 		print "-B " + str(self) + " " + self.name + " (player death)"
 
@@ -635,16 +635,24 @@ class Player(Entity):
 			if obj.name.startswith("^r" + self.name):
 				self.currentRoom.objects.remove(obj)
 
-		self.client.send_cc("\n^!^U^IVICTORY!^~\n")
+		self.client.send_cc("\n^!^U^I            ***YOU WIN!***            ^~\n\n")
+
 		self.kind.exp += self.rewardExp
-
 		self.client.send_cc("You gained ^Y^!" + str(self.rewardExp) + " experience.^~\n")
-
+		self.client.send_cc("______________________________________\n\n")		
 		self.rewardExp = 0
 
 		#print self.currentRoom.name
 		cMove.move(client=self.client, cmd=Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name, args=[], CLIENT_LIST=Globals.CLIENT_LIST, CLIENT_DATA=Globals.CLIENT_DATA, exits={Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name:Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo}, fromBattle=True)
 
+		Globals.battleRooms.remove(Globals.CLIENT_DATA[self.clientDataID].battleRoom)
+		
+		label = str(Globals.CLIENT_DATA[self.clientDataID].battleRoom.region)+str(Globals.CLIENT_DATA[self.clientDataID].battleRoom.name)
+		if label in Globals.masterRooms:
+			del Globals.masterRooms[label]
+
+		Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo = None
+		Globals.CLIENT_DATA[self.clientDataID].battleRoom = None
 		Globals.CLIENT_DATA[self.clientDataID].gameState = 'normal'
 
 		print "-B " + str(self) + " " + self.name + " (victory)"
