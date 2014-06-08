@@ -616,6 +616,7 @@ def status(client, args, CLIENT_LIST, CLIENT_DATA):
 	divspc3=0
 	divspc4=0
 	divspc5=0
+	divspc6=0
 
 	if avatar.kind.offense<10:
 		divspc1=2
@@ -637,21 +638,82 @@ def status(client, args, CLIENT_LIST, CLIENT_DATA):
 	elif avatar.kind.IQ<100:
 		divspc4=1
 
+	if avatar.kind.exp<10:
+		divspc5=7
+	elif avatar.kind.exp<100:
+		divspc5=6
+	elif avatar.kind.exp<1000:
+		divspc5=5
+	elif avatar.kind.exp<10000:
+		divspc5=4
+	elif avatar.kind.exp<100000:
+		divspc5=3
+	elif avatar.kind.exp<1000000:
+		divspc5=2
+	elif avatar.kind.exp<10000000:
+		divspc5=1
+
+	if avatar.kind.money<10:
+		divspc6=0
+	elif avatar.kind.money<100:
+		divspc6=1
+	elif avatar.kind.money<1000:
+		divspc6=2
+	elif avatar.kind.money<10000:
+		divspc6=3
+	elif avatar.kind.money<100000:
+		divspc6=4
+	elif avatar.kind.money<1000000:
+		divspc6=5
+	elif avatar.kind.money<10000000:
+		divspc6=6
+	elif avatar.kind.money<100000000:
+		divspc6=7
+
+	hpratio = (1.000*avatar.kind.hp)/(1.000*avatar.kind.maxHp)
+	ppratio = (1.000*avatar.kind.pp)/(1.000*avatar.kind.maxPp)
+	#print hpratio
+
+	hpcolor = ""
+	ppcolor = ""
+
+	if hpratio <= 0.1:
+		hpcolor = "^r"
+	elif hpratio <= 0.33:
+		hpcolor = "^R"
+	elif hpratio <= 0.66:
+		hpcolor = "^y"
+	elif hpratio <= 0.85:
+		hpcolor = "^g"
+	elif hpratio < 1.0:
+		hpcolor = "^G"
+
+	if ppratio <= 0.1:
+		ppcolor = "^K"
+	elif ppratio <= 0.33:
+		ppcolor = "^b"
+	elif ppratio <= 0.66:
+		ppcolor = "^B"
+	elif ppratio <= 0.85:
+		ppcolor = "^c"
+	elif ppratio < 1.0:
+		ppcolor = "^C"
+
 	client.send_cc("    _____________________^I[ Status ]^~____________________\n")
 	client.send_cc("    |"+ (" "*49) + "|\n")
 	client.send_cc("  ^I  ^~| ^!" + str(avatar.name) + "^~, " + str(avatar.title) +(" "*(48-len(str(avatar.name))-2-len(str(avatar.title))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
-	client.send_cc("  ^I  ^~| Level: " + str(avatar.kind.level)+ (" "*(48-7-len(str(avatar.kind.level)))) + "|\n")
+	client.send_cc("  ^I  ^~| Level: " + str(avatar.kind.level)+ "     " +(" "*divspc5) +"Exp: " + str(avatar.kind.exp) + (" "*(48-7-5-5-divspc5-len(str(avatar.kind.level))-len(str(avatar.kind.exp)))) + "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
-	client.send_cc("  ^I  ^~| ^GHP:^~ " + str(avatar.kind.hp) + "/" + str(avatar.kind.maxHp) +(" "*(48-4-len(str(avatar.kind.hp))-1-len(str(avatar.kind.maxHp))))+"|\n")
-	client.send_cc("  ^I  ^~| ^CPP:^~ " + str(avatar.kind.pp) + "/" + str(avatar.kind.maxPp) +(" "*(48-4-len(str(avatar.kind.pp))-1-len(str(avatar.kind.maxPp))))+ "|\n")
+	client.send_cc("  ^I  ^~| ^GHP:^~ " + hpcolor + str(avatar.kind.hp) + "^~" + "/" + str(avatar.kind.maxHp) +(" "*(48-4-len(str(avatar.kind.hp))-1-len(str(avatar.kind.maxHp))))+"|\n")
+	client.send_cc("  ^I  ^~| ^CPP:^~ " + ppcolor + str(avatar.kind.pp) + "^~" + "/" + str(avatar.kind.maxPp) +(" "*(48-4-len(str(avatar.kind.pp))-1-len(str(avatar.kind.maxPp))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
-	client.send_cc("  ^I  ^~| Offense: " + str(avatar.kind.offense) + "      " +(" "*divspc1)+ "Defense: " + str(avatar.kind.defense) +(" "*(47-9-6-divspc1-9-len(str(avatar.kind.defense))))+"|\n")
-	client.send_cc("  ^I  ^~| Vitality: " + str(avatar.kind.vitality) + "       " +(" "*divspc2)+ "Guts: " + str(avatar.kind.guts) +(" "*(47-10-7-divspc2-6-len(str(avatar.kind.guts))))+ "|\n")
-	client.send_cc("  ^I  ^~| Speed: " + str(avatar.kind.speed) + "        " + (" "*divspc3) + "Luck: "+ str(avatar.kind.luck) +(" "*(47-7-8-divspc3-6-len(str(avatar.kind.luck))))+ "|\n")
+	client.send_cc("  ^I  ^~| Offense: " + str(avatar.kind.offense) + "       " +(" "*divspc1)+ "Defense: " + str(avatar.kind.defense) +(" "*(47-9-7-divspc1-9-len(str(avatar.kind.defense))))+"|\n")
+	client.send_cc("  ^I  ^~| Vitality: " + str(avatar.kind.vitality) + "        " +(" "*divspc2)+ "Guts: " + str(avatar.kind.guts) +(" "*(47-10-8-divspc2-6-len(str(avatar.kind.guts))))+ "|\n")
+	client.send_cc("  ^I  ^~| Speed: " + str(avatar.kind.speed) + "         " + (" "*divspc3) + "Luck: "+ str(avatar.kind.luck) +(" "*(47-7-9-divspc3-6-len(str(avatar.kind.luck))))+ "|\n")
 	client.send_cc("  ^I  ^~| IQ: " + str(avatar.kind.IQ) + "           " + (" "*divspc4) +(" "*(47-4-11-divspc4-0+1-len(str(avatar.kind.IQ))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n") 
-	client.send_cc("  ^I  ^~| Money: $" + str(avatar.kind.money) +(" "*(47-8-0-divspc5-0+1-len(str(avatar.kind.money))))+ "|\n")
+	client.send_cc("  ^I  ^~| Money: $" + str(avatar.kind.money) + (" "*(47-8-0-divspc6-0+1-len(str(avatar.kind.money))))+ "|\n")
 	client.send_cc("  ^I  ^~|_________________________________________________|\n")
 	client.send_cc("  ^I                                                  ^~\n")
 	client.send_cc("\n")

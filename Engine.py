@@ -279,6 +279,21 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     ## player used a room exit name as a command, move to room associated with the exit
                     cMove.move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom.exits)
 
+                elif cmd in ['1','2','3','4','5','6','7','8','9']:
+                    exitList = []
+                    for exit in CLIENT_DATA[clientDataID].avatar.currentRoom.exits:
+                        exitList.append(exit)
+                    if len(CLIENT_DATA[clientDataID].avatar.currentRoom.exits) >= int(cmd):
+                        cMove.move(client, exitList[int(cmd)-1], args, CLIENT_LIST, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom.exits)
+
+                    else:
+                        if len(CLIENT_DATA[clientDataID].avatar.currentRoom.exits) == 0:
+                            client.send("You don't see any exits!.\n")
+                        elif len(CLIENT_DATA[clientDataID].avatar.currentRoom.exits) == 1:
+                            client.send("You only see 1 exit.\n")
+                        else:
+                            client.send("You only see " + str(len(CLIENT_DATA[clientDataID].avatar.currentRoom.exits)) + " exits.\n")
+
                 elif cmd == 'get':
                     ## pick up an item in the room
                     cInteractions.get(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))

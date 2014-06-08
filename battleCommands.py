@@ -97,7 +97,7 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 		
 
 	if playerLifeStatus != 'dead' and mobLifeStatus != 'victory':
-		client.send_cc("______________________________________\n\n")
+		client.send_cc("______________________________________\n\n\n")
 		cInfo.display_mobs(client, room, CLIENT_DATA, isBattle=True)
 		client.send("\n\n")
 		cInfo.display_player_status(client, room, CLIENT_DATA)
