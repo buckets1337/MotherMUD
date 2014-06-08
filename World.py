@@ -569,7 +569,7 @@ class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
-	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = ['bash','flee'], spawnRoom = None):
+	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = None, spawnRoom = None, rewardExp=0, rewardMoney=0):
 		Entity.__init__(self, description, currentRoom, name)
 		self.name = name
 		self.title = title
@@ -579,12 +579,14 @@ class Player(Entity):
 		if self.kind:
 			self.kind.owner = self
 		self.battleCommands = battleCommands
+		if self.battleCommands == None:
+			self.battleCommands = ('bash','flee')
 		self.spawnRoom = spawnRoom
 
 		self.spawnRoom = Globals.regionListDict['test']['bullpen']
 
-		self.rewardExp = 0
-		self.rewardMoney = 0
+		self.rewardExp = rewardExp
+		self.rewardMoney = rewardMoney
 
 
 	def battleDeath(self, killingMob):

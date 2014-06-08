@@ -54,6 +54,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	battleRoom = None
 	battleRoomAttachedTo = None
 	battleCommands = None
+	rewardExp = 0
+	rewardMoney = 0
 
 	#print fileData
 	for data in fileData:
@@ -104,6 +106,10 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			exp = int(data[4:-1])
 		if data.startswith("money="):
 			money = int(data[6:-1])
+		if data.startswith("rewardExp="):
+			rewardExp = int(data[10:-1])
+		if data.startswith("rewardMoney="):
+			rewardMoney = int(data[12:-1])
 		if data.startswith("offense="):
 			offense = int(data[8:-1])
 		if data.startswith("defense="):
@@ -148,7 +154,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 
 	#print Globals.startingRoom.players
 	#print Globals.startingRoom
-	newAvatar = World.Player(description, currentRoomRoom, clientName, client, clientDataID, title)
+	newAvatar = World.Player(description=description, currentRoom=currentRoomRoom, name=clientName, client=client, clientDataID=clientDataID, title=title, rewardExp=rewardExp, rewardMoney=rewardMoney)
 	newMortal = World.mortal(hp, maxHp, pp, maxPp, level, exp, money, offense, defense, speed, guts, luck, vitality, IQ, [])
 	newMortal.inventory = []
 	# print newAvatar.currentRoom.players
@@ -294,6 +300,8 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		inventory = kind.inventory
 		inventorySize = str(kind.inventorySize)
 		equipment = kind.equipment
+		rewardExp = str(avatar.rewardExp)
+		rewardMoney = str(avatar.rewardMoney)
 
 
 
@@ -325,6 +333,8 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("level=" + level + "\n")
 			f.write("exp=" + exp + "\n")
 			f.write("money=" + money + "\n")
+			f.write("rewardExp=" + rewardExp + "\n")
+			f.write("rewardMoney=" + rewardMoney + "\n")
 			f.write("offense=" + offense + "\n")
 			f.write("defense=" + defense + "\n")
 			f.write("speed=" + speed + "\n")
@@ -332,6 +342,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("luck=" + luck + "\n")
 			f.write("vitality=" + vitality + "\n")
 			f.write("IQ=" + IQ + "\n")
+
 			commandList = ''
 			for command in battleCommands:
 				commandList += (str(command) + ", ")
@@ -339,6 +350,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 				commandList = commandList[:-2]
 
 			f.write("battleCommands=" + str(commandList) + "\n")
+			
 			f.write("inventorySize=" + inventorySize + "\n")
 
 			f.write("\ninventory=")
@@ -452,6 +464,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 	except:
 		print "!! Failed to save CLIENT " + Globals.CLIENT_DATA[clientDataID].name
 		raise
+
 
 def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 	"""
@@ -630,10 +643,12 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 				TI.write(str(timerID) + " actionArgs=" + str(TIMER.actionArgs) + "\n")
 				if hasattr(TIMER, 'attachedTo'):
 					if TIMER.attachedTo != None:
-						if hasattr(TIMER.attachedTo.owner, 'owner'):
-							TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
-						elif hasattr(TIMER.attachedTo, 'owner'):
-							TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.name + "\n")
+						if hasattr(TIMER.attachedTo, 'owner'):
+							if TIMER.attachedTo.owner != None:
+								if hasattr(TIMER.attachedTo.owner, 'owner'):
+									TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.owner.name + "\n")
+								elif hasattr(TIMER.attachedTo, 'owner'):
+									TI.write(str(timerID) + " attachedTo=" + TIMER.attachedTo.owner.name + "\n")
 				TI.write(str(timerID) + " respawns=" + str(TIMER.respawns) + "\n")
 				TI.write(str(timerID) + " currentTime=" + str(TIMER.currentTime) + "\n")
 				TI.write(" \n")
@@ -675,7 +690,6 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 	# except OSError:
 	# 	print "Failed to save CLIENT_LIST"
 	# 	return
-
 
 
 def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='cmd', spawnContainer=None):

@@ -499,6 +499,7 @@ def saveMobToFile(mob, path):
 		f.write('\n')
 		if mob.expirator != None:
 			f.write('expirator=%s\n' %mob.expirator.startingTime)
+
 		if mob.aiMove != None:
 			if mob.aiMove.Timer.actionFunction == mob.aiMove.basicRandom:
 				actionFunction = 'basicRandom'
@@ -509,6 +510,12 @@ def saveMobToFile(mob, path):
 			elif mob.aiMove.Timer.actionFunction == mob.aiMove.doNotMove:
 				actionFunction = 'doNotMove'
 			f.write('moveAI=%s:%s\n' %(actionFunction, mob.aiMove.Timer.time))
+
+		if mob.aiBattle != None:
+			if mob.aiBattle == aiBattle.basicBash:
+				battleFunction = 'basicBash'
+			f.write('battleAI=%s\n' %battleFunction)
+
 		f.write('\n')
 		f.write('kind.hp=%s\n' %str(mob.kind.hp))
 		f.write('kind.maxHp=%s\n' %str(mob.kind.maxHp))
