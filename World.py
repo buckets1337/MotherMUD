@@ -569,7 +569,7 @@ class Player(Entity):
 	"""
 	This is a representation of the clients' avatar.  Methods should mostly be added using the same general components as mobs
 	"""
-	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = None, spawnRoom = None, rewardExp=0, rewardMoney=0):
+	def __init__(self, description, currentRoom, name, client, clientDataID, title = 'just another soul on the bus.', kind = None, battleCommands = None, spawnRoom = None, rewardExp=0, rewardMoney=0, expToLevel=100):
 		Entity.__init__(self, description, currentRoom, name)
 		self.name = name
 		self.title = title
@@ -587,6 +587,9 @@ class Player(Entity):
 
 		self.rewardExp = rewardExp
 		self.rewardMoney = rewardMoney
+
+		self.expToLevel = expToLevel
+		self.lvlchoiceslist = []
 
 
 	def battleDeath(self, killingMob):
@@ -622,7 +625,6 @@ class Player(Entity):
 		print "-B " + str(self) + " " + self.name + " (player death)"
 
 
-
 	def battleWin(self):
 		'''
 		run when the player wins a battle.  Moves the player from the battleRoom back to the currentRoom
@@ -640,12 +642,15 @@ class Player(Entity):
 		self.client.send_cc("\n^!^U^I            ***YOU WIN!***            ^~\n\n")
 
 		self.kind.exp += self.rewardExp
-		self.client.send_cc("You gained ^Y^!" + str(self.rewardExp) + " experience.^~\n")
-		self.client.send_cc("______________________________________\n\n")		
+		self.expToLevel -= self.rewardExp
+		leveled = self.levelUp()
+		if not leveled:
+			self.client.send_cc("You gained ^Y^!" + str(self.rewardExp) + " experience.^~\n")
+			self.client.send_cc("______________________________________\n\n")		
 		self.rewardExp = 0
 
 		#print self.currentRoom.name
-		cMove.move(client=self.client, cmd=Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name, args=[], CLIENT_LIST=Globals.CLIENT_LIST, CLIENT_DATA=Globals.CLIENT_DATA, exits={Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name:Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo}, fromBattle=True)
+		cMove.move(client=self.client, cmd=Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name, args=[], CLIENT_LIST=Globals.CLIENT_LIST, CLIENT_DATA=Globals.CLIENT_DATA, exits={Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo.name:Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo}, fromBattle=True, leveledUp=leveled)
 
 		Globals.battleRooms.remove(Globals.CLIENT_DATA[self.clientDataID].battleRoom)
 		
@@ -655,11 +660,75 @@ class Player(Entity):
 
 		Globals.CLIENT_DATA[self.clientDataID].battleRoom.attachedTo = None
 		Globals.CLIENT_DATA[self.clientDataID].battleRoom = None
-		Globals.CLIENT_DATA[self.clientDataID].gameState = 'normal'
+		if not leveled:
+			Globals.CLIENT_DATA[self.clientDataID].gameState = 'normal'
 
 		print "-B " + str(self) + " " + self.name + " (victory)"
+		if leveled:
+			print "lvl " + str(self) + " " + self.name + " (now " + str(self.kind.level) + ")"
 
 
+	def levelUp(self):
+		'''checks for and handles leveling up a player'''
+
+		if self.expToLevel <= 0:
+			Globals.CLIENT_DATA[self.clientDataID].gameState = 'levelup'
+			self.kind.level += 1
+
+			if self.expToLevel < 0:
+				expMod = 0 + self.expToLevel
+			else:
+				expMod = 0
+
+			expToLevelMod = (random.randint(80,120)+self.kind.level)/100.00
+			newBaseExpToLevel = (((self.kind.exp + expMod) * self.kind.level)/(self.kind.level-1))*expToLevelMod
+			self.expToLevel = int(newBaseExpToLevel)
+
+			choicesList = []
+			maxChoices = (abs(self.kind.IQ/3)-self.kind.level)
+			if maxChoices < 1:
+				maxChoices = 1
+			numberOfChoices = random.randint(0, maxChoices)
+			if numberOfChoices < 2:
+				numberOfChoices = 2
+			if numberOfChoices > 6:
+				numberOfChoices = 6
+
+
+			i = 0
+			while i < numberOfChoices:
+				spread = [0,0,0,0,0,0,0]
+				boosts = 5
+				if random.randint(0,20) == 0:
+					boosts += random.randint(0, (self.kind.level/random.randint(1,5)))
+					self.client.send_cc("^W^U****!!!SMASH!!!****^~\n")
+
+				for x in range(boosts):	
+					pointer = random.randint(0,6)
+					spread[pointer] += 1
+				choicesList.append(spread)
+				i += 1
+
+
+			self.client.send_cc("^W^UYOU GAINED A LEVEL!^~\n")
+			self.client.send_cc("Which way would you like to develop?\n")
+			self.client.send_cc("\n")
+			self.client.send_cc("^W^IChoice  Off  Def  Vit  Gut  Spd  Lck  I.Q. ^~\n")
+			self.client.send_cc("  A      " + str(choicesList[0][0]) + "    " + str(choicesList[0][1]) + "    " + str(choicesList[0][2]) + "    " + str(choicesList[0][3]) + "    " + str(choicesList[0][4]) + "    " + str(choicesList[0][5]) + "    " + str(choicesList[0][6]) + "\n")
+			self.client.send_cc("  B      " + str(choicesList[1][0]) + "    " + str(choicesList[1][1]) + "    " + str(choicesList[1][2]) + "    " + str(choicesList[1][3]) + "    " + str(choicesList[1][4]) + "    " + str(choicesList[1][5]) + "    " + str(choicesList[1][6]) + "\n")
+			if numberOfChoices > 2:
+				self.client.send_cc("  C      " + str(choicesList[2][0]) + "    " + str(choicesList[2][1]) + "    " + str(choicesList[2][2]) + "    " + str(choicesList[2][3]) + "    " + str(choicesList[2][4]) + "    " + str(choicesList[2][5]) + "    " + str(choicesList[2][6]) + "\n")
+			if numberOfChoices > 3:
+				self.client.send_cc("  D      " + str(choicesList[3][0]) + "    " + str(choicesList[3][1]) + "    " + str(choicesList[3][2]) + "    " + str(choicesList[3][3]) + "    " + str(choicesList[3][4]) + "    " + str(choicesList[3][5]) + "    " + str(choicesList[3][6]) + "\n")
+			if numberOfChoices > 4:
+				self.client.send_cc("  E      " + str(choicesList[4][0]) + "    " + str(choicesList[4][1]) + "    " + str(choicesList[4][2]) + "    " + str(choicesList[4][3]) + "    " + str(choicesList[4][4]) + "    " + str(choicesList[4][5]) + "    " + str(choicesList[4][6]) + "\n")
+			if numberOfChoices > 5:
+				self.client.send_cc("  F      " + str(choicesList[5][0]) + "    " + str(choicesList[5][1]) + "    " + str(choicesList[5][2]) + "    " + str(choicesList[5][3]) + "    " + str(choicesList[5][4]) + "    " + str(choicesList[5][5]) + "    " + str(choicesList[5][6]) + "\n")
+
+			self.lvlchoiceslist = choicesList
+			return True
+		else:
+			return False
 
 
 class mortal:		# 'kind' attribute 
@@ -684,6 +753,7 @@ class mortal:		# 'kind' attribute
 		self.inventory = inventory
 		self.inventorySize = inventorySize
 		self.equipment = equipment
+
 
 
 class expirator:		# component added to mobs.  Causes the mob to expire and delete after a set period of time, so the world does not fill with mobs

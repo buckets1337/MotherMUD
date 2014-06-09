@@ -9,7 +9,7 @@ import cInfo, cInteractions
 
 
 
-def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False):
+def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False, leveledUp = False):
 	"""
 	moves from one room to the next.
 	"""
@@ -34,8 +34,8 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False)
 	for mob in player.currentRoom.mobs:
 		if mob.expirator != None:
 			mob.expirator.resetTimer()
-
-	cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
+	if not leveledUp:
+		cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
 	if fromBattle == False:
 		alert(client, CLIENT_DATA, ("\n^g^!%s has entered.^~\n" %player.name))
 	elif fromBattle:

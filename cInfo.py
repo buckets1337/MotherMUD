@@ -704,6 +704,7 @@ def status(client, args, CLIENT_LIST, CLIENT_DATA):
 	client.send_cc("  ^I  ^~| ^!" + str(avatar.name) + "^~, " + str(avatar.title) +(" "*(48-len(str(avatar.name))-2-len(str(avatar.title))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
 	client.send_cc("  ^I  ^~| Level: " + str(avatar.kind.level)+ "     " +(" "*divspc5) +"Exp: " + str(avatar.kind.exp) + (" "*(48-7-5-5-divspc5-len(str(avatar.kind.level))-len(str(avatar.kind.exp)))) + "|\n")
+	client.send_cc("  ^I  ^~|        " + " "*len(str(avatar.kind.level))+ "     " +(" "*divspc5) +"TNL: " + str(avatar.expToLevel) + (" "*(48-7-5-5-divspc5-len(str(avatar.kind.level))-len(str(avatar.expToLevel)))) + "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
 	client.send_cc("  ^I  ^~| ^GHP:^~ " + hpcolor + str(avatar.kind.hp) + "^~" + "/" + str(avatar.kind.maxHp) +(" "*(48-4-len(str(avatar.kind.hp))-1-len(str(avatar.kind.maxHp))))+"|\n")
 	client.send_cc("  ^I  ^~| ^CPP:^~ " + ppcolor + str(avatar.kind.pp) + "^~" + "/" + str(avatar.kind.maxPp) +(" "*(48-4-len(str(avatar.kind.pp))-1-len(str(avatar.kind.maxPp))))+ "|\n")

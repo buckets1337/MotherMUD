@@ -150,7 +150,10 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 cMove.alert(client, CLIENT_DATA, ("\n^g^!%s appeared.^~\n" %player.name))
                 #print Rooms.startingRoom.players
-                cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA=CLIENT_DATA)
+                if CLIENT_DATA[clientDataID].gameState == 'normal':
+                    cInfo.render_room(client=client, player=CLIENT_DATA[clientDataID].avatar, room=CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA=CLIENT_DATA)
+                elif CLIENT_DATA[clientDataID].gameState == 'battle':
+                    cInfo.battleLook(client=client, args=[], CLIENT_LIST=Globals.CLIENT_LIST, CLIENT_DATA=CLIENT_DATA)
                 CLIENT_DATA[clientDataID].loadFinish = True
                 commandSuccess = True
 
@@ -375,7 +378,39 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     client.send("\nI can't '%s' in a battle.\n\n" % msg)
 
 
+            elif CLIENT_DATA[clientDataID].gameState == 'levelup':
+                if cmd == 'a' or cmd == 'A':
+                    statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[0])
 
+                elif cmd == 'b' or cmd == 'B':
+                    statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[1])
+
+                elif cmd == 'c' or cmd == 'C':
+                    if len(CLIENT_DATA[clientDataID].lvlchoiceslist) > 2:
+                        statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[2])
+                    else:
+                        client.send("C is not an available choice.\n")
+
+                elif cmd == 'd' or cmd == 'D':
+                    if len(CLIENT_DATA[clientDataID].lvlchoiceslist) > 3:
+                        statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[3])
+                    else:
+                        client.send("D is not an available choice.\n")
+
+                elif cmd == 'e' or cmd == 'E':
+                    if len(CLIENT_DATA[clientDataID].lvlchoiceslist) > 4:
+                        statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[4])
+                    else:
+                        client.send("E is not an available choice.\n")
+
+                elif cmd == 'f' or cmd == 'F':
+                    if len(CLIENT_DATA[clientDataID].lvlchoiceslist) > 5:
+                        statRaiser(client, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.lvlchoiceslist[5])
+                    else:
+                        client.send("F is not an available choice.\n")
+
+                else:
+                    client.send("Please select using one letter from : A,B,C,D,E,F.\n")
 
             elif cmd == '':
                 ## client just send a return ony, with no information at all
@@ -409,7 +444,42 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
         #print timer.attachedTo.owner.owner.name
     return sel
 
+def statRaiser(client, clientDataID, CLIENT_DATA, spread):
 
+    CLIENT_DATA[clientDataID].avatar.kind.offense += spread[0]
+    if spread[0] != 0:
+        client.send_cc("^WI feel stronger.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.defense += spread[1]
+    if spread[1] != 0:
+        client.send_cc("^WI feel tougher.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.vitality += spread[2]
+    if spread[2] != 0:
+        client.send_cc("^WI feel more fit.^~\n")
+    hpGained = int((int(spread[2]*0.75)+int(spread[3]*0.25))*(random.randint(1,5)*(int(CLIENT_DATA[clientDataID].avatar.kind.level*0.1)+1))+ 5)
+    CLIENT_DATA[clientDataID].avatar.kind.maxHp += hpGained
+    CLIENT_DATA[clientDataID].avatar.kind.hp += hpGained
+    if hpGained > 5:
+        client.send_cc("^WI feel more resilient.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.guts += spread[3]
+    if spread[3] != 0:
+        client.send_cc("^WI feel more daring.^~\n")
+    ppGained = int((int(spread[3]*0.75)+int(spread[6]*0.25))*(random.randint(1,3)*(int(CLIENT_DATA[clientDataID].avatar.kind.level*0.1)+1)))
+    CLIENT_DATA[clientDataID].avatar.kind.maxPp += ppGained
+    CLIENT_DATA[clientDataID].avatar.kind.pp += ppGained
+    if ppGained != 0:
+        client.send_cc("^WI feel more attuned.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.speed += spread[4]
+    if spread[4] != 0:
+        client.send_cc("^WI feel faster.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.luck += spread[5]
+    if spread[5] != 0:
+        client.send_cc("^WI'm feeling lucky.^~\n")
+    CLIENT_DATA[clientDataID].avatar.kind.IQ += spread[6]
+    if spread[6] != 0:
+        client.send_cc("^WI feel smarter.^~\n")
+
+    CLIENT_DATA[clientDataID].gameState = 'normal'
+    cInfo.look(client, [], Globals.CLIENT_LIST, CLIENT_DATA)
 
 
 

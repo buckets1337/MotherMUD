@@ -56,6 +56,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	battleCommands = None
 	rewardExp = 0
 	rewardMoney = 0
+	expToLevel = 0
 
 	#print fileData
 	for data in fileData:
@@ -104,6 +105,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			level = int(data[6:-1])
 		if data.startswith("exp="):
 			exp = int(data[4:-1])
+		if data.startswith("expToLevel="):
+			expToLevel = int(data[11:-1])
 		if data.startswith("money="):
 			money = int(data[6:-1])
 		if data.startswith("rewardExp="):
@@ -156,6 +159,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	#print Globals.startingRoom
 	newAvatar = World.Player(description=description, currentRoom=currentRoomRoom, name=clientName, client=client, clientDataID=clientDataID, title=title, rewardExp=rewardExp, rewardMoney=rewardMoney)
 	newMortal = World.mortal(hp, maxHp, pp, maxPp, level, exp, money, offense, defense, speed, guts, luck, vitality, IQ, [])
+	newAvatar.expToLevel = expToLevel
 	newMortal.inventory = []
 	# print newAvatar.currentRoom.players
 	# print newAvatar.currentRoom.name
@@ -302,6 +306,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		equipment = kind.equipment
 		rewardExp = str(avatar.rewardExp)
 		rewardMoney = str(avatar.rewardMoney)
+		expToLevel = str(avatar.expToLevel)
 
 
 
@@ -332,6 +337,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			f.write("maxPp=" + maxPp + "\n")
 			f.write("level=" + level + "\n")
 			f.write("exp=" + exp + "\n")
+			f.write("expToLevel=" + expToLevel + "\n")
 			f.write("money=" + money + "\n")
 			f.write("rewardExp=" + rewardExp + "\n")
 			f.write("rewardMoney=" + rewardMoney + "\n")
@@ -350,7 +356,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 				commandList = commandList[:-2]
 
 			f.write("battleCommands=" + str(commandList) + "\n")
-			
+
 			f.write("inventorySize=" + inventorySize + "\n")
 
 			f.write("\ninventory=")

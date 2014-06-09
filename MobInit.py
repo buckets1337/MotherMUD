@@ -445,7 +445,7 @@ def loadSavedMobFromFile(file, path, isBattle=False):
 	# 	Globals.TIMERS.remove(newMob.expirator.Timer)
 	# 	newMob.expirator.Timer = None
 
-	Globals.mobsFromFile.append(newMob)
+	#Globals.mobsFromFile.append(newMob)
 
 	return newMob
 
