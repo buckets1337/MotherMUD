@@ -604,6 +604,14 @@ class Player(Entity):
 		self.client.send_cc("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
 		self.rewardExp = 0
+		expPenalty = int(self.kind.exp * (self.kind.level/100.0) * (0.1*self.kind.level) * (random.randint(8,15)/10))
+		#print expPenalty
+		if expPenalty > (0.5*self.kind.exp):
+			expPenalty = int(0.5*self.kind.exp)
+		self.kind.exp -= expPenalty
+		if self.kind.exp < 0:
+			self.kind.exp = 0
+		self.expToLevel += expPenalty
 
 		Globals.CLIENT_DATA[self.clientDataID].battleRoom.players.remove(self)		
 		self.kind.hp = 1
@@ -682,7 +690,7 @@ class Player(Entity):
 
 			expToLevelMod = (random.randint(80,120)+self.kind.level)/100.00
 			newBaseExpToLevel = (((self.kind.exp + expMod) * self.kind.level)/(self.kind.level-1))*expToLevelMod
-			self.expToLevel = int(newBaseExpToLevel)
+			self.expToLevel = int(newBaseExpToLevel - expMod)
 
 			choicesList = []
 			maxChoices = (abs(self.kind.IQ/3)-self.kind.level)
@@ -696,13 +704,12 @@ class Player(Entity):
 
 
 			i = 0
+			boosts = 5
+			if random.randint(0,20) == 0:
+				boosts += random.randint(1, int((self.kind.level/random.randint(1,5))+1))
+				self.client.send_cc("^W^U!!!^ISMAAAAAAAAASH^~^W^U!!!^~\n")
 			while i < numberOfChoices:
 				spread = [0,0,0,0,0,0,0]
-				boosts = 5
-				if random.randint(0,20) == 0:
-					boosts += random.randint(0, (self.kind.level/random.randint(1,5)))
-					self.client.send_cc("^W^U****!!!SMASH!!!****^~\n")
-
 				for x in range(boosts):	
 					pointer = random.randint(0,6)
 					spread[pointer] += 1
@@ -711,7 +718,7 @@ class Player(Entity):
 
 
 			self.client.send_cc("^W^UYOU GAINED A LEVEL!^~\n")
-			self.client.send_cc("Which way would you like to develop?\n")
+			self.client.send_cc("How would you like to develop?\n")
 			self.client.send_cc("\n")
 			self.client.send_cc("^W^IChoice  Off  Def  Vit  Gut  Spd  Lck  I.Q. ^~\n")
 			self.client.send_cc("  A      " + str(choicesList[0][0]) + "    " + str(choicesList[0][1]) + "    " + str(choicesList[0][2]) + "    " + str(choicesList[0][3]) + "    " + str(choicesList[0][4]) + "    " + str(choicesList[0][5]) + "    " + str(choicesList[0][6]) + "\n")

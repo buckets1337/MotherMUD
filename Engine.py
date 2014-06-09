@@ -310,8 +310,9 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
                 elif cmd == 'fight' or cmd == 'f':
                     ## start a battle with a mob
-                    cInteractions.startBattle(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
-                    CLIENT_DATA[clientDataID].gameState = 'battle'
+                    fighting = cInteractions.startBattle(client, args, clientDataID, CLIENT_DATA, (CLIENT_DATA[clientDataID].avatar.currentRoom))
+                    if fighting:
+                        CLIENT_DATA[clientDataID].gameState = 'battle'
 
                 elif cmd == 'look' or cmd == 'l':
                     ## If the client sends a 'look' command, send back the description

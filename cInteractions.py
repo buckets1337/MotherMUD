@@ -263,7 +263,7 @@ def check(client, args, clientDataID, CLIENT_DATA, room):
 def startBattle(client, args, clientDataID, CLIENT_DATA, room):
 	if len(args) == 0:
 		client.send_cc("Who do I want to fight?\n")
-		return
+		return False
 
 	playerAvatar = CLIENT_DATA[clientDataID].avatar
 	#print playerAvatar
@@ -278,11 +278,13 @@ def startBattle(client, args, clientDataID, CLIENT_DATA, room):
 		if len(mobList) != 0:
 			mobToBattle = mobList[0]
 		else:
-			client.send_cc("You don't see a %s\n" %args[0])
+			client.send_cc("I don't see a %s.\n" %args[0])
+			return False
 
 	elif len(args) == 2:
 		if int(args[1]) > len(args):
 			client.send_cc("I don't see %s %s(s) here!\n" %(args[1], args[0]))
+			return False
 		else:
 			mobToBattle = mobList[int(args[1])-1]
 
@@ -326,6 +328,7 @@ def startBattle(client, args, clientDataID, CLIENT_DATA, room):
 	print "+B " + str(playerAvatar) +  " " + str(playerAvatar.name) + " vs. " + str(mobToBattle.name) + " @ [" + room.region + ":" + room.name + "]" 
 
 	cInfo.battleLook(client, [], Globals.CLIENT_LIST, CLIENT_DATA)
+	return True
 
 def stopBattle(battleRoom):
 	'''
