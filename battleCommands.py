@@ -2,6 +2,7 @@
 # all player battle commands
 
 import cInfo, Globals
+import random
 
 def checkIfPlayerAlive(playerAvatar, attackingMob):
 	'''
@@ -57,7 +58,27 @@ def checkIfMobAlive(mob, attackingPlayer):
 
 		return 'dead'
 
+def mobsAttack(room, client, playerAvatar, target, mobLifeStatus):
+	playerLifeStatus = ''
+	for mob in room.mobs:
+		hurt = mob.aiBattle(playerAvatar, target, room, Globals.CLIENT_DATA)
+		if hurt != 'miss':
+			client.send_cc("\n^Y*^Ublam^~^Y*^~ ^!" + mob.name.capitalize() + " hits^~ you for ^!" + str(hurt) + " damage^~.\n")
+			playerAvatar.kind.hp -= hurt
+		else:
+			client.send_cc("\n^!" + mob.name.capitalize() + " missed^~ you!\n")
+		playerLifeStatus = checkIfPlayerAlive(playerAvatar, mob)
+	#client.send_cc("\n")
+	if playerLifeStatus == 'dead':
+		cInfo.render_room(playerAvatar.client, playerAvatar, playerAvatar.currentRoom, Globals.CLIENT_DATA)
+		
 
+	if playerLifeStatus != 'dead' and mobLifeStatus != 'victory':
+		client.send_cc("______________________________________\n\n\n")
+		cInfo.display_mobs(client, room, Globals.CLIENT_DATA, isBattle=True)
+		client.send("\n\n")
+		cInfo.display_player_status(client, room, Globals.CLIENT_DATA)
+		cInfo.display_battle_commands(client, Globals.CLIENT_DATA)
 #--------------------------------------------------------------------------
 
 def bash(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -75,35 +96,49 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 				target = mob
 
 	#calculate damage dealt to mob
-	damage = 1
+	speedMod = (playerAvatar.kind.speed - target.kind.speed)
+	if speedMod <0:
+		speedMod = int(speedMod/2)
+	else:
+		speedMod = int(speedMod*2)
+	toHit = 80 + speedMod
+	hitRoll = random.randint(0,100)
+	luckMod = int(playerAvatar.kind.luck/playerAvatar.kind.level)
+	if luckMod < 0:
+		luckMod = 0
 
-	target.kind.hp -= damage
+	if hitRoll <= toHit:
+		baseDamage = int((playerAvatar.kind.offense * ((random.randint(80,120) + luckMod)/100)) - (target.kind.defense * (random.randint(50,100)/100)))
+		damageMod = 0		# reserved for boosts from weapons later on
+		damage = baseDamage + damageMod
 
-	client.send_cc("\n^Y*^Ubonk^~^Y*^~ You ^!bash " + target.name + "^~ for ^!" + str(damage) + " damage^~.\n")
+		if damage <=0:		# if damage is 0 or less, you may still cause 1 damage sometimes
+			hailMary = random.randint(0,4)
+			if hailMary == 0:
+				damage = 1
+			else:
+				damage = 0
 
-	mobLifeStatus = checkIfMobAlive(target, playerAvatar)
+		target.kind.hp -= damage
+
+		sound = 'bonk'
+
+		client.send_cc("\n^Y*^U" + sound + "^~^Y*^~ You ^!bash " + target.name + "^~ for ^!" + str(damage) + " damage^~.\n")
+
+		mobLifeStatus = checkIfMobAlive(target, playerAvatar)
+
+	else:
+		client.send_cc("\nYou ^!missed %s^~!" %target.name)
+		mobLifeStatus = checkIfMobAlive(target, playerAvatar)
 
 
 	#calculate damage dealt to player
-	playerLifeStatus = ''
-	for mob in room.mobs:
-		hurt = mob.aiBattle(playerAvatar, target, room, CLIENT_DATA)
-		client.send_cc("\n^Y*^Ublam^~^Y*^~ ^!" + mob.name.capitalize() + " hits^~ you for ^!" + str(hurt) + " damage^~.\n")
-		playerAvatar.kind.hp -= hurt
-		playerLifeStatus = checkIfPlayerAlive(playerAvatar, mob)
-	#client.send_cc("\n")
-	if playerLifeStatus == 'dead':
-		cInfo.render_room(playerAvatar.client, playerAvatar, playerAvatar.currentRoom, Globals.CLIENT_DATA)
-		
-
-	if playerLifeStatus != 'dead' and mobLifeStatus != 'victory':
-		client.send_cc("______________________________________\n\n\n")
-		cInfo.display_mobs(client, room, CLIENT_DATA, isBattle=True)
-		client.send("\n\n")
-		cInfo.display_player_status(client, room, CLIENT_DATA)
-		cInfo.display_battle_commands(client, CLIENT_DATA)
+	mobsAttack(room, client, playerAvatar, target, mobLifeStatus)
 
 def identify(client, args, CLIENT_LIST, CLIENT_DATA):
 	clientDataID = str(client.addrport())
 	CLIENT_DATA[clientDataID].avatar.kind.pp -= 1
 	cInfo.battleLook(client, [], CLIENT_LIST, CLIENT_DATA)
+
+
+
