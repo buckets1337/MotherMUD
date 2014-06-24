@@ -1,0 +1,15 @@
+name='cherry_bomb'
+
+description='A tiny, red cherry bomb.'
+
+longDescription='This explosive is so tiny children are allowed to have them.'
+
+isVisible=True
+
+kind=item
+kind.itemGrabHandler=True
+
+kind.isCarryable=True
+kind.respawns=False
+
+kind.onUse=attackMob(10,15,-1,^Y*^UPOP!^~^Y*^~ The ^Wcherry_bomb^~ explodes!)

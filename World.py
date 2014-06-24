@@ -138,12 +138,11 @@ class Object():
 			self.TIMERS.owner = self
 
 
-
 class item:		# 'kind' attribute
 	"""
 	This component represents an item, that is able to be picked up and used by players in some manner
 	"""
-	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None, objectSpawner = None):
+	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None, objectSpawner = None, onUse = None):
 		self.isCarryable = isCarryable		# if true, item can be picked up into an inventory
 		self.respawns = respawns 			# if true, item will eventually respawn at original location after it has been picked up
 		self.itemGrabHandler = itemGrabHandler
@@ -152,6 +151,9 @@ class item:		# 'kind' attribute
 		self.objectSpawner = objectSpawner
 		if self.objectSpawner:
 			self.objectSpawner.owner = self
+		self.onUse = onUse
+		if self.onUse:
+			self.onUse.owner = self
 
 
 class container:		# 'kind' attribute
@@ -760,7 +762,6 @@ class mortal:		# 'kind' attribute
 		self.inventory = inventory
 		self.inventorySize = inventorySize
 		self.equipment = equipment
-
 
 
 class expirator:		# component added to mobs.  Causes the mob to expire and delete after a set period of time, so the world does not fill with mobs

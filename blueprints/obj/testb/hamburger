@@ -1,0 +1,15 @@
+name='hamburger'
+
+description='A slightly stale hamburger, with all the fixins.'
+
+longDescription='Maybe this isn't as good as a fresh one, but who can really tell?'
+
+isVisible=True
+
+kind=item
+kind.itemGrabHandler=True
+
+kind.isCarryable=True
+kind.respawns=False
+
+kind.onUse=heal(10,15)

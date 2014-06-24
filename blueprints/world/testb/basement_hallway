@@ -7,8 +7,8 @@ longDescription='It is very dark here.  You can't really make out the details of
 
 exits=test:stairwell
 
-objects=trash_can, spider_web
+objects=trash_can, spider_web, hamburger, hamburger, cherry_bomb
 
-stuffList=
+stuffList=hamburger:trash_can, hamburger:trash_can
 
 mobs=spider

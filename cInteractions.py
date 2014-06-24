@@ -2,6 +2,7 @@
 # handles various commands that modify the world in some manner
 
 import World, Globals, Rooms, cInfo
+import uses
 
 def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 	# targetsList = []
@@ -183,6 +184,87 @@ def drop(client, args, clientDataID, CLIENT_DATA, currentRoom):
 		client.send("I have nothing to drop!\n")
 
 
+def use(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA, currentRoom):
+	'''
+	use an item in the player's inventory, causing some effect as defined in uses.py 
+	'''
+	playerAvatar = CLIENT_DATA[clientDataID].avatar
+
+	possibles = []
+
+	if len(args) == 0:
+		client.send("What did I want to use?\n")
+		return
+
+	for item in playerAvatar.kind.inventory:
+		if item.name == args[0]:
+			possibles.append(item)
+
+	for item in possibles:
+		#print item.kind.onUse
+		if item.kind.onUse != None:
+			if item.kind.onUse.endswith(")"):
+				params = item.kind.onUse.split("(")
+				params = params[1]
+				params = params[:-1]
+				params = params.split(",")
+				paramsList = []
+				paramsList.append(client)
+				paramsList.append(playerAvatar)
+				paramsList.append(item.name)
+
+				paramsList += params
+				# print params
+				# print paramsList
+				item.kind.useParams = paramsList
+			else:
+				item.kind.useParams = None
+
+			# This is where each of the things that can happen when an item is used are defined and plugged into the appropriate function in uses.py
+			if item.kind.onUse.startswith("heal"):
+				item.kind.useFunction = uses.heal
+			elif item.kind.onUse.startswith("attackMob"):
+				item.kind.useFunction = uses.attackMob
+
+
+			else:
+				item.kind.useFunction = None
+		else:
+			item.kind.useFunction = None
+			item.kind.useParams = None
+
+	if len(args) == 1:
+		if len(possibles) == 0:
+			client.send("I don't have a " + args[0] + "!\n")
+		else:
+			result = possibles[0].kind.useFunction(possibles[0].kind.useParams)
+			if result == True:
+				playerAvatar.kind.inventory.remove(possibles[0])
+
+
+	if len(args) >= 2:
+		if not args[1].isdigit():
+			client.send(args[1] + " doesn't appear to distinguish an item from the others.\n")
+			return
+		if len(possibles) == 0:
+			client.send("I don't have a " + args[0] + "to use!\n")
+			return
+		else:
+			if len(possibles) < int(args[1]):
+				client.send("You only have " + str(len(possibles)) + " " + args[0] + "!\n")
+				return
+			else:
+				params = possibles[int(args[1])-1].kind.useParams
+				remainingArgs = args[2:]
+				for arg in remainingArgs:
+					params.append(arg)
+				result = possibles[int(args[1])-1].kind.useFunction(params)
+				if result == True:
+					playerAvatar.kind.inventory.remove(possibles[int(args[1])-1])
+
+
+
+
 def check(client, args, clientDataID, CLIENT_DATA, room):
 	'''
 	get all items from the container named in args
@@ -329,6 +411,7 @@ def startBattle(client, args, clientDataID, CLIENT_DATA, room):
 
 	cInfo.battleLook(client, [], Globals.CLIENT_LIST, CLIENT_DATA)
 	return True
+
 
 def stopBattle(battleRoom):
 	'''

@@ -59,6 +59,8 @@ def checkIfMobAlive(mob, attackingPlayer):
 		return 'dead'
 
 def mobsAttack(room, client, playerAvatar, target, mobLifeStatus):
+	if mobLifeStatus == 'victory':
+		return
 	playerLifeStatus = ''
 	for mob in room.mobs:
 		hurt = mob.aiBattle(playerAvatar, target, room, Globals.CLIENT_DATA)
@@ -79,6 +81,18 @@ def mobsAttack(room, client, playerAvatar, target, mobLifeStatus):
 		client.send("\n\n")
 		cInfo.display_player_status(client, room, Globals.CLIENT_DATA)
 		cInfo.display_battle_commands(client, Globals.CLIENT_DATA)
+
+def tickTurn(playerAvatar):
+	'''
+	advances combat 1 turn, causing the mobs to attack if they are still alive
+	'''
+	mobStatus = ''
+	for mob in Globals.CLIENT_DATA[str(playerAvatar.client.addrport())].battleRoom.mobs:
+		mobLifeStatus = checkIfMobAlive(mob, playerAvatar)
+		if mobLifeStatus == 'victory':
+			mobStatus = 'victory'
+	mobsAttack(Globals.CLIENT_DATA[str(playerAvatar.client.addrport())].battleRoom, playerAvatar.client, playerAvatar, playerAvatar, mobStatus)
+
 #--------------------------------------------------------------------------
 
 def bash(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -125,20 +139,20 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 
 		client.send_cc("\n^Y*^U" + sound + "^~^Y*^~ You ^!bash " + target.name + "^~ for ^!" + str(damage) + " damage^~.\n")
 
-		mobLifeStatus = checkIfMobAlive(target, playerAvatar)
 
 	else:
 		client.send_cc("\nYou ^!missed %s^~!" %target.name)
-		mobLifeStatus = checkIfMobAlive(target, playerAvatar)
 
+	tickTurn(playerAvatar)
 
-	#calculate damage dealt to player
-	mobsAttack(room, client, playerAvatar, target, mobLifeStatus)
 
 def identify(client, args, CLIENT_LIST, CLIENT_DATA):
 	clientDataID = str(client.addrport())
 	CLIENT_DATA[clientDataID].avatar.kind.pp -= 1
 	cInfo.battleLook(client, [], CLIENT_LIST, CLIENT_DATA)
+
+
+
 
 
 

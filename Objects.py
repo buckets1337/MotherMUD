@@ -74,6 +74,7 @@ def buildObjectFromFile(file):
 	mobTime = None
 	mobFile = None
 	mobSpawner = None
+	onUse = None
 
 	for Data in fileData:
 
@@ -189,6 +190,10 @@ def buildObjectFromFile(file):
 			elif text == 'False':
 				notDroppable = False
 
+		if Data.startswith('kind.onUse='):
+			text = Data[11:-1]
+			onUse = text
+
 		if Data.startswith('mobSpawner='):
 			text = Data[11:-1]
 			if text == 'True':
@@ -272,6 +277,7 @@ def buildObjectFromFile(file):
 		itemComponent.respawns = respawns
 		itemComponent.itemGrabHandler = itemGrabHandlerComponent
 		itemComponent.objectSpawner = objectSpawnerComponent
+		itemComponent.onUse = onUse
 		#itemComponent = World.item(isCarryable, respawns, itemGrabHandlerComponent, objectSpawnerComponent)
 	if kind == 'container':
 		itemComponent.isLocked = isLocked
@@ -311,6 +317,7 @@ def buildObjectFromFile(file):
 			print "kind.respawns:" + str(newObject.kind.respawns)
 			print "kind.itemGrabHandler:" + str(newObject.kind.itemGrabHandler)
 			print "kind.objectSpawner:" + str(newObject.kind.objectSpawner)
+			print "kind.onUse:" + str(newObject.kind.onUse)
 		if isinstance(newObject.kind, World.container):
 			print "kind.inventory:" + str(newObject.kind.inventory)
 			print "kind.isLocked:" + str(newObject.kind.isLocked)
