@@ -742,6 +742,7 @@ def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='c
             newObject.kind.objectSpawner = obj.kind.objectSpawner
             if newObject.kind.objectSpawner:
                 newObject.kind.objectSpawner.owner = newObject.kind
+            newObject.kind.onUse = obj.kind.onUse
 
         if isinstance(newObject.kind, World.container):
             newObject.kind = World.container()

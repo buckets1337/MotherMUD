@@ -21,7 +21,8 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False,
 	# newRoomName = str(cmd)
 	player = CLIENT_DATA[clientDataID].avatar
 
-	alert(client, CLIENT_DATA, ("\n^g%s left.^~\n" %player.name))
+	if fromBattle == False:
+		alert(client, CLIENT_DATA, ("^g%s left.^~\n" %player.name))
 
 	if player in player.currentRoom.players:
 		player.currentRoom.players.remove(player)
@@ -37,9 +38,9 @@ def move(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, fromBattle = False,
 	if not leveledUp:
 		cInfo.render_room(client, player, player.currentRoom, CLIENT_DATA)
 	if fromBattle == False:
-		alert(client, CLIENT_DATA, ("\n^g^!%s has entered.^~\n" %player.name))
+		alert(client, CLIENT_DATA, ("^g^!%s has entered.^~\n" %player.name))
 	elif fromBattle:
-		alert(client, CLIENT_DATA, ("\n^g^!%s has arrived from battle.^~\n" %player.name))
+		alert(client, CLIENT_DATA, ("^g^!%s has arrived from battle.^~\n" %player.name))
 
 
 def alert(client, CLIENT_DATA, messageString):

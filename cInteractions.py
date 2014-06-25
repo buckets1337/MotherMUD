@@ -401,7 +401,7 @@ def startBattle(client, args, clientDataID, CLIENT_DATA, room):
 
 	for player in room.players:
 		if CLIENT_DATA[player.clientDataID].gameState != 'battle':
-			CLIENT_DATA[player.clientDataID].client.send_cc("%s and %s began fighting.\n" %(playerAvatar.name.capitalize(), mobToBattle.name))
+			CLIENT_DATA[player.clientDataID].client.send_cc("^r%s and %s began fighting.^~\n" %(playerAvatar.name.capitalize(), mobToBattle.name))
 
 	battleObjectName = "^r" +playerAvatar.name + "_vs_" + mobToBattle.name + "^c"
 	battleObject = World.Object(name=battleObjectName, description=battleRoomDescription, currentRoom=room, isVisible=True, longDescription=battleRoomLongDescription)
@@ -424,6 +424,8 @@ def stopBattle(battleRoom):
 		Globals.MoveTIMERS.append(mob.aiMove.Timer)
 		if mob.expirator.Timer is not None:
 			Globals.TIMERS.append(mob.expirator.Timer)
+		for player in mob.currentRoom.players:
+			player.client.send_cc("^R" + mob.name + " has arrived from battle.^~\n")
 
 	for player in battleRoom.players:
 		battleRoom.players.remove(player)
@@ -435,6 +437,7 @@ def stopBattle(battleRoom):
 				battleRoom.attachedTo.objects.remove(obj)
 		Globals.CLIENT_DATA[str(player.client.addrport())].gameState = 'normal'
 		cInfo.render_room(player.client, player, battleRoom.attachedTo, Globals.CLIENT_DATA)
+		alert(player.client, Globals.CLIENT_DATA, ("^g^!%s has arrived from battle.^~\n" %player.name))
 
 
 
@@ -446,3 +449,13 @@ def stopBattle(battleRoom):
 
 	print "-B " + str(player) + " " + player.name + " (flee)"
 
+def alert(client, CLIENT_DATA, messageString):
+	"""
+	Lets other players know about movement into or out of a room
+	"""
+	
+	clientDataID = str(client.addrport())
+	player = CLIENT_DATA[clientDataID].avatar
+	for guest in player.currentRoom.players:
+		if player.currentRoom == guest.currentRoom and player != guest:
+			guest.client.send_cc(messageString)

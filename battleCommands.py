@@ -141,7 +141,7 @@ def bash(client, args, CLIENT_LIST, CLIENT_DATA):
 
 
 	else:
-		client.send_cc("\nYou ^!missed %s^~!" %target.name)
+		client.send_cc("\nYou ^!missed %s^~!\n" %target.name)
 
 	tickTurn(playerAvatar)
 
