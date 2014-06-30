@@ -32,5 +32,6 @@ battleRooms = []
 #initializeMasterRooms(RegionsList)
 fromFileList = []
 mobsFromFile = []
+equipmentFromFile = []
 startingRoom = None
 

@@ -460,6 +460,7 @@ def loadRoom(file):
 	hasSpawnContainers = False
 	activesList = []
 	mobs = []
+	equipment = []
 
 	for Data in fileData:
 
@@ -621,7 +622,7 @@ def loadRoom(file):
 
 			mobString = Data[5:-1]
 			if mobString != '':
-				print "mobs found in file definition"
+				print "mobs found in file definition."
 				mobList = mobString.split(", ")
 				for mob in mobList:
 					for proto in Globals.mobsFromFile:
@@ -652,6 +653,89 @@ def loadRoom(file):
 					mobs.append(newMob)
 
 
+		if Data.startswith('equipment='):
+			equipmentString = Data[10:-1]
+			print equipmentString
+			if equipmentString != '':
+				print 'equipment found in room definition file.'
+				equipmentList = equipmentString.split(", ")
+				print equipmentList
+
+				for eq in equipmentList:
+					for proto in Globals.equipmentFromFile:
+						if proto.name == eq:
+							protoEq = proto
+
+					if hasattr(protoEq.kind.equipment, 'weapon'):
+						if protoEq.kind.equipment.weapon != None:
+							newWeapon = World.weapon()
+						else:
+							newWeapon = None
+					else:
+						newWeapon = None
+					if hasattr(protoEq.kind.equipment, 'armor'):
+						if protoEq.kind.equipment.armor != None:
+							newArmor = World.armor()
+						else:
+							newArmor = None
+					else:
+						newArmor = None
+
+					newEquipment = World.equipment(None)
+					newItem = World.item()
+					newObject = World.Object(None, None)
+
+
+					newEquipment.owner = newItem
+					if protoEq.kind.equipment.weapon != None:
+						newEquipment.weapon = newWeapon
+					else:
+						newEquipment.weapon = None
+					if protoEq.kind.equipment.armor != None:
+						newEquipment.armor = newArmor
+					else:
+						newEquipment.armor = None
+					newEquipment.slot = protoEq.kind.equipment.slot
+					newEquipment.durability = protoEq.kind.equipment.durability
+					newEquipment.maxDurability = protoEq.kind.equipment.maxDurability
+					newEquipment.worth = protoEq.kind.equipment.worth
+					newEquipment.hp = protoEq.kind.equipment.hp
+					newEquipment.pp = protoEq.kind.equipment.pp
+					newEquipment.offense = protoEq.kind.equipment.offense
+					newEquipment.defense = protoEq.kind.equipment.defense
+					newEquipment.speed = protoEq.kind.equipment.speed
+					newEquipment.guts = protoEq.kind.equipment.guts
+					newEquipment.luck = protoEq.kind.equipment.luck
+					newEquipment.vitality = protoEq.kind.equipment.vitality
+					newEquipment.IQ = protoEq.kind.equipment.IQ
+					newEquipment.statusEffect = protoEq.kind.equipment.statusEffect
+					bcList = []
+					for command in protoEq.kind.equipment.battleCommands:
+						bcList.append(command)
+					newEquipment.battleCommands = bcList
+					newEquipment.onUse = protoEq.kind.equipment.onUse
+
+
+					newItem.isCarryable = protoEq.kind.isCarryable
+					newItem.respawns = protoEq.kind.respawns
+					newItem.itemGrabHandler = protoEq.kind.itemGrabHandler
+					newItem.objectSpawner = protoEq.kind.objectSpawner
+					newItem.equipment = newEquipment
+					newItem.onUse = protoEq.kind.onUse
+
+
+					newObject.name = protoEq.name
+					newObject.description = protoEq.description
+					newObject.isVisible = protoEq.isVisible
+					newObject.spawnContainer = protoEq.spawnContainer
+					newObject.longDescription = protoEq.longDescription
+					newObject.kind = newItem
+					newObject.TIMERS = Globals.TIMERS
+
+
+					equipment.append(newObject)
+
+
 
 
 
@@ -663,6 +747,23 @@ def loadRoom(file):
 	for mob in mobs:
 		print mob.name
 		Globals.regionListDict[newRoom.region][newRoom.name].mobs.append(mob)
+		mob.currentRoom = Globals.regionListDict[newRoom.region][newRoom.name]
+
+	print "equipment:" + str(equipment)
+	Globals.regionListDict[newRoom.region][newRoom.name].equipment = []
+	for eq in equipment:
+		print eq.name
+		Globals.regionListDict[newRoom.region][newRoom.name].equipment.append(eq)
+		print Globals.regionListDict[newRoom.region][newRoom.name].equipment
+		eq.currentRoom = newRoom
+		eq.kind.owner = eq
+		eq.kind.equipment.owner = eq.kind
+		if eq.kind.itemGrabHandler:
+			eq.kind.itemGrabHandler.owner = eq.kind
+		if eq.kind.objectSpawner:
+			eq.kind.objectSpawner.owner = eq.kind
+
+
 
 
 
@@ -693,6 +794,7 @@ def loadRoom(file):
 	print "exits=" + str(newRoom.exits)
 	print "objects=" + str(newRoom.objects)
 	print 'mobs=' + str(newRoom.mobs)
+	print 'equipment=' + str(newRoom.equipment)
 	print "\n"
 
 

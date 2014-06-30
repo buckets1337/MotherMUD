@@ -41,7 +41,7 @@ class Room():
 	# region is the world region that the room belongs to
 	# name is the name of the room
 
-	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], objects=[], items=[], containers=[], mobs=[]):
+	def __init__(self, region='', name='', description='', exits={}, longDescription = '', players=[], objects=[], items=[], containers=[], mobs=[], equipment=[]):
 		self.region = region
 		self.name = name
 		self.description = description
@@ -52,6 +52,7 @@ class Room():
 		self.items = items
 		self.containers = containers
 		self.mobs = mobs
+		self.equipment = equipment
 
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +143,7 @@ class item:		# 'kind' attribute
 	"""
 	This component represents an item, that is able to be picked up and used by players in some manner
 	"""
-	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None, objectSpawner = None, onUse = None):
+	def __init__(self, isCarryable = True, respawns = False, itemGrabHandler = None, objectSpawner = None, equipment = None, onUse = None):
 		self.isCarryable = isCarryable		# if true, item can be picked up into an inventory
 		self.respawns = respawns 			# if true, item will eventually respawn at original location after it has been picked up
 		self.itemGrabHandler = itemGrabHandler
@@ -154,10 +155,15 @@ class item:		# 'kind' attribute
 		self.onUse = onUse
 		if self.onUse:
 			self.onUse.owner = self
+		self.equipment = equipment
+		if self.equipment:
+			self.equipment.owner = self
 
 
 class container:		# 'kind' attribute
 	"""
+
+
 	This component represents some kind of container.  A container is an object that has an inventory and may hold other items.
 	"""
 	def __init__(self, inventory = [], isLocked = False, isCarryable = False, respawns = False, respawnContents = False, itemGrabHandler = None, objectSpawner = None):
@@ -173,6 +179,38 @@ class container:		# 'kind' attribute
 		if self.objectSpawner:
 			self.objectSpawner.owner = self
 
+
+class equipment:		# for 'kind' components, adds stats to make an item into equipment
+	def __init__(self, owner, weapon=None, armor=None, slot=None, durability=None, maxDurability=None, worth=None, hp=None, pp=None, offense=None, defense=None, speed=None, guts=None, luck=None, vitality=None, IQ=None, statusEffect=None, battleCommands=None, onUse=None):
+		self.owner = owner
+		self.weapon = weapon
+		self.armor = armor
+		self.slot = slot
+		self.durability = durability
+		self.maxDurability = maxDurability
+		self.worth = worth
+		self.hp = hp
+		self.pp = pp
+		self.offense = offense
+		self.defense = defense
+		self.speed = speed
+		self.guts = guts
+		self.luck = luck
+		self.vitality = vitality
+		self.IQ = IQ
+		self.statusEffect = statusEffect
+		self.battleCommands = battleCommands
+		self.onUse = onUse
+
+
+class weapon:
+	def __init__(self):
+		pass
+
+
+class armor:	
+	def __init__(self):	
+		pass
 
 class itemGrabHandler:		# for 'kind' components, adds the ability for item to be picked up or dropped
 	"""
@@ -226,6 +264,17 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 									# 	print ob.name
 									# 	obj.kind.inventory.remove(ob)
 									# 	gotten = True
+				for obj in self.owner.owner.currentRoom.equipment:
+					if obj == self.owner.owner and gotten == False:
+						self.owner.owner.currentRoom.equipment.remove(self.owner.owner)		
+						#print '!self.owner.owner removed!'
+						gotten = True
+					elif obj.name == self.owner.owner.name and gotten == False:
+						#print 'curroomobj:'+ str(self.owner.owner.currentRoom.objects)
+						self.owner.owner.currentRoom.equipment.remove(obj)
+						#print self.owner.owner.currentRoom.objects
+						#print'!'+ obj.name + ' removed!'
+						gotten = True
 			else:
 				# if self.owner.owner in self.owner.owner.spawnContainer.kind.inventory:
 				# 	self.owner.owner.spawnContainer.kind.inventory.remove(self.owner.owner)
@@ -237,6 +286,8 @@ class itemGrabHandler:		# for 'kind' components, adds the ability for item to be
 				if self.owner.owner in self.owner.owner.currentRoom.objects:
 					self.owner.owner.currentRoom.objects.remove(self.owner.owner)
 					gotten = True
+				elif self.owner.owner in self.owner.owner.currentRoom.equipment:
+					self.owner.owner.currentRoom.equipment.remove(self.owner.owner)
 				if gotten == False:
 					print str(self.owner.owner.name) +'not found.'
 

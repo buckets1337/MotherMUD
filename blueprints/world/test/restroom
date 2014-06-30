@@ -8,3 +8,5 @@ longDescription='You are pretty sure you have never seen a more disgusting restr
 exits=test:lobby
 
 objects=trash_can, rat_hole
+
+equipment=baseball_cap

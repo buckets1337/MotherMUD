@@ -40,6 +40,7 @@ def look(client, args, CLIENT_LIST, CLIENT_DATA):
 		client.send_cc("\n^I[ %s ]^~\n" %CLIENT_DATA[clientDataID].avatar.currentRoom.name)
 		display_description(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_objects(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
+		display_equipment(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_mobs(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_other_players(client, CLIENT_DATA[clientDataID].avatar.currentRoom, CLIENT_DATA)
 		display_exits(client, CLIENT_DATA[clientDataID].avatar.currentRoom)
@@ -328,7 +329,13 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 						if resultsList[int(args[-1]) - 1].kind.isLocked == False:
 							for ob in resultsList[int(args[-1]) - 1].kind.inventory:
 								# if ob.name == "_".join(args):
-								client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+								if hasattr(ob, 'kind'):
+									if ob.kind.isCarryable == True:
+										client.send_cc("^c[In %s]: ^C%s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+									else:
+										client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+								else:
+									client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
 							if resultsList[int(args[-1]) - 1].kind.inventory == []:
 								client.send_cc("^c[In %s]:^~\n" %resultsList[int(args[1]) - 1].name)
 						else:
@@ -354,7 +361,13 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 					if obj.kind.isLocked == False:
 						for ob in obj.kind.inventory:
 							#print ob.name,
-							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
+							if hasattr(ob, 'kind'):
+								if ob.kind.isCarryable == True:
+									client.send_cc("^c[In %s]: ^C%s^~\n" %(obj.name, ob.name))
+								else:
+									client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
+							else:
+								client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
 						if obj.kind.inventory == []:
 							client.send_cc("^c[In %s]:^~\n" %obj.name)
 					else:
@@ -376,7 +389,13 @@ def examine(client, args, CLIENT_LIST, CLIENT_DATA):
 				#print"&&&&&&&&&&&&&&"
 				if obj.kind.isLocked == False:
 					for ob in obj.kind.inventory:
-						client.send_cc("^c[In %s]: A %s^~\n" %(obj.name, ob.name))
+						if hasattr(ob, 'kind'):
+							if ob.kind.isCarryable == True:
+								client.send_cc("^c[In %s]: ^C%s^~\n" %(obj.name, ob.name))
+							else:
+								client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
+						else:
+							client.send_cc("^c[In %s]: %s^~\n" %(obj.name, ob.name))
 					if obj.kind.inventory == []:
 						client.send_cc("^c[In %s]:^~\n" %obj.name)
 				else:
@@ -491,7 +510,13 @@ def battleExamine(client, args, CLIENT_LIST, CLIENT_DATA):
 						if resultsList[int(args[-1]) - 1].kind.isLocked == False:
 							for ob in resultsList[int(args[-1]) - 1].kind.inventory:
 								# if ob.name == "_".join(args):
-								client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+								if hasattr(ob, 'kind'):
+									if ob.kind.isCarryable == True:
+										client.send_cc("^c[In %s]: ^C%s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+									else:
+										client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
+								else:
+									client.send_cc("^c[In %s]: %s^~\n" %(resultsList[int(args[1]) - 1].name, ob.name))
 							if resultsList[int(args[-1]) - 1].kind.inventory == []:
 								client.send_cc("^c[In %s]:^~\n" %resultsList[int(args[1]) - 1].name)
 						else:
@@ -743,6 +768,7 @@ def render_room(client, player, room, CLIENT_DATA):
 	client.send_cc("\n^I[ " + roomName + " ]^~\n")
 	display_description(client, room, CLIENT_DATA)
 	display_objects(client, room, CLIENT_DATA)
+	display_equipment(client, room, CLIENT_DATA)
 	display_mobs(client, room, CLIENT_DATA)
 	display_other_players(client, room, CLIENT_DATA)
 	display_exits(client, room)
@@ -828,21 +854,51 @@ def display_objects(client, room, CLIENT_DATA):
 	roomObjects = Rooms.master[regionRoom].objects
 	for obj in roomObjects:
 		if obj.isVisible == True:
-			client.send_cc("^c%s^~\n" %obj.description)
+			if hasattr(obj, 'kind') and obj.kind != None:
+				if obj.kind.isCarryable:
+					client.send_cc("^C%s^~\n" %obj.description)
+				else:
+					client.send_cc("^c%s^~\n" %obj.description)
+			else:
+				client.send_cc("^c%s^~\n" %obj.description)
 
 
 def display_object_names(client, room, CLIENT_DATA):
 	region = room.region
 	regionRoom = str(region)+room.name.capitalize()
 	roomObjects = Rooms.master[regionRoom].objects
+	roomEq = Rooms.master[regionRoom].equipment
 	for obj in roomObjects:
 		if obj.isVisible == True:
-			if obj.kind == None:
-				client.send_cc("^cAn object named '%s'^~\n" %obj.name)
-			elif isinstance(obj.kind, World.item):
-				client.send_cc("^cAn item named '%s'^~\n" %obj.name)		
-			elif isinstance(obj.kind, World.container):
-				client.send_cc("^cA container named '%s'^~\n" %obj.name)
+			if hasattr(obj, 'kind') and obj.kind != None:
+				if obj.kind.isCarryable:
+					if obj.kind == None:
+						client.send_cc("^CObject named '%s'^~\n" %obj.name)
+					elif isinstance(obj.kind, World.item):
+						client.send_cc("^CItem named '%s'^~\n" %obj.name)		
+					elif isinstance(obj.kind, World.container):
+						client.send_cc("^CContainer named '%s'^~\n" %obj.name)
+				else:
+					if obj.kind == None:
+						client.send_cc("^cObject named '%s'^~\n" %obj.name)
+					elif isinstance(obj.kind, World.item):
+						client.send_cc("^cItem named '%s'^~\n" %obj.name)		
+					elif isinstance(obj.kind, World.container):
+						client.send_cc("^cContainer named '%s'^~\n" %obj.name)
+
+			else:
+				if obj.kind == None:
+					client.send_cc("^cObject named '%s'^~\n" %obj.name)
+				elif isinstance(obj.kind, World.item):
+					client.send_cc("^cItem named '%s'^~\n" %obj.name)		
+				elif isinstance(obj.kind, World.container):
+					client.send_cc("^cContainer named '%s'^~\n" %obj.name)
+	for eq in roomEq:
+		if eq.isVisible == True:
+			if eq.kind.equipment.weapon != None:
+				client.send_cc("^CWeapon named '%s'^~\n" %eq.name)
+			elif eq.kind.equipment.armor != None:
+				client.send_cc("^CArmor named '%s'^~\n" %eq.name)
 
 
 def display_mobs(client, room, CLIENT_DATA, isBattle=False):
@@ -895,6 +951,15 @@ def display_mob_names(client, room, CLIENT_DATA, isBattle=False):
 			client.send_cc("^yA mob named '%s'.^~\n" %mob.name)	
 		else:
 			client.send_cc("^yA mob named '" + mob.name + "'. " + healthmessage + "^~\n")
+
+
+def display_equipment(client, room, CLIENT_DATA, isBattle=False):
+	region = room.region
+	regionRoom = str(region)+room.name.capitalize()
+	roomEquipment = Rooms.master[regionRoom].equipment
+	for obj in roomEquipment:
+		if obj.isVisible == True:
+			client.send_cc("^C%s^~\n" %obj.description)
 
 
 def display_player_status(client, room, CLIENT_DATA):

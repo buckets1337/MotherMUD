@@ -15,14 +15,20 @@ import Globals
 
 indexList = []
 fromFileList = Globals.fromFileList
+equipmentFromFile = Globals.equipmentFromFile
 
 fileList = []
+eqFileList = []
 
 for region in Globals.RegionsList:
 	directoryFiles = os.listdir('blueprints/obj/'+str(region)+'/')
+	eqDirectoryFiles = os.listdir('blueprints/equip/'+str(region)+'/')
 	for obj in directoryFiles:
 		path = str(region)+'/'+obj
 		fileList.append(path)
+	for obj in eqDirectoryFiles:
+		path = str(region)+'/'+obj
+		eqFileList.append(path)	
 
 
 def setLocation(location):
@@ -351,147 +357,283 @@ def buildObjectFromFile(file):
 	print "\n"
 
 
+def buildEquipmentFromFile(file):
+
+	print file
+
+	if str(file).endswith('~'):
+		print "\n"
+		return
+
+	path = 'blueprints/equip/' + file
+	with open(path, 'r') as f:
+		fileData = f.readlines()
+
+
+	newWeapon = None
+	newArmor = None
+	equipmentType = None
+	slot = None
+	durability = None
+	maxDurability = None
+	worth = None
+	description = None
+	longDescription = None
+	hp = None
+	pp = None
+	offense = None
+	defense = None
+	speed = None
+	guts = None
+	luck = None
+	vitality = None
+	IQ = None
+	battleCommands = None
+	statusEffect = None
+	onUse = None
+	isVisible = None
+	spawnContainer = None
+	isCarryable = None
+	respawns = None
+	itemGrabHandler = None
+	objectSpawner = None
+	notDroppable = None
+	container = None
+	spawnOdds = None
+	time = None
+	active = None
+	repeat = None
+	cycles = None
+
+
+	for Data in fileData:
+		if Data.startswith('type='):
+			equipmentType = Data[5:-1]
+		if Data.startswith('ID='):
+			ID = Data[3:-1]
+		if Data.startswith('name='):
+			name = Data[5:-1]
+		if Data.startswith('slot='):
+			slot = Data[5:-1]
+		if Data.startswith('durability='):
+			durability = Data[11:-1]
+		if Data.startswith('maxDurability='):
+			maxDurability = Data[14:-1]
+		if Data.startswith('worth='):
+			worth = Data[6:-1]
+		if Data.startswith('description='):
+			description = Data[12:-1]
+		if Data.startswith('longDescription='):
+			longDescription = Data[16:-1]
+		if Data.startswith('hp='):
+			hp = int(Data[3:-1])
+		if Data.startswith('pp='):
+			pp = int(Data[3:-1])
+		if Data.startswith('offense='):
+			offense = int(Data[8:-1])
+		if Data.startswith('defense='):
+			defense = int(Data[8:-1])
+		if Data.startswith('speed='):
+			speed = int(Data[6:-1])
+		if Data.startswith('guts='):
+			guts = int(Data[5:-1])
+		if Data.startswith('luck='):
+			luck = int(Data[5:-1])
+		if Data.startswith('vitality='):
+			vitality = int(Data[9:-1])
+		if Data.startswith('IQ='):
+			IQ = int(Data[3:-1])
+		if Data.startswith('battleCommands='):
+			battleCommands = Data[15:-1]
+			battleCommands = battleCommands.split(",")
+		if Data.startswith('statusEffect='):
+			statusEffect = Data[13:-1]
+		if Data.startswith('onUse='):
+			onUse = Data[6:-1]
+		if Data.startswith('isVisible='):
+			isVisible = Data[10:-1]
+			if isVisible == 'True':
+				isVisible = True
+			elif isVisible == 'False':
+				isVisible = False
+		if Data.startswith('kind.isCarryable='):
+			isCarryable = Data[12:-1]
+			if isCarryable == "True":
+				isCarryable = True
+			elif isCarryable == "False":
+				isCarryable = False
+		if Data.startswith('kind.respawns='):
+			respawns = Data[14:-1]
+			if respawns == "True":
+				respawns = True
+			elif respawns == "False":
+				respawns = False
+		if Data.startswith('kind.itemGrabHandler='):
+			itemGrabHandler = Data[21:-1]
+			if itemGrabHandler == "True":
+				itemGrabHandler = True
+			elif itemGrabHandler == "False":
+				itemGrabHandler = False
+		if Data.startswith('kind.itemGrabHandler.notDroppable='):
+			notDroppable = Data[34:-1]
+			if notDroppable == "True":
+				notDroppable = True
+			elif notDroppable == "False":
+				notDroppable = False
+		if Data.startswith('kind.objectSpawner='):
+			objectSpawner = Data[19:-1]
+			if objectSpawner == 'True':
+				objectSpawner = True
+			elif objectSpawner == 'False':
+				objectSpawner = False
+		if Data.startswith('kind.objectSpawner.time='):
+			time = int(Data[24:-1])
+		if Data.startswith('kind.objectSpawner.spawnOdds='):
+			text = Data[29:-1]
+			oddsList = text.split(',')
+			#print "oddsList:" + str(oddsList)
+			nestedOddsList = []
+			for odds in oddsList:
+				nestedOddsList.append(odds.split(':'))
+			for oddsEntry in nestedOddsList:
+				oddsEntry[1] = int(oddsEntry[1])
+				if oddsEntry[0] == 'True':
+					oddsEntry[0] = True
+				elif oddsEntry[0] == 'False':
+					oddsEntry[0] = False
+			#print nestedOddsList
+			spawnOdds = nestedOddsList
+		if Data.startswith('kind.objectSpawner.container='):
+			text = Data[29:-1]
+			if text == 'None':
+				container = None
+			else:
+				container = text[1:-1]		# this should be a reference to another object
+				container = container.split(', ')
+		if Data.startswith('kind.objectSpawner.cycles='):
+			cycles = int(Data[26:-1])
+		if Data.startswith('kind.objectSpawner.repeat='):
+			text = Data[26:-1]
+			if text == 'True':
+				repeat = True
+			elif text == 'False':
+				repeat = False
+		if Data.startswith('kind.objectSpawner.active='):
+			text = Data[26:-1]
+			#print "***active:" + text
+			if text == 'True':
+				active = True
+			elif text == 'False':
+				active = False
+
+
+	if equipmentType == 'weapon':
+		newWeapon = World.weapon()
+	elif equipmentType == 'armor':
+		newArmor = World.armor()
+
+	if itemGrabHandler == True:
+		newItemGrabHandler = World.itemGrabHandler(notDroppable=notDroppable)
+	else:
+		newItemGrabHandler = None
+	if objectSpawner == True:
+		newObjectSpawner = World.objectSpawner(owner=None, TIMERS=Globals.TIMERS, time=time, obj=None, oddsList=oddsList, container=container, cycles=cycles, repeat=repeat, active=active)
+	else:
+		newObjectSpawner = None
+
+
+	newEquipment = World.equipment(owner=None, weapon=newWeapon, armor=newArmor, slot=slot, durability=durability, maxDurability=maxDurability, worth=worth, hp=hp, pp=pp, offense=offense, defense=defense, speed=speed, guts=guts, luck=luck, vitality=vitality, IQ=IQ, battleCommands=battleCommands, statusEffect=statusEffect, onUse=onUse)
+	newItem = World.item(isCarryable=isCarryable, respawns=respawns, itemGrabHandler=newItemGrabHandler, objectSpawner=newObjectSpawner, equipment=newEquipment, onUse=onUse)
+	if newItem.itemGrabHandler:
+		newItem.itemGrabHandler.owner = newItem
+	if newItem.objectSpawner:
+		newItem.objectSpawner.owner = newItem
+	newEquipment.owner = newItem
+	newObject = World.Object(name=name, description=description, isVisible=isVisible, spawnContainer=spawnContainer, longDescription=longDescription, kind=newItem)
+	if newObject.kind.objectSpawner:
+		newObject.kind.objectSpawner.obj = newObject
+	newItem.owner = newObject
+
+
+	equipmentFromFile.append(newObject)
+
+	print "\n"
+	print "name:" + str(newObject.name)
+	print "description:" + str(newObject.description)
+	print "currentRoom:" + str(newObject.currentRoom)
+	print "isVisible:" + str(newObject.isVisible)
+	print "spawnContainer:" + str(newObject.spawnContainer)
+	print "longDescription:" + str(newObject.longDescription)
+	print "kind:" + str(newObject.kind)
+	#print "TIMERS:" + str(newObject.TIMERS)
+	if newObject.kind is not None:
+		print "kind.owner:" + str(newObject.kind.owner)
+		print "kind.equipment:" + str(newObject.kind.equipment)
+		print "kind.equipment.owner" + str(newObject.kind.equipment.owner)
+		if hasattr(newObject.kind.equipment, 'weapon'):
+			if newObject.kind.equipment.weapon is not None:
+				print "weapon:" + str(newObject.kind.equipment.weapon)
+		if hasattr(newObject.kind.equipment, 'armor'):
+			if newObject.kind.equipment.armor is not None:
+				print "armor:" + str(newObject.kind.equipment.armor)
+		print "slot:" + str(newObject.kind.equipment.slot)
+		print "durability:" + str(newObject.kind.equipment.durability)
+		print "maxDurability:" + str(newObject.kind.equipment.maxDurability)
+		print "worth:" + str(newObject.kind.equipment.worth)
+		if newObject.kind.equipment.hp != 0:
+			print "hp:" + str(newObject.kind.equipment.hp)
+		if newObject.kind.equipment.pp != 0:
+			print "pp:" + str(newObject.kind.equipment.pp)
+		if newObject.kind.equipment.offense != 0:
+			print "offense:" + str(newObject.kind.equipment.offense)
+		if newObject.kind.equipment.defense != 0:
+			print "defense:" + str(newObject.kind.equipment.defense)
+		if newObject.kind.equipment.speed != 0:
+			print "speed:" + str(newObject.kind.equipment.speed)
+		if newObject.kind.equipment.guts != 0:
+			print "guts:" + str(newObject.kind.equipment.guts)
+		if newObject.kind.equipment.luck != 0:
+			print "luck:" + str(newObject.kind.equipment.luck)
+		if newObject.kind.equipment.vitality != 0:
+			print "vitality:" + str(newObject.kind.equipment.vitality)
+		if newObject.kind.equipment.IQ != 0:
+			print "IQ:" + str(newObject.kind.equipment.IQ)
+		if newObject.kind.equipment.statusEffect is not None:
+			if newObject.kind.equipment.statusEffect != '':
+				print "statusEffect:" + str(newObject.kind.equipment.statusEffect)
+		if newObject.kind.equipment.battleCommands is not None:
+			if newObject.kind.equipment.battleCommands != ['']:
+				print "battleCommands:" + str(newObject.kind.equipment.battleCommands)
+		if newObject.kind.equipment.onUse is not None:
+			if newObject.kind.equipment.onUse != '':
+				print "onUse:" + str(newObject.kind.equipment.onUse)
+
+		if newObject.kind.itemGrabHandler is not None:
+			print "kind.itemGrabHandler:" + str(newObject.kind.itemGrabHandler)
+			print "kind.itemGrabHandler.notDroppable:" + str(newObject.kind.itemGrabHandler.notDroppable)
+		if newObject.kind.objectSpawner is not None:
+			print "kind.objectSpawner:" + str(newObject.kind.objectSpawner)
+			print "kind.objectSpawner.owner:" + str(newObject.kind.objectSpawner.owner)
+			print "kind.objectSpawner.TIMERS:" + str(newObject.kind.objectSpawner.TIMERS)
+			print "kind.objectSpawner.time:" + str(newObject.kind.objectSpawner.time)
+			print "kind.objectSpawner.obj:" + str(newObject.kind.objectSpawner.obj)
+			print "kind.objectSpawner.oddsList:" + str(newObject.kind.objectSpawner.oddsList)
+			print "kind.objectSpawner.container:" + str(newObject.kind.objectSpawner.container)
+			print "kind.objectSpanwer.cycles:" + str(newObject.kind.objectSpawner.cycles)
+			print "kind.objectSpawner.repeat:" + str(newObject.kind.objectSpawner.repeat)
+			print "kind.objectSpawner.active:" + str(newObject.kind.objectSpawner.active)
+			print "kind.objectSpawner.timer:" + str(newObject.kind.objectSpawner.timer)
+			print "kind.objectSpawner.startingLocation:" + str(newObject.kind.objectSpawner.startingLocation)
+	
+	print "\n"
+
+
 for obj in fileList:
 	buildObjectFromFile(obj)
 
+for obj in eqFileList:
+	buildEquipmentFromFile(obj)
 
 
-
-# ######################
-# # test region objects
-# ######################
-
-# ## Room: Lobby
-
-# testLobbyPottedPlant = World.Object(
-# 	name = 'potted_plant',
-# 	description = 'A plant in a pot.',
-# 	isVisible = True,
-# 	longDescription = 'This appears to be a long-neglected fern of some sort, in a crumbling ceramic pot.'
-# )
-# indexList.append(testLobbyPottedPlant)
-
-# testLobbyDesk = World.Object(
-# 	name = 'desk',
-# 	description = 'A cheap plywood desk.',
-# 	isVisible = True,
-# 	longDescription = "This desk looks like it was flimsy even when it was new.  It has a single desk drawer which does not appear to be locked."
-# )
-# indexList.append(testLobbyDesk)
-
-# #~~~~~~~~~~~~~~  <-This signifies these items are related to each other somehow.  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# testKeyGrabber = World.itemGrabHandler(notDroppable=True)		
-# testKeyItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testKeyGrabber)
-# testLobbyKey =  World.Object(
-# 	name = 'rusty_key',
-# 	description = 'An old rusty key.',
-# 	isVisible = False,
-# 	kind = testKeyItemComponent,
-# 	longDescription = "This key appears to be old.  It has to go to something around here, since it was in the desk.",
-# )
-# indexList.append(testLobbyKey)
-
-# testDeskContainer = World.container(inventory=[testLobbyKey], respawnContents=True)
-# testLobbyDeskDrawer = World.Object(
-# 	name = 'desk_drawer',
-# 	description = 'An unlocked desk drawer.',
-# 	isVisible = False,
-# 	longDescription = "This is an ordinary desk drawer.  It has a lock on it, but it does not appear to be engaged.",
-# 	kind = testDeskContainer
-# )
-# indexList.append(testLobbyDeskDrawer)
-
-# # places the key in the desk drawer
-# testLobbyKey.spawnContainer = testLobbyDeskDrawer
-# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# testFilesGrabber = World.itemGrabHandler()		
-# testFilesItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testFilesGrabber)
-
-# testLobbyFiles =  World.Object(
-# 	name = 'files',
-# 	description = 'Random files.',
-# 	isVisible = False,
-# 	kind = testFilesItemComponent,
-# 	longDescription = "A random assortment of files",
-# )
-# indexList.append(testLobbyFiles)
-
-# testFileCabinetContainer = World.container(isLocked = True, inventory=[testLobbyFiles], respawnContents=True)
-# testLobbyFileCabinet = World.Object(
-# 	name = 'file_cabinet',
-# 	description = 'A grey steel file cabinet.',
-# 	isVisible = True,
-# 	longDescription = "This is a file cabinet.   There are many like it, but this one is here.",
-# 	kind = testFileCabinetContainer
-# )
-# indexList.append(testLobbyFileCabinet)
-# # place the files in the file cabinet
-# testLobbyFiles.spawnContainer = testLobbyFileCabinet
-# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-# ## Room: restroom
-
-# testTrashcanContainer = World.container(inventory=[], respawnContents=False)
-# testTrashcan = World.Object(
-# 	name = 'trash_can',
-# 	description = 'A metal trash can, in poor condition.',
-# 	isVisible = True,
-# 	kind = testTrashcanContainer,
-# 	longDescription = "This trash can is probably as old as you are.  It is suprisingly rust-free, however.  Unfortunately, this doesn't seem to be the type of trashcan that holds good things."
-# )
-# indexList.append(testTrashcan)
-
-# #@ things that spawn in the restroom
-# testTrashGrabber = World.itemGrabHandler()
-# testTrashItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testTrashGrabber)
-# testTrash = World.Object(
-# 	name = 'trash_pile',
-# 	description = "A pile of trash",
-# 	isVisible = True,
-# 	kind = testTrashItemComponent,
-# 	longDescription = "Your typical trash heap.  Trash seems to pile up if no one takes it out.",
-# 	spawnContainer = testTrashcan.kind
-
-# )
-# indexList.append(testTrash)
-# testTrashSpawnOdds = [[True, 1],[False, 20]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
-# testTrashSpawner = World.objectSpawner(testTrashItemComponent, Globals.TIMERS, (6), testTrash, testTrashSpawnOdds, cycles=1, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
-# testTrash.kind.objectSpawner = testTrashSpawner
-
-
-
-# ## Room: outside
-
-# testRockGrabber = World.itemGrabHandler()
-# testRockItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testRockGrabber)
-# testRock = World.Object(
-# 	name = 'rock',
-# 	description = 'An ordinary rock.',
-# 	isVisible = True,
-# 	kind = testRockItemComponent,
-# 	longDescription = "This is a typical rock.  Roundish and hard.",
-# )
-# indexList.append(testRock)
-
-# testGardenGnomeGrabber = World.itemGrabHandler()
-# testGardenGnomeItemComponent = World.item(isCarryable=True, respawns=True, itemGrabHandler=testGardenGnomeGrabber)
-# testGardenGnome = World.Object(
-# 	name = 'garden_gnome',
-# 	description = "A beat-up garden gnome.",
-# 	isVisible = True,
-# 	kind = testGardenGnomeItemComponent,
-# 	longDescription = "This garden gnome is all scratched and worn, as if it had been traveling."
-
-# )
-# indexList.append(testGardenGnome)
-# testGardenGnomeSpawnOdds = [[True, 1],[False, 10]]		# a true/false odds listing, if True object spawns.  This one is high freq low odds for regular item creation
-# testGardenGnomeSpawner = World.objectSpawner(testGardenGnomeItemComponent, Globals.TIMERS, (6), testGardenGnome, testGardenGnomeSpawnOdds, cycles=3, repeat=True, active=True)		# spawners and their odds have to go after the item definition because they reference it
-# testGardenGnome.kind.objectSpawner = testGardenGnomeSpawner
-# # print "spwn " + str(testGardenGnome.kind.objectSpawner)
-# # print "obstrm " + str(testGardenGnome.kind.objectSpawner.startingLocation)
 
 

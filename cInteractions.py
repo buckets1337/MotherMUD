@@ -18,7 +18,7 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 		return
 
 	if len(CLIENT_DATA[clientDataID].avatar.kind.inventory) >= CLIENT_DATA[clientDataID].avatar.kind.inventorySize:
-		client.send("I have no more space in your inventory. I should drop something first.\n")
+		client.send("I have no more space in my inventory. I should drop something first.\n")
 		return
 
 	for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.objects:
@@ -53,6 +53,11 @@ def get(client, args, clientDataID, CLIENT_DATA, currentRoom):
 			# else:
 			# 	client.send("The %s is locked!\n" %obj.name)
 			# 	return
+
+	for obj in CLIENT_DATA[clientDataID].avatar.currentRoom.equipment:
+		if obj.name == "_".join(args) or obj.name == "_".join(args[:-1]) or obj.name == "_".join(args[:-2]):
+			resultsList.append(obj)
+
 
 	#print "resultsList:"+str(resultsList)
 	if len(resultsList) == 1:
@@ -448,6 +453,7 @@ def stopBattle(battleRoom):
 		del Globals.masterRooms[label]
 
 	print "-B " + str(player) + " " + player.name + " (flee)"
+
 
 def alert(client, CLIENT_DATA, messageString):
 	"""

@@ -80,7 +80,7 @@ def attackMob(params):
 					print soundTag
 				soundTagEle = soundTag.split("*")
 				print soundTagEle
-				soundTag = "*" + soundTagEle[1] + "* "
+				soundTag = "\n*" + soundTagEle[1] + "* "
 				print soundTag
 				client.send_cc((" "*len(soundTag)) + "^W" +mob.name.capitalize() + "^~ takes ^W" + str(damage) + " damage.^~\n")
 
