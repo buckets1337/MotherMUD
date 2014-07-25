@@ -50,7 +50,7 @@ def on_connect(client):
     #print "&&&&&&&&&&&&" + str(Globals.CLIENT_LIST)
     clientID = len(CLIENT_LIST) - 1
 
-    clientInfo = ClientInfo(name='none', prompt='>>', client=client, clientID=clientID)
+    clientInfo = ClientInfo(name='none', prompt='>>', client=client, clientID=clientID, clientDataID=clientDataID)
     CLIENT_DATA[clientDataID] = clientInfo
 
     CLIENT_DATA[clientDataID].loadFinish = False
@@ -90,6 +90,7 @@ def kick_idle():
         if client.idle() > IDLE_TIMEOUT and CLIENT_DATA[str(client.addrport())].gameState != 'battle':
             print('>> Kicking idle lobby client from %s' % client.addrport())
             SysInit.clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS)
+            client.send("You have been kicked for inactivity.\n")
             client.active = False
 
 
@@ -133,7 +134,7 @@ if __name__ == '__main__':
         timeout = .05
         )
 
-    world = World.World(regions = ['test'])     # create the world and load the regions into it
+    world = World.World(regions = ['test', 'testb', 'Onette'])     # create the world and load the regions into it
 
 
 

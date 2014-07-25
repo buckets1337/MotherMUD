@@ -12,6 +12,7 @@ import World
 import Objects
 import Globals
 import SysInit
+import timerActions
 # import clientInfo
 
 
@@ -46,7 +47,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
             #print "args: " + str(args)
 
             clientDataID = str(client.addrport())       # location of client's data in CLIENT_DATA
-            prompt = CLIENT_DATA[clientDataID].prompt 
+            #prompt = CLIENT_DATA[clientDataID].prompt 
 
             
 
@@ -57,6 +58,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
 
             if CLIENT_DATA[clientDataID].name == "none" or CLIENT_DATA[clientDataID].name == '':     # client just logged in and doesn't have a name assigned.  Accept the first input and assign it to the client as it's name.
                 CLIENT_DATA[clientDataID].name = str(msg)
+                CLIENT_DATA[clientDataID].lastCmd = str(msg)
 
                 path = "data/client/" + CLIENT_DATA[clientDataID].name
                 if os.path.isfile(path):
@@ -105,15 +107,30 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                         client.send("Last attempt is final before kick.\n")
                     elif CLIENT_DATA[clientDataID].numTries > 2:
                         CLIENT_DATA[clientDataID].numTries = 0
+                        client.send("Too many failed passwords.  Goodbye.\n")
+                        print "-- Disconnected " + str(clientDataID) + " (too many failed pw)"
                         client.active = False
 
                     client.send("Incorrect password.  Please try again.\n")
                     CLIENT_DATA[clientDataID].numTries += 1
+                    CLIENT_DATA[clientDataID].lastCmd = str(msg)
                     return
 
 
 
             if CLIENT_DATA[clientDataID].authSuccess == True and CLIENT_DATA[clientDataID].loadFinish == False:
+                for cli in CLIENT_DATA:
+                    # print CLIENT_DATA[cli].name
+                    # print CLIENT_DATA[cli].clientDataID
+                    # print CLIENT_DATA[clientDataID].name
+                    # print CLIENT_DATA[clientDataID].clientDataID
+                    # print "****"
+                    if CLIENT_DATA[cli].name == CLIENT_DATA[clientDataID].name and CLIENT_DATA[cli].clientDataID != CLIENT_DATA[clientDataID].clientDataID:
+                        CLIENT_DATA[cli].client.send("You have been kicked because your username logged in again.\n")
+                        print "-- Kicked " + CLIENT_DATA[cli].clientDataID + " " + CLIENT_DATA[cli].name + " (duplicate login)"
+                        kickTimer = World.Timer(Globals.TIMERS, 1, None, actionArgs = [], attachedTo = None, respawns = False)
+                        kickTimer.actionFunction = timerActions.kick(CLIENT_DATA[cli].client, kickTimer, Globals.TIMERS)
+
                 print "** " + str(client.addrport()) + " identified as " + str(CLIENT_DATA[clientDataID].name)
 
                 # client.send(prompt)
@@ -428,6 +445,9 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 ## command does not exist or is badly formed
                 client.send("\nHuh?  I don't know what '%s' means.\n\n" % msg)
 
+
+
+            CLIENT_DATA[clientDataID].lastCmd = str(msg)
 
 
 
