@@ -36,6 +36,119 @@ def setLocation(location):
 	room = location
 
 
+def loadSavedEq():
+	'''
+	loads equipment into rooms from equipment definition files after server restart
+	'''
+	pass
+
+
+def saveEq():
+	'''
+	handles saving all equipment in the world (but not player equipment) into unique equipment definition files when the server is shutdown
+	'''
+	for region in Globals.regionListDict:
+		for room in Globals.regionListDict[region]:
+			path='data/world/'+region+'/equip/'+room+'/'
+			shortPath='data/world/'+region+'/equip/'
+			if not os.path.exists(shortPath):
+				os.makedirs(shortPath)
+			if not os.path.exists(path):
+				os.makedirs(path)
+
+			dirList = os.listdir(path)
+			for eqFile in dirList:
+				print eqFile
+				os.remove(path+eqFile)
+
+			for eq in Globals.regionListDict[region][room].equipment:
+				saveEqToFile(eq, path)
+
+
+def saveEqToFile(eq, path):
+	'''
+	handles saving a single bit of equipment to a unique equipment definition file when the server is shutdown
+	'''
+	eqType = ''
+	if eq.kind.equipment.weapon != None:
+		eqType = 'weapon'
+	elif eq.kind.equipment.armor != None:
+		eqType = 'armor'
+
+	battleCommands = []
+	if eq.kind.equipment.battleCommands != [''] and eq.kind.equipment.battleCommands != []:
+		for command in eq.kind.equipment.battleCommands:
+			battleCommands.append(command)
+	if battleCommands == []:
+		battleCommands = ''
+
+	itemGrabHandler = 'False'
+	if hasattr(eq.kind, 'itemGrabHandler'):
+		if eq.kind.itemGrabHandler != None:
+			itemGrabHandler = 'True'
+
+	notDroppable = 'False'
+	if hasattr(eq.kind, 'itemGrabHandler') and eq.kind.itemGrabHandler != None:
+		if eq.kind.itemGrabHandler.notDroppable:
+			notDroppable = 'True'
+
+	objectSpawner = 'False'
+	if hasattr(eq.kind, 'objectSpawner'):
+		if eq.kind.objectSpawner != None:
+			objectSpawner = 'True'
+
+	filePath = path + str(eq)
+	with open(filePath, 'w') as f:
+		f.write('ID=%s\n' %str(eq))
+		f.write('currentRoom=%s\n' %(str(eq.currentRoom.region)+ ":" +str(eq.currentRoom.name)))
+		f.write('\n')
+		f.write('name=%s\n' %eq.name)
+		f.write('type=%s\n' %eqType)
+		f.write('slot=%s\n' %eq.kind.equipment.slot)
+		f.write('\n')
+		f.write('durability=%s\n' %eq.kind.equipment.durability)
+		f.write('maxDurability=%s\n' %eq.kind.equipment.maxDurability)
+		f.write('worth=%s\n' %eq.kind.equipment.worth)
+		f.write('\n')
+		f.write('description=%s\n' %eq.description)
+		f.write('\n')
+		f.write('longDescription=%s\n' %eq.longDescription)
+		f.write('\n')
+		f.write('isVisible=%s\n' %eq.isVisible)
+		f.write('\n')
+		f.write('hp=%s\n' %eq.kind.equipment.hp)
+		f.write('pp=%s\n' %eq.kind.equipment.pp)
+		f.write('offense=%s\n' %eq.kind.equipment.offense)
+		f.write('defense=%s\n' %eq.kind.equipment.defense)
+		f.write('speed=%s\n' %eq.kind.equipment.speed)
+		f.write('guts=%s\n' %eq.kind.equipment.guts)
+		f.write('luck=%s\n' %eq.kind.equipment.luck)
+		f.write('vitality=%s\n' %eq.kind.equipment.vitality)
+		f.write('IQ=%s\n' %eq.kind.equipment.IQ)
+		f.write('\n')
+		f.write('battleCommands=%s\n' %battleCommands)
+		f.write('\n')
+		f.write('statusEffect=%s\n' %eq.kind.equipment.statusEffect)
+		f.write('\n')
+		f.write('onUse=%s\n' %eq.kind.equipment.onUse)
+		f.write('\n\n')
+		f.write('kind.isCarryable=%s\n' %eq.kind.isCarryable)
+		f.write('kind.respawns=%s\n' %eq.kind.respawns)
+		f.write('\n')
+		f.write('kind.itemGrabHandler=%s\n' %itemGrabHandler)
+		if itemGrabHandler == 'True':
+			f.write('kind.itemGrabHandler.notDroppable=%s\n' %notDroppable)
+		f.write('\n')
+		f.write('kind.objectSpawner=%s\n' %objectSpawner)
+		if objectSpawner == 'True':
+			f.write('kind.objectSpawner.time=%s\n' %eq.kind.objectSpawner.time)
+			f.write('kind.objectSpawner.spawnOdds=%s\n' %eq.kind.objectSpawner.spawnOdds)
+			f.write('kind.objectSpawner.container=%s\n' %eq.kind.objectSpawner.container)
+			f.write('kind.objectSpawner.cycles=%s\n' %eq.kind.objectSpawner.cycles)
+			f.write('kind.objectSpawner.repeat=%s\n' %eq.kind.objectSpawner.repeat)
+			f.write('kind.objectSpawner.active=%s\n' %eq.kind.objectSpawner.active)
+
+
 def buildObjectFromFile(file):
 	'''
 	creates an object by constructing it out of details in a file
@@ -357,7 +470,7 @@ def buildObjectFromFile(file):
 	print "\n"
 
 
-def buildEquipmentFromFile(file):
+def buildEquipmentFromFile(file, location):
 
 	print file
 
@@ -365,7 +478,7 @@ def buildEquipmentFromFile(file):
 		print "\n"
 		return
 
-	path = 'blueprints/equip/' + file
+	path = location + file
 	with open(path, 'r') as f:
 		fileData = f.readlines()
 
@@ -457,7 +570,7 @@ def buildEquipmentFromFile(file):
 			elif isVisible == 'False':
 				isVisible = False
 		if Data.startswith('kind.isCarryable='):
-			isCarryable = Data[12:-1]
+			isCarryable = Data[17:-1]
 			if isCarryable == "True":
 				isCarryable = True
 			elif isCarryable == "False":
@@ -632,7 +745,13 @@ for obj in fileList:
 	buildObjectFromFile(obj)
 
 for obj in eqFileList:
-	buildEquipmentFromFile(obj)
+	buildEquipmentFromFile(obj, 'blueprints/equip/')
+
+
+
+
+
+
 
 
 

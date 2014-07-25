@@ -1,4 +1,6 @@
 ID=
+currentRoom=
+
 name=baseball_bat
 type=weapon
 slot=main_hand,off_hand

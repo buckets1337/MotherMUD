@@ -1,4 +1,6 @@
 ID=
+currentRoom=
+
 name=baseball_cap
 type=armor
 slot=head

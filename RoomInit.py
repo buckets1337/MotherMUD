@@ -122,6 +122,14 @@ def saveRoom(room):
 			mobString = mobString[:-2]+'\n'
 		f.write(mobString)
 		f.write('\n')
+		f.write('equipment=',)
+		eqString=''
+		for eq in room.equipment:
+			eqString += (eq.name + ', ')
+		if eqString.endswith(', '):
+			eqString = eqString[:-2]+'\n'
+		f.write(eqString)
+		f.write('\n')
 
 
 
@@ -804,6 +812,37 @@ def loadRoom(file):
 
 def setSpawnContainers(newRoom):
 	for obj in newRoom.objects:
+		#print obj.name
+		try:
+			if obj.spawnContainer is not None:
+				print 'init:' + str(obj.spawnContainer)
+				for thing in obj.spawnContainer:
+					print thing
+				if isinstance(obj.spawnContainer, World.Object):
+					pass
+				else:
+					print 'sc:' + str(obj.spawnContainer)
+					destination = Globals.regionListDict[obj.spawnContainer[1]][obj.spawnContainer[2]]
+					print "destination:" + str(destination) + obj.spawnContainer[1] + ":" + obj.spawnContainer[2]
+					#print destination.objects
+					for item in destination.objects:
+						print obj.spawnContainer
+						#print obj.spawnContainer[3]
+						#print item.name
+						#print "destCont:" + str(obj.spawnContainer)
+						#print item.name
+						if not isinstance(obj.spawnContainer, World.Object):
+							print obj.spawnContainer
+							if item.name == obj.spawnContainer[3]:
+								obj.spawnContainer = item
+								# for ob in Globals.fromFileList:
+								# 	if ob.name == obj.name
+								print "spawnCont:" + str(obj.spawnContainer) + str(obj.spawnContainer.name)
+		except:
+			#print "obj.spawnContainer:" + str(obj.spawnContainer) + str(obj.spawnContainer.name)
+			raise
+
+	for obj in newRoom.equipment:
 		#print obj.name
 		try:
 			if obj.spawnContainer is not None:

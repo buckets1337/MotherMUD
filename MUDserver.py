@@ -22,6 +22,7 @@ from miniboa import TelnetServer
 from clientInfo import ClientInfo
 
 import Engine, World, SysInit, RoomInit, MobInit, Rooms
+import Objects
 from cMove import alert
 
 import Globals
@@ -184,6 +185,7 @@ if __name__ == '__main__':
             SysInit.dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS)
             RoomInit.saveAllRooms()
             MobInit.saveMobs()
+            Objects.saveEq()
             SERVER_RUN = False
 
     print("<< Server shutdown.")

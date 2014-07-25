@@ -1,6 +1,7 @@
 # mobInit.py
 # initializes the mobs in the world, and handles saving and loading the mobs in the world to and from file
 
+
 import os
 
 import Globals
@@ -541,4 +542,5 @@ def saveMobToFile(mob, path):
 		f.write('\n')
 		f.write('kind.inventorySize=%s\n' %str(mob.kind.inventorySize))
 		f.write('kind.equipment=%s\n' %str(mob.kind.equipment))
+
 
