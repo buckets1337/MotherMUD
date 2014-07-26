@@ -66,6 +66,7 @@ def saveEq():
 	'''
 	handles saving all equipment in the world (but not player equipment) into unique equipment definition files when the server is shutdown
 	'''
+
 	for region in Globals.regionListDict:
 		for room in Globals.regionListDict[region]:
 			path='data/world/'+region+'/equip/'+room+'/'

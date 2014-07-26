@@ -3,7 +3,7 @@
 
 import os
 import World, Globals
-import RoomInit, MobInit
+import RoomInit, MobInit, Objects
 
 
 
@@ -16,7 +16,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	clientDataID = str(client.addrport())
 	name = CLIENT_DATA[clientDataID].name
 	fileData = []
-	path = 'data/client/' + name
+	path = 'data/client/' + name + '/' + name
 	try:
 		with open(path, 'r') as CD:
 			fileData = CD.readlines()
@@ -137,19 +137,40 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 			inventory = data[10:-1]
 			inventory = inventory.split(", ")
 
+			if os.path.exists('data/client/' + name + '/inv_equip/'):
+				fileList = os.listdir('data/client/' + name + '/inv_equip/')
+				for equip in fileList:
+					Objects.buildEquipmentFromFile(equip, 'data/client/' + name + '/inv_equip/')
+
+			print inventory
 			for item in inventory:
-				#print item
-				found = False
-				for obj in Globals.fromFileList:
-					#print obj.name
-				 	if item == obj.name and found == False:
-						#inventoryItems.append(obj)
-						
-						newItem = cmdSpawnObject(obj.name, currentRoomRoom, alert=False, whereFrom='playerinv')
-						inventoryItems.append(newItem)
-						currentRoomRoom.objects.remove(newItem)
-						found = True
-						#print 'invI:' + str(inventoryItems)
+				if item != '':
+					#print 'item:' + str(item)
+					found = False
+					for obj in Globals.fromFileList:
+						#print obj.name
+					 	if item == obj.name and found == False:
+							#inventoryItems.append(obj)
+							
+							newItem = cmdSpawnObject(obj.name, currentRoomRoom, alert=False, whereFrom='playerinv')
+							inventoryItems.append(newItem)
+							currentRoomRoom.objects.remove(newItem)
+							found = True
+							#print 'invI:' + str(inventoryItems)
+
+					for obj in Globals.equipmentFromFile:
+						#print item
+						#print obj.ID
+						if item == str(obj.ID) and found == False:
+							newItem = cmdSpawnObject(obj.ID, currentRoomRoom, alert=False, whereFrom='playerinv')
+							inventoryItems.append(newItem)
+							print 'invit:' + str(inventoryItems)
+							#print currentRoomRoom.objects
+							currentRoomRoom.objects.remove(newItem)
+							found = True
+							#print 'invE:' + str(inventoryItems)
+				else:
+					inventory.remove('')
 
 
 
@@ -258,6 +279,9 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		os.mkdir('data/world')
 	if not os.path.exists('data/world/battles'):
 		os.mkdir('data/world/battles')
+	if not os.path.exists('data/client/' + player.name + '/'):
+		os.mkdir('data/client/' + player.name + '/')
+
 
 
 	try:
@@ -310,7 +334,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 
 
-		path = 'data/client/' + name
+		path = 'data/client/' + name +'/' + name
 		with open(path, 'w') as f:
 			f.write(str(player.password) + "\n")
 			f.write("name=" + name + "\n")
@@ -363,7 +387,14 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 			fileString = ''
 			for item in inventory:
-				fileString = fileString + (item.name + ", ")
+				print item
+				if hasattr(item.kind, 'equipment'):
+					if not os.path.exists('data/client/' + str(name) + '/inv_equip/'):
+						os.mkdir('data/client/' + str(name) + '/inv_equip/')
+					Objects.saveEqToFile(item, 'data/client/' + str(name) + '/inv_equip/')
+					fileString = fileString + (str(item) + ", ")
+				else:
+					fileString = fileString + (item.name + ", ")
 			if fileString.endswith(', '):
 				fileString = fileString[:-2]
 			f.write(fileString)
@@ -710,6 +741,10 @@ def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='c
         if thing.name == str(refobj):
             obj = thing
             #print obj
+    for thing in Globals.equipmentFromFile:
+    	if thing.ID == str(refobj):
+    		obj = thing
+
     if obj == None:
         print ("%s not found." %refobj)
         return
@@ -742,6 +777,7 @@ def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='c
             newObject.kind.objectSpawner = obj.kind.objectSpawner
             if newObject.kind.objectSpawner:
                 newObject.kind.objectSpawner.owner = newObject.kind
+            newObject.kind.equipment = obj.kind.equipment
             newObject.kind.onUse = obj.kind.onUse
 
         if isinstance(newObject.kind, World.container):
@@ -773,6 +809,27 @@ def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='c
             newObject.kind.objectSpawner.repeat = obj.kind.objectSpawner.repeat
             newObject.kind.objectSpawner.timer = World.Timer(newObject.kind.objectSpawner.TIMERS, newObject.kind.objectSpawner.time, newObject.kind.objectSpawner.spawn, [], newObject.kind.objectSpawner, newObject.kind.respawns)
             newObject.kind.objectSpawner.startingLocation = spawnLocation,
+
+        if newObject.kind.equipment:
+			newObject.kind.equipment.owner = obj.kind.equipment.owner
+			newObject.kind.equipment.weapon = obj.kind.equipment.weapon
+			newObject.kind.equipment.armor = obj.kind.equipment.armor
+			newObject.kind.equipment.slot = obj.kind.equipment.slot
+			newObject.kind.equipment.durability = obj.kind.equipment.durability
+			newObject.kind.equipment.maxDurability = obj.kind.equipment.maxDurability
+			newObject.kind.equipment.worth = obj.kind.equipment.worth
+			newObject.kind.equipment.hp = obj.kind.equipment.hp
+			newObject.kind.equipment.pp = obj.kind.equipment.pp
+			newObject.kind.equipment.offense = obj.kind.equipment.offense
+			newObject.kind.equipment.defense = obj.kind.equipment.defense
+			newObject.kind.equipment.speed = obj.kind.equipment.speed
+			newObject.kind.equipment.guts = obj.kind.equipment.guts
+			newObject.kind.equipment.luck = obj.kind.equipment.luck
+			newObject.kind.equipment.vitality = obj.kind.equipment.vitality
+			newObject.kind.equipment.IQ = obj.kind.equipment.IQ
+			newObject.kind.equipment.statusEffect = obj.kind.equipment.statusEffect
+			newObject.kind.equipment.battleCommands = obj.kind.equipment.battleCommands
+			newObject.kind.equipment.onUse = obj.kind.equipment.onUse
 
     if newObject.kind:
         if newObject.kind.objectSpawner:

@@ -60,7 +60,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 CLIENT_DATA[clientDataID].name = str(msg)
                 CLIENT_DATA[clientDataID].lastCmd = str(msg)
 
-                path = "data/client/" + CLIENT_DATA[clientDataID].name
+                path = "data/client/" + CLIENT_DATA[clientDataID].name + "/" + CLIENT_DATA[clientDataID].name
                 if os.path.isfile(path):
                     client.send("\nWelcome back, %s!\n" %CLIENT_DATA[clientDataID].name)
                     client.send("Please enter your password.\n")
@@ -72,7 +72,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     return
 
             while CLIENT_DATA[clientDataID].authSuccess == False:
-                path = "data/client/" + CLIENT_DATA[clientDataID].name
+                path = "data/client/" + CLIENT_DATA[clientDataID].name + "/" + CLIENT_DATA[clientDataID].name
                 if os.path.isfile(path):
                     with open(path, 'r') as f:
                         CLIENT_DATA[clientDataID].password = f.readline()
@@ -136,7 +136,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 # client.send(prompt)
                 mortalComponent = World.mortal(hp=100,maxHp=100,pp=10,maxPp=10,level=1,exp=0,money=0,offense=1,defense=1,speed=1,guts=1,luck=1,vitality=1,IQ=1,inventory=[])
                 
-                if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name)):
+                if os.path.isfile('data/client/'+str(CLIENT_DATA[clientDataID].name) + '/' + str(CLIENT_DATA[clientDataID].name)):
                     #print "cl:" + str(CLIENT_LIST)
                     #CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)          
                     SysInit.clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, Globals.TIMERS, mortalComponent)
@@ -146,6 +146,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                     # print 'avacr:' + str(CLIENT_DATA[clientDataID].avatar.currentRoom)
                     #print "cl2:" + str(CLIENT_LIST)
                 else:
+                    os.mkdir('data/client/'+str(CLIENT_DATA[clientDataID].name) + '/')
                     CLIENT_DATA[clientDataID].avatar = World.Player(description='Just another traveler.', currentRoom = Globals.startingRoom, name=CLIENT_DATA[clientDataID].name, client=client, clientDataID = clientDataID, kind=mortalComponent)
                     Globals.startingRoom.players.append(CLIENT_DATA[clientDataID].avatar)
                     # print 'starting;' + str(Globals.startingRoom.players)
