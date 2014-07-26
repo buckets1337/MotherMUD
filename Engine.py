@@ -240,6 +240,7 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 cInteractions.use(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom)
                 commandSuccess = True
 
+
             elif cmd == 'status' or cmd == 'st':
                 cInfo.status(client, args, CLIENT_LIST, CLIENT_DATA)
                 commandSuccess = True

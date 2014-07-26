@@ -78,6 +78,8 @@ def chat(client, args, CLIENT_LIST, CLIENT_DATA):
             guest.send_cc('^Y^I<chat>^~ ^U%s^~: %s^~\n' % (CLIENT_DATA[clientDataID].name, message))
             # guest.send(prompt)
 
+    CLIENT_DATA[clientDataID].replyTo = None
+
 
 def tell(client, args, CLIENT_LIST, CLIENT_DATA):
     """
@@ -93,8 +95,9 @@ def tell(client, args, CLIENT_LIST, CLIENT_DATA):
         clientDataID = str(player.addrport())
         if CLIENT_DATA[clientDataID].name == who:
             if CLIENT_DATA[clientDataID].name != CLIENT_DATA[str(client.addrport())].name:
-                player.send_cc("^w" + senderName + " tells you: " + message +"^~\n")
+                player.send_cc("^W^I" + senderName + " tells you:^~^w " + message +"^~\n")
                 CLIENT_DATA[clientDataID].replyTo = client
+                CLIENT_DATA[str(client.addrport())].replyTo = player
                 success = True
                 print "   <" + str(CLIENT_DATA[clientDataID].name) + '>'+ senderName + ": " + message
             else:
@@ -103,9 +106,10 @@ def tell(client, args, CLIENT_LIST, CLIENT_DATA):
                 isSelf = True
     if success:
         if not isSelf:
-            client.send_cc("^wYou tell "+ who + ": "+ message +"^~\n")
+            client.send_cc("^W^IYou tell "+ who + ":^~^w "+ message +"^~\n")
         return True
         
     else:
         client.send_cc("^wIt appears "+ who + " isnt around right now.^~\n")
         return False
+
