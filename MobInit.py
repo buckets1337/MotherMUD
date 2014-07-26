@@ -474,7 +474,7 @@ def saveMobs():
 				
 			dirList = os.listdir(path)
 			for mobFile in dirList:
-				print mobFile
+				#print mobFile
 				os.remove(path+mobFile)
 
 			for mob in Globals.regionListDict[region][room].mobs:

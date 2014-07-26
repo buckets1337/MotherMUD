@@ -389,8 +389,14 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 			for item in inventory:
 				print item
 				if hasattr(item.kind, 'equipment'):
+					fileList = []
 					if not os.path.exists('data/client/' + str(name) + '/inv_equip/'):
 						os.mkdir('data/client/' + str(name) + '/inv_equip/')
+					else:
+						fileList = os.listdir('data/client/' + str(name) + '/inv_equip/')
+					if fileList != []:
+						for file in fileList:
+							os.remove('data/client/' + str(name) + '/inv_equip/' + file)
 					Objects.saveEqToFile(item, 'data/client/' + str(name) + '/inv_equip/')
 					fileString = fileString + (str(item) + ", ")
 				else:
