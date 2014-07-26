@@ -125,7 +125,7 @@ def saveRoom(room):
 		f.write('equipment=',)
 		eqString=''
 		for eq in room.equipment:
-			eqString += (eq.name + ', ')
+			eqString += (str(eq) + ', ')
 		if eqString.endswith(', '):
 			eqString = eqString[:-2]+'\n'
 		f.write(eqString)
@@ -670,8 +670,9 @@ def loadRoom(file):
 				print equipmentList
 
 				for eq in equipmentList:
+					protoEq = None
 					for proto in Globals.equipmentFromFile:
-						if proto.name == eq:
+						if proto.ID == eq or proto.name == eq:
 							protoEq = proto
 
 					if hasattr(protoEq.kind.equipment, 'weapon'):

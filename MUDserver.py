@@ -148,6 +148,7 @@ if __name__ == '__main__':
     #print TIMERS
 
     MobInit.loadMobs()
+    Objects.loadSavedEq()
     RoomInit.setup()
     MobInit.loadSavedMobs()
 

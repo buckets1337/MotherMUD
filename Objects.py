@@ -19,16 +19,24 @@ equipmentFromFile = Globals.equipmentFromFile
 
 fileList = []
 eqFileList = []
+savedEqFileList = []
 
 for region in Globals.RegionsList:
 	directoryFiles = os.listdir('blueprints/obj/'+str(region)+'/')
 	eqDirectoryFiles = os.listdir('blueprints/equip/'+str(region)+'/')
+	if os.path.exists('data/world/' + str(region) + '/equip/'):
+		savedEqFiles = os.listdir('data/world/' + str(region) + '/equip/')
+	else:
+		savedEqFiles = []
 	for obj in directoryFiles:
 		path = str(region)+'/'+obj
 		fileList.append(path)
 	for obj in eqDirectoryFiles:
 		path = str(region)+'/'+obj
-		eqFileList.append(path)	
+		eqFileList.append(path)
+	for obj in savedEqFiles:
+		path = str(region) + '/equip/' + obj
+		savedEqFileList.append(path)	
 
 
 def setLocation(location):
@@ -40,7 +48,18 @@ def loadSavedEq():
 	'''
 	loads equipment into rooms from equipment definition files after server restart
 	'''
-	pass
+	for region in Globals.regionListDict:
+		for room in Globals.regionListDict[region]:
+			path='data/world/' + region + '/equip/' + room + '/'
+			#shortPath='data/world' + region + '/equip/'
+
+			if os.path.exists(path):
+				Globals.regionListDict[region][room].equipment = {}
+				dirList = os.listdir(path)
+				for eqFile in dirList:
+					if not eqFile.endswith('~'):
+						newEq = buildEquipmentFromFile(eqFile, path)
+						# Globals.regionListDict[region][room].items.append(newEq)
 
 
 def saveEq():
@@ -665,6 +684,7 @@ def buildEquipmentFromFile(file, location):
 	newObject = World.Object(name=name, description=description, isVisible=isVisible, spawnContainer=spawnContainer, longDescription=longDescription, kind=newItem)
 	if newObject.kind.objectSpawner:
 		newObject.kind.objectSpawner.obj = newObject
+	newObject.ID = ID
 	newItem.owner = newObject
 
 
@@ -741,11 +761,17 @@ def buildEquipmentFromFile(file, location):
 	print "\n"
 
 
+	return newObject
+
 for obj in fileList:
 	buildObjectFromFile(obj)
 
-for obj in eqFileList:
-	buildEquipmentFromFile(obj, 'blueprints/equip/')
+print savedEqFileList
+if savedEqFileList == []:
+	for obj in eqFileList:
+		buildEquipmentFromFile(obj, 'blueprints/equip/')
+else:
+	loadSavedEq()
 
 
 
