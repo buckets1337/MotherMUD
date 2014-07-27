@@ -268,6 +268,70 @@ def use(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA, currentRoom):
 					playerAvatar.kind.inventory.remove(possibles[int(args[1])-1])
 
 
+def equip(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
+	gear = None
+	gearType = None
+	if args == []:
+		client.send("What did I want to equip?\n")
+		return
+	for item in CLIENT_DATA[clientDataID].avatar.kind.inventory:
+		if item.name == args[0]:
+			if hasattr(item.kind, 'equipment'):
+				gear = item
+				if hasattr(item.kind.equipment, 'weapon'):
+					if item.kind.equipment.weapon != None:
+						gearType = 'weapon'
+				if hasattr(item.kind.equipment, 'armor'):
+					if item.kind.equipment.armor != None:
+						gearType = 'armor'
+
+	if gear == None:
+		client.send("I don't seem to have %s.\n" %(args[0]))
+		return
+
+	else:
+		slot = gear.kind.equipment.slot
+
+		if slot == 'both hands' and ('main hand' in CLIENT_DATA[clientDataID].avatar.kind.equipment or 'off hand' in CLIENT_DATA[clientDataID].avatar.kind.equipment):
+			client.send("I am already holding a weapon, and %s requires both hands.\n" %gear.name)
+			return
+
+		if slot == 'main hand' and 'both hands' in CLIENT_DATA[clientDataID].avatar.kind.equipment:
+			client.sent("I am already holding a weapon, and I must hold %s in my main hand.\n" %gear.name)
+			return
+
+		if slot not in CLIENT_DATA[clientDataID].avatar.kind.equipment:
+			CLIENT_DATA[clientDataID].avatar.kind.equipment[slot] = gear
+			CLIENT_DATA[clientDataID].avatar.kind.hp += gear.kind.equipment.hp
+			CLIENT_DATA[clientDataID].avatar.kind.maxHp += gear.kind.equipment.hp
+			CLIENT_DATA[clientDataID].avatar.kind.pp += gear.kind.equipment.pp
+			CLIENT_DATA[clientDataID].avatar.kind.maxPp += gear.kind.equipment.pp
+			CLIENT_DATA[clientDataID].avatar.kind.offense += gear.kind.equipment.offense
+			CLIENT_DATA[clientDataID].avatar.kind.defense += gear.kind.equipment.defense
+			CLIENT_DATA[clientDataID].avatar.kind.speed += gear.kind.equipment.speed
+			CLIENT_DATA[clientDataID].avatar.kind.guts += gear.kind.equipment.guts
+			CLIENT_DATA[clientDataID].avatar.kind.luck += gear.kind.equipment.luck
+			CLIENT_DATA[clientDataID].avatar.kind.vitality += gear.kind.equipment.vitality
+			CLIENT_DATA[clientDataID].avatar.kind.IQ += gear.kind.equipment.IQ
+
+		else:
+			if gearType == 'weapon':
+				if slot != 'both hands':
+					client.send("I am already holding a weapon in my %s.\n" %slot)
+					return
+				else:
+					client.send("I am already holding a weapon that requires both my hands!\n")
+			elif gearType == 'armor':
+				client.send("I am already wearing " + str(CLIENT_DATA[clientDataID].avatar.kind.equipment[slot].name) + " on my " + slot + ".\n")
+
+	if gearType == 'weapon':
+		client.send("I hold the %s in my %s.\n" %(gear.name,str(slot)))
+	elif gearType == 'armor':
+		client.send("I put the %s on my %s.\n" %(gear.name,str(slot)))
+
+
+def remove(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
+	pass
 
 
 def check(client, args, clientDataID, CLIENT_DATA, room):

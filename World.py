@@ -212,6 +212,7 @@ class armor:
 	def __init__(self):	
 		pass
 
+
 class itemGrabHandler:		# for 'kind' components, adds the ability for item to be picked up or dropped
 	"""
 	This component adds the ability to pick up and drop an item
@@ -796,24 +797,60 @@ class mortal:		# 'kind' attribute
 	A component class for all attributes of mortals (living creatures)
 	'''
 	def __init__(self, hp, maxHp, pp, maxPp, level, exp, money, offense, defense, speed, guts, luck, vitality, IQ, inventory, inventorySize=16, equipment={}):
+		self.equipment = equipment
+		#self._hp = None
 		self.hp = hp
+		self.base_hp = hp
 		self.maxHp = maxHp
+		self.base_maxHp = maxHp
 		self.pp = pp
+		self.base_pp = pp
 		self.maxPp = maxPp
+		self.base_maxPp = maxPp
 		self.level = level
 		self.exp = exp
 		self.money = money
 		self.offense = offense
+		self.base_offense = offense
 		self.defense = defense
+		self.base_defense = defense
 		self.speed = speed
+		self.base_speed = speed
 		self.guts = guts
+		self.base_guts = guts
 		self.luck = luck
+		self.base_luck = luck
 		self.vitality = vitality
+		self.base_vitality = vitality
 		self.IQ = IQ
+		self.base_IQ = IQ
 		self.inventory = inventory
 		self.inventorySize = inventorySize
-		self.equipment = equipment
 
+
+	# @property
+	# def hp(self):
+	# 	bonus = 0
+	# 	for gear in self.equipment:
+	# 		bonus += self.equipment[gear].kind.equipment.hp
+	# 	return self._hp + bonus
+	# 	print "hpbonus:" + bonus
+	# @hp.setter
+	# def hp(self, value):
+	#     self._hp = value
+
+	# @property
+	# def defense(self):
+	#     bonus = 0
+	#     for gear in self.equipment:
+	#     	bonus += self.equipment[gear].kind.equipment.defense
+	# 	return self._defense + bonus
+	# @defense.setter
+	# def defense(self, value):
+	#     self._defense = value
+	
+
+		
 
 class expirator:		# component added to mobs.  Causes the mob to expire and delete after a set period of time, so the world does not fill with mobs
 

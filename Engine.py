@@ -240,6 +240,17 @@ def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
                 cInteractions.use(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA, CLIENT_DATA[clientDataID].avatar.currentRoom)
                 commandSuccess = True
 
+            elif cmd == 'equip':
+                ## Equip a bit of kit
+                cInteractions.equip(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA)
+                commandSuccess = True
+
+
+            elif cmd == 'remove':
+                ## Remove a bit of kit
+                cInteractions.remove(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA)
+                commandSuccess = True
+
 
             elif cmd == 'status' or cmd == 'st':
                 cInfo.status(client, args, CLIENT_LIST, CLIENT_DATA)
@@ -476,34 +487,45 @@ def selector(oddsList):     # pick a random selection from an odds list and retu
 def statRaiser(client, clientDataID, CLIENT_DATA, spread):
 
     CLIENT_DATA[clientDataID].avatar.kind.offense += spread[0]
+    CLIENT_DATA[clientDataID].avatar.kind.base_offense += spread[0]
     if spread[0] != 0:
         client.send_cc("^WI feel stronger.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.defense += spread[1]
+    CLIENT_DATA[clientDataID].avatar.kind.base_defense += spread[1]
     if spread[1] != 0:
         client.send_cc("^WI feel tougher.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.vitality += spread[2]
+    CLIENT_DATA[clientDataID].avatar.kind.base_vitality += spread[2]
     if spread[2] != 0:
         client.send_cc("^WI feel more fit.^~\n")
     hpGained = int((int(spread[2]*0.75)+int(spread[3]*0.25))*(random.randint(1,5)*(int(CLIENT_DATA[clientDataID].avatar.kind.level*0.1)+1))+ 5)
     CLIENT_DATA[clientDataID].avatar.kind.maxHp += hpGained
+    CLIENT_DATA[clientDataID].avatar.kind.base_maxHp += hpGained
     CLIENT_DATA[clientDataID].avatar.kind.hp += hpGained
+    CLIENT_DATA[clientDataID].avatar.kind.base_hp += hpGained
     if hpGained > 5:
         client.send_cc("^WI feel more resilient.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.guts += spread[3]
+    CLIENT_DATA[clientDataID].avatar.kind.base_guts += spread[3]
     if spread[3] != 0:
         client.send_cc("^WI feel more daring.^~\n")
     ppGained = int((int(spread[3]*0.75)+int(spread[6]*0.25))*(random.randint(1,3)*(int(CLIENT_DATA[clientDataID].avatar.kind.level*0.1)+1)))
     CLIENT_DATA[clientDataID].avatar.kind.maxPp += ppGained
+    CLIENT_DATA[clientDataID].avatar.kind.base_maxPp += ppGained
     CLIENT_DATA[clientDataID].avatar.kind.pp += ppGained
+    CLIENT_DATA[clientDataID].avatar.kind.base_pp += ppGained
     if ppGained != 0:
         client.send_cc("^WI feel more attuned.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.speed += spread[4]
+    CLIENT_DATA[clientDataID].avatar.kind.base_speed += spread[4]
     if spread[4] != 0:
         client.send_cc("^WI feel faster.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.luck += spread[5]
+    CLIENT_DATA[clientDataID].avatar.kind.base_luck += spread[5]
     if spread[5] != 0:
         client.send_cc("^WI'm feeling lucky.^~\n")
     CLIENT_DATA[clientDataID].avatar.kind.IQ += spread[6]
+    CLIENT_DATA[clientDataID].avatar.kind.base_IQ += spread[6]
     if spread[6] != 0:
         client.send_cc("^WI feel smarter.^~\n")
 

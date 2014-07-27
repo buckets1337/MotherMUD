@@ -619,17 +619,113 @@ def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 	for obj in CLIENT_DATA[clientDataID].avatar.kind.inventory:
 		if len(obj.name) > longestItemName:
 			longestItemName = len(obj.name)
-		if len(obj.name) > longestItemDescription:
-			longestItemDescription = len(obj.name)
+		if len(obj.description) > longestItemDescription:
+			longestItemDescription = len(obj.description)
 
-	client.send_cc("\n^I[" + ((longestItemName + 9)* " ") + "    Inventory" + ((longestItemDescription + 16)* " ") +"]^~\n")
-	client.send_cc("\nSpace: " + str(len(CLIENT_DATA[clientDataID].avatar.kind.inventory)) + "/" + str(CLIENT_DATA[clientDataID].avatar.kind.inventorySize)+ " used. \n\n")
+	client.send_cc("\n   _" +  ("_"*(longestItemName+13)) +"^I[ Inventory ]^~" + ("_"*longestItemDescription)+"\n   |" + (" "*(longestItemName+longestItemDescription+26)) + "|")
+	client.send_cc("\n ^I  ^~| Space: " + str(len(CLIENT_DATA[clientDataID].avatar.kind.inventory)) + "/" + str(CLIENT_DATA[clientDataID].avatar.kind.inventorySize)+ " used. \n ^I  ^~|\n ^I  ^~|")
 
-	client.send_cc("^U^!Item Name" + (longestItemName* " ") + "    Item Description"+ (longestItemDescription * " ") + "^~\n")
+	client.send_cc(" ^U^!  Name" + (longestItemName* " ") +"       Description"+ ((longestItemDescription-1) * " ") + "^~  |\n")
 
 	for obj in CLIENT_DATA[clientDataID].avatar.kind.inventory:
-		client.send_cc(str(obj.name) + (((9 + longestItemName) - len(obj.name)) * " ") + "    " + str(obj.description) + "\n")
-	client.send("\n")
+		if obj.kind.equipment == None:
+			client.send_cc(" ^I  ^~|   " +str(obj.name) + (((7 + longestItemName) - len(obj.name)) * " ") + "    " + str(obj.description) +(" "*12) + (" "*(longestItemDescription-len(obj.description))) + "|\n")
+
+		elif obj.kind.equipment.weapon != None:
+			descBuffer = 12
+			descString = ""
+			if obj.kind.equipment.hp != 0:
+				if obj.kind.equipment.hp > 0:
+					descString += "hp:+" + str(obj.kind.equipment.hp) +", "
+			if obj.kind.equipment.pp != 0:
+				if obj.kind.equipment.pp > 0:
+					descString += "pp:+" + str(obj.kind.equipment.pp) +", "
+			if obj.kind.equipment.offense != 0:
+				if obj.kind.equipment.offense > 0:
+					descString += "off:+" + str(obj.kind.equipment.offense) +", "
+			if obj.kind.equipment.defense != 0:
+				if obj.kind.equipment.defense > 0:
+					descString += "def:+" + str(obj.kind.equipment.defense) +", "
+			if obj.kind.equipment.speed != 0:
+				if obj.kind.equipment.speed > 0:
+					descString += "spd:+" + str(obj.kind.equipment.speed) +", "
+			if obj.kind.equipment.guts != 0:
+				if obj.kind.equipment.guts > 0:
+					descString += "guts:+" + str(obj.kind.equipment.guts) +", "
+			if obj.kind.equipment.luck != 0:
+				if obj.kind.equipment.luck > 0:
+					descString += "lck:+" + str(obj.kind.equipment.luck) +", "
+			if obj.kind.equipment.vitality != 0:
+				if obj.kind.equipment.vitality > 0:
+					descString += "vit:+" + str(obj.kind.equipment.vitality) +", "
+
+			if descString.endswith(", "):
+				descString = descString[:-2]
+
+			description = str("[W]" + "<" + obj.kind.equipment.slot + "> " + descString)
+			if len(description) > longestItemDescription + 10:
+				description = description[:longestItemDescription+7] + "... "
+				descBuffer = 1
+			equipBuffer = 2
+			equipToken = ''
+			print "VALUES" +str(CLIENT_DATA[clientDataID].avatar.kind.equipment.values())
+			if obj in CLIENT_DATA[clientDataID].avatar.kind.equipment.values() or obj.name in CLIENT_DATA[clientDataID].avatar.kind.equipment.values():
+				equipBuffer = 0
+				equipToken = '^WE ^~'
+			client.send_cc(" ^I  ^~| " +(" "*equipBuffer)+ equipToken+str(obj.name) + (((7 + longestItemName) - len(obj.name)) * " ") + "    " + description +(" "*descBuffer) + (" "*(longestItemDescription-len(description))) + "|\n")
+
+		elif obj.kind.equipment.armor != None:
+			descBuffer = 12
+			descString = ""
+			if obj.kind.equipment.hp != 0:
+				if obj.kind.equipment.hp > 0:
+					descString += "hp:+" + str(obj.kind.equipment.hp) +", "
+			if obj.kind.equipment.pp != 0:
+				if obj.kind.equipment.pp > 0:
+					descString += "pp:+" + str(obj.kind.equipment.pp) +", "
+			if obj.kind.equipment.offense != 0:
+				if obj.kind.equipment.offense > 0:
+					descString += "off:+" + str(obj.kind.equipment.offense) +", "
+			if obj.kind.equipment.defense != 0:
+				if obj.kind.equipment.defense > 0:
+					descString += "def:+" + str(obj.kind.equipment.defense) +", "
+			if obj.kind.equipment.speed != 0:
+				if obj.kind.equipment.speed > 0:
+					descString += "spd:+" + str(obj.kind.equipment.speed) +", "
+			if obj.kind.equipment.guts != 0:
+				if obj.kind.equipment.guts > 0:
+					descString += "guts:+" + str(obj.kind.equipment.guts) +", "
+			if obj.kind.equipment.luck != 0:
+				if obj.kind.equipment.luck > 0:
+					descString += "lck:+" + str(obj.kind.equipment.luck) +", "
+			if obj.kind.equipment.vitality != 0:
+				if obj.kind.equipment.vitality > 0:
+					descString += "vit:+" + str(obj.kind.equipment.vitality) +", "
+			if obj.kind.equipment.IQ != 0:
+				if obj.kind.equipment.IQ > 0:
+					descString += "IQ:+" + str(obj.kind.equipment.IQ) +", "
+			if obj.kind.equipment.statusEffect != None and obj.kind.equipment.statusEffect != '':
+				descString += str(obj.kind.equipment.statusEffect) + ", "
+			if obj.kind.equipment.battleCommands != None and obj.kind.equipment.battleCommands != ['']:
+				descString += str(obj.kind.equipment.battleCommands) + ", "
+
+			if descString.endswith(", "):
+				descString = descString[:-2]
+			description = str("[A]" + "<" + obj.kind.equipment.slot + "> " + descString)
+			if len(description) > longestItemDescription + 10:
+				description = description[:longestItemDescription+7] + "... "
+				descBuffer = 1
+			equipBuffer = 2
+			equipToken = ''
+			print "VALUES" +str(CLIENT_DATA[clientDataID].avatar.kind.equipment)
+			if obj.kind.equipment.slot in CLIENT_DATA[clientDataID].avatar.kind.equipment:
+				if CLIENT_DATA[clientDataID].avatar.kind.equipment[obj.kind.equipment.slot] == obj:
+					equipBuffer = 0
+					equipToken = '^WE ^~'
+			client.send_cc(" ^I  ^~| " +(" "*equipBuffer)+ equipToken+str(obj.name) + (((7 + longestItemName) - len(obj.name)) * " ") + "    " + description +(" "*descBuffer) + (" "*(longestItemDescription-len(description))) + "|\n")
+
+	client.send_cc(" ^I  ^~|" + "\n ^I  ^~|" + ("_"*longestItemName) + ("_"*longestItemDescription) + ("_"*26) + "|\n")
+	client.send_cc(" ^I   " + (" "*longestItemName) + (" "*longestItemDescription) + (" "*26) + "^~\n\n")
 
 
 def status(client, args, CLIENT_LIST, CLIENT_DATA):
@@ -640,28 +736,70 @@ def status(client, args, CLIENT_LIST, CLIENT_DATA):
 	divspc2=0
 	divspc3=0
 	divspc4=0
+
 	divspc5=0
 	divspc6=0
+
+	divspc7=0
+	divspc8=0
+	divspc9=0
+	divspc10=0
 
 	if avatar.kind.offense<10:
 		divspc1=2
 	elif avatar.kind.offense<100:
 		divspc1=1
+	elif avatar.kind.offense<1000:
+		divspc1=0
+
+	if avatar.kind.base_offense<10:
+		divspc7=2
+	elif avatar.kind.base_offense<100:
+		divspc7=1
+	elif avatar.kind.base_offense<1000:
+		divspc7=0
 
 	if avatar.kind.vitality<10:
-		divscp2=2
+		divspc2=2
 	elif avatar.kind.vitality<100:
 		divspc2=1
+	elif avatar.kind.vitality<1000:
+		divspc2=0
+
+	if avatar.kind.base_vitality<10:
+		divspc8=2
+	elif avatar.kind.base_vitality<100:
+		divspc8=1
+	elif avatar.kind.base_vitality<1000:
+		divspc8=0
 
 	if avatar.kind.speed<10:
 		divspc3=2
 	elif avatar.kind.speed<100:
 		divspc3=1
+	elif avatar.kind.speed<1000:
+		divspc3=0
+
+	if avatar.kind.base_speed<10:
+		divspc9=2
+	elif avatar.kind.base_speed<100:
+		divspc9=1
+	elif avatar.kind.base_speed<1000:
+		divspc9=0
 
 	if avatar.kind.IQ<10:
-		divscp4=2
+		divspc4=2
 	elif avatar.kind.IQ<100:
 		divspc4=1
+	elif avatar.kind.IQ<1000:
+		divspc4=0
+
+	if avatar.kind.base_IQ<10:
+		divspc10=2
+	elif avatar.kind.base_IQ<100:
+		divspc10=1
+	elif avatar.kind.base_IQ<1000:
+		divspc10=0
 
 	if avatar.kind.exp<10:
 		divspc5=7
@@ -734,10 +872,10 @@ def status(client, args, CLIENT_LIST, CLIENT_DATA):
 	client.send_cc("  ^I  ^~| ^GHP:^~ " + hpcolor + str(avatar.kind.hp) + "^~" + "/" + str(avatar.kind.maxHp) +(" "*(48-4-len(str(avatar.kind.hp))-1-len(str(avatar.kind.maxHp))))+"|\n")
 	client.send_cc("  ^I  ^~| ^CPP:^~ " + ppcolor + str(avatar.kind.pp) + "^~" + "/" + str(avatar.kind.maxPp) +(" "*(48-4-len(str(avatar.kind.pp))-1-len(str(avatar.kind.maxPp))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n")
-	client.send_cc("  ^I  ^~| Offense: " + str(avatar.kind.offense) + "       " +(" "*divspc1)+ "Defense: " + str(avatar.kind.defense) +(" "*(47-9-7-divspc1-9-len(str(avatar.kind.defense))))+"|\n")
-	client.send_cc("  ^I  ^~| Vitality: " + str(avatar.kind.vitality) + "        " +(" "*divspc2)+ "Guts: " + str(avatar.kind.guts) +(" "*(47-10-8-divspc2-6-len(str(avatar.kind.guts))))+ "|\n")
-	client.send_cc("  ^I  ^~| Speed: " + str(avatar.kind.speed) + "         " + (" "*divspc3) + "Luck: "+ str(avatar.kind.luck) +(" "*(47-7-9-divspc3-6-len(str(avatar.kind.luck))))+ "|\n")
-	client.send_cc("  ^I  ^~| IQ: " + str(avatar.kind.IQ) + "           " + (" "*divspc4) +(" "*(47-4-11-divspc4-0+1-len(str(avatar.kind.IQ))))+ "|\n")
+	client.send_cc("  ^I  ^~| Offense:   ^W" + str(avatar.kind.offense) + "^~ (" + str(avatar.kind.base_offense) + ")   " +(" "*divspc1)+(" "*divspc7)+ "Defense:  ^W" + str(avatar.kind.defense) + " ^~(" + str(avatar.kind.base_defense) + ") " + (" "*(11-len(str(avatar.kind.defense))-len(str(avatar.kind.base_defense))))+"|\n")
+	client.send_cc("  ^I  ^~| Vitality:  ^W" + str(avatar.kind.vitality) + "^~ (" + str(avatar.kind.base_vitality) + ")   " +(" "*divspc2)+(" "*divspc8)+ "Guts:     ^W" + str(avatar.kind.guts) +" ^~(" + str(avatar.kind.base_guts) + ") " + (" "*(11-len(str(avatar.kind.guts))-len(str(avatar.kind.base_guts))))+ "|\n")
+	client.send_cc("  ^I  ^~| Speed:     ^W" + str(avatar.kind.speed) + "^~ (" + str(avatar.kind.base_speed) + ")   " + (" "*divspc3) +(" "*divspc9)+ "Luck:     ^W"+ str(avatar.kind.luck) + " ^~(" + str(avatar.kind.base_luck) + ") " +(" "*(11-len(str(avatar.kind.luck))-len(str(avatar.kind.base_luck))))+ "|\n")
+	client.send_cc("  ^I  ^~| IQ:        ^W" + str(avatar.kind.IQ) + "^~ (" + str(avatar.kind.base_IQ)+ ")         " + (" "*divspc4) +(" "*divspc10)+(" "*(25-divspc4-divspc10-len(str(avatar.kind.IQ))-len(str(avatar.kind.base_IQ))))+ "|\n")
 	client.send_cc("  ^I  ^~|"+ (" "*49) + "|\n") 
 	client.send_cc("  ^I  ^~| Money: $" + str(avatar.kind.money) + (" "*(47-8-0-divspc6-0+1-len(str(avatar.kind.money))))+ "|\n")
 	client.send_cc("  ^I  ^~|_________________________________________________|\n")

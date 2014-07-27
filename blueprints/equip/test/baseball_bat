@@ -3,7 +3,7 @@ currentRoom=
 
 name=baseball_bat
 type=weapon
-slot=main_hand,off_hand
+slot=main hand
 
 durability=10
 maxDurability=10
