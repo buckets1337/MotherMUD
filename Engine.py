@@ -16,21 +16,11 @@ import timerActions
 # import clientInfo
 
 
-
-
-
-
-
-
-
 def process_clients(SERVER_RUN, OPList, CLIENT_LIST, CLIENT_DATA):
     """
     Check each client, if client.cmd_ready == True then there is a line of
     input available via client.get_command().
     """
-
-
-
 
     for client in CLIENT_LIST:
         if client.active and client.cmd_ready:
