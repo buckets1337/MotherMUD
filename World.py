@@ -122,8 +122,9 @@ class Object():
 	A class representing objects in the world.  Objects contain a description and location, but may or may not be visible.
 	An object that contains no other components is essentially a prop, or scenery.  Adding components allows items to be built that do more interesting things.
 	"""
-	def __init__(self, name, description, currentRoom = None, isVisible = False, spawnContainer = None, longDescription = None, kind = None, TIMERS = None):
+	def __init__(self, name, description, currentRoom = None, isVisible = False, spawnContainer = None, longDescription = None, kind = None, TIMERS = None, ID = None):
 		self.name = name
+		self.ID = ID
 		self.description = description
 		self.currentRoom = currentRoom
 		self.isVisible = isVisible

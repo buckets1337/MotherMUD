@@ -271,11 +271,23 @@ def use(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA, currentRoom):
 def equip(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
 	gear = None
 	gearType = None
-	if args == []:
+
+	if args == [] or args == [''] or args == [None]:
 		client.send("What did I want to equip?\n")
 		return
+
+	print CLIENT_DATA[clientDataID].avatar.kind.inventory
 	for item in CLIENT_DATA[clientDataID].avatar.kind.inventory:
 		if item.name == args[0]:
+			if hasattr(item.kind, 'equipment'):
+				gear = item
+				if hasattr(item.kind.equipment, 'weapon'):
+					if item.kind.equipment.weapon != None:
+						gearType = 'weapon'
+				if hasattr(item.kind.equipment, 'armor'):
+					if item.kind.equipment.armor != None:
+						gearType = 'armor'
+		elif str(item.ID) == args[0]:
 			if hasattr(item.kind, 'equipment'):
 				gear = item
 				if hasattr(item.kind.equipment, 'weapon'):

@@ -4,6 +4,7 @@
 import os
 import World, Globals
 import RoomInit, MobInit, Objects
+import cInteractions
 
 
 
@@ -57,6 +58,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	rewardExp = 0
 	rewardMoney = 0
 	expToLevel = 0
+	equipItems = ''
+	newItemsList = []
 
 	#print fileData
 	for data in fileData:
@@ -142,7 +145,7 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 				for equip in fileList:
 					Objects.buildEquipmentFromFile(equip, 'data/client/' + name + '/inv_equip/')
 
-			print inventory
+			#print inventory
 			for item in inventory:
 				if item != '':
 					#print 'item:' + str(item)
@@ -154,7 +157,8 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 							
 							newItem = cmdSpawnObject(obj.name, currentRoomRoom, alert=False, whereFrom='playerinv')
 							inventoryItems.append(newItem)
-							currentRoomRoom.objects.remove(newItem)
+							newItemsList.append(newItem)
+							#currentRoomRoom.objects.remove(newItem)
 							found = True
 							#print 'invI:' + str(inventoryItems)
 
@@ -164,13 +168,20 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 						if item == str(obj.ID) and found == False:
 							newItem = cmdSpawnObject(obj.ID, currentRoomRoom, alert=False, whereFrom='playerinv')
 							inventoryItems.append(newItem)
-							print 'invit:' + str(inventoryItems)
+							newItemsList.append(newItem)
+							#print 'invit:' + str(inventoryItems)
 							#print currentRoomRoom.objects
-							currentRoomRoom.objects.remove(newItem)
+							#currentRoomRoom.objects.remove(newItem)
 							found = True
 							#print 'invE:' + str(inventoryItems)
 				else:
-					inventory.remove('')
+					inventory.remove(item)
+
+		if data.startswith("equipment="):
+			equipItems = data[10:-1]
+			equipItems = equipItems.split(", ")
+
+
 
 
 
@@ -264,6 +275,42 @@ def clientDataLoad(client, CLIENT_LIST, CLIENT_DATA, TIMERS, kind):
 	# CLIENT_LIST.remove(client)
 	# CLIENT_LIST.append(client)
 
+	#print equipItems
+	#print Globals.equipmentFromFile
+	# for item in Globals.equipmentFromFile:
+	# 	print item.ID
+	if equipItems != ['']:
+		for item in equipItems:
+			item = item.split(":")
+			slot = item[0]
+			gear = item[1]
+
+			eq = None
+
+			for item in currentRoomRoom.objects:
+				#print item.ID, item.name
+				#print gear
+				if item.ID == gear:
+					eq = item
+					# CLIENT_DATA[clientDataID].avatar.kind.inventory.append(item)
+					# Globals.equipmentFromFile.remove(item)
+					#print "found equipment by name " + str(equipment)
+				elif item.name == gear:
+					eq = item
+					# CLIENT_DATA[clientDataID].avatar.kind.inventory.append(item)
+					#print "found equipment by ID " + str(equipment)
+			args = [eq.name]
+			#print "args=" + str(args)
+			# CLIENT_DATA[clientDataID].avatar.kind.equipment[slot] = equipment
+			cInteractions.equip(CLIENT_DATA[clientDataID].client, args, CLIENT_LIST, clientDataID, CLIENT_DATA)
+			#print CLIENT_DATA[clientDataID].avatar.kind.equipment
+
+	for item in newItemsList:
+		for obj in currentRoomRoom.objects:
+			if obj == item:
+				currentRoomRoom.objects.remove(obj)
+				#print "removed " + str(obj)
+
 
 def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
@@ -281,6 +328,14 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		os.mkdir('data/world/battles')
 	if not os.path.exists('data/client/' + player.name + '/'):
 		os.mkdir('data/client/' + player.name + '/')
+
+	fileList = []
+	if not os.path.exists('data/client/' + str(player.name) + '/inv_equip/'):
+		os.mkdir('data/client/' + str(player.name) + '/inv_equip/')
+	fileList = os.listdir('data/client/' + str(player.name) + '/inv_equip/')
+	if fileList != []:
+		for file in fileList:
+			os.remove('data/client/' + str(player.name) + '/inv_equip/' + file)
 
 
 
@@ -310,20 +365,20 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		#clientDataID = avatar.clientDataID
 		kind = avatar.kind
 
-		hp = str(kind.hp)
-		maxHp = str(kind.maxHp)
-		pp = str(kind.pp)
-		maxPp = str(kind.maxPp)
+		hp = str(kind.base_hp)
+		maxHp = str(kind.base_maxHp)
+		pp = str(kind.base_pp)
+		maxPp = str(kind.base_maxPp)
 		level = str(kind.level)
 		exp = str(kind.exp)
 		money = str(kind.money)
-		offense = str(kind.offense)
-		defense = str(kind.defense)
-		speed = str(kind.speed)
-		guts = str(kind.guts)
-		luck = str(kind.luck)
-		vitality = str(kind.vitality)
-		IQ = str(kind.IQ)
+		offense = str(kind.base_offense)
+		defense = str(kind.base_defense)
+		speed = str(kind.base_speed)
+		guts = str(kind.base_guts)
+		luck = str(kind.base_luck)
+		vitality = str(kind.base_vitality)
+		IQ = str(kind.base_IQ)
 		battleCommands = avatar.battleCommands
 		inventory = kind.inventory
 		inventorySize = str(kind.inventorySize)
@@ -331,6 +386,7 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 		rewardExp = str(avatar.rewardExp)
 		rewardMoney = str(avatar.rewardMoney)
 		expToLevel = str(avatar.expToLevel)
+
 
 
 
@@ -387,16 +443,14 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 
 			fileString = ''
 			for item in inventory:
-				print item
+				#print item
 				if hasattr(item.kind, 'equipment'):
-					fileList = []
-					if not os.path.exists('data/client/' + str(name) + '/inv_equip/'):
-						os.mkdir('data/client/' + str(name) + '/inv_equip/')
-					else:
-						fileList = os.listdir('data/client/' + str(name) + '/inv_equip/')
-					if fileList != []:
-						for file in fileList:
-							os.remove('data/client/' + str(name) + '/inv_equip/' + file)
+
+					# else:
+					# 	fileList = os.listdir('data/client/' + str(name) + '/inv_equip/')
+					# if fileList != []:
+					# 	for file in fileList:
+					# 		os.remove('data/client/' + str(name) + '/inv_equip/' + file)
 					Objects.saveEqToFile(item, 'data/client/' + str(name) + '/inv_equip/')
 					fileString = fileString + (str(item) + ", ")
 				else:
@@ -490,7 +544,19 @@ def clientDataSave(client, CLIENT_LIST, CLIENT_DATA, TIMERS):
 				# 	f.write("\n")
 				# location += 1
 
-			f.write("\nequipment=\n")
+			f.write("\nequipment=")
+			if player.avatar.kind.equipment != {}:
+				equipType = ''
+				fileString = ''
+				for key, value in player.avatar.kind.equipment.items():
+					fileString += str(key) + ":" + str(value) + ", "
+				if fileString.endswith(", "):
+					fileString = fileString[:-2]
+
+				f.write(fileString)
+
+			f.write("\n")
+
 
 			# if battleRoom != None and battleRoom != 'None' and battleRoom != '':
 			# 	RoomInit.saveRoom(player.battleRoom)
@@ -676,7 +742,7 @@ def dataSave(CLIENT_LIST, CLIENT_DATA, TIMERS):
 	# 	print "Failed to save CLIENT_DATA"
 	# 	return
 
-	print TIMERS
+	#print TIMERS
 	try:
 		timerID = 0
 		with open('data/server/TIMERS', 'w') as TI:
@@ -757,6 +823,7 @@ def cmdSpawnObject(refobj, spawnLocation, alert=True, active=False, whereFrom='c
 
     newObject = World.Object(obj.name, obj.description)
 
+    newObject.ID = obj.ID
     newObject.currentRoom = spawnLocation
     newObject.isVisible = obj.isVisible
     if obj.spawnContainer:

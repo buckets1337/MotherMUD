@@ -117,6 +117,8 @@ def saveEqToFile(eq, path):
 		if eq.kind.objectSpawner != None:
 			objectSpawner = 'True'
 
+
+
 	filePath = path + str(eq)
 	with open(filePath, 'w') as f:
 		f.write('ID=%s\n' %str(eq))
