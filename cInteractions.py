@@ -276,7 +276,7 @@ def equip(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
 		client.send("What did I want to equip?\n")
 		return
 
-	print CLIENT_DATA[clientDataID].avatar.kind.inventory
+	#print CLIENT_DATA[clientDataID].avatar.kind.inventory
 	for item in CLIENT_DATA[clientDataID].avatar.kind.inventory:
 		if item.name == args[0]:
 			if hasattr(item.kind, 'equipment'):

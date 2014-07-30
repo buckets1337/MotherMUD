@@ -1,7 +1,7 @@
 # RoomInit.py
 # handles loading in all the rooms in all the regions in the world.
 
-import Globals, Engine, Rooms, World, aiMove, MobInit
+import Globals, Engine, Rooms, World, aiMove, MobInit, onExits
 import os
 
 
@@ -460,6 +460,8 @@ def loadRoom(file):
 
 	newRoom.players = []
 	newRoom.mobs = []
+	newRoom.onExit = {}
+	newRoom.onExitArgs = {}
 
 	item = ''
 	destRegion = ''
@@ -469,6 +471,9 @@ def loadRoom(file):
 	activesList = []
 	mobs = []
 	equipment = []
+	onExit = {}
+	onExitArgs = {}
+
 
 	for Data in fileData:
 
@@ -743,6 +748,41 @@ def loadRoom(file):
 
 
 					equipment.append(newObject)
+
+		if Data.startswith("onExit="):
+			onExit = Data[7:-1]
+			onExit = onExit.split(")")
+			#print "onExit:" + str(onExit)
+			for exit in onExit:
+				if exit == '':
+					continue
+				exit = exit[1:]
+				exit = exit.split("|")
+				#print "exit:" + str(exit)
+				exitFunction = exit[1]
+				exit = exit[0]
+				exitFunction = exitFunction.split(":")
+				function = exitFunction[0]
+				args = exitFunction[1]
+				args = args.split(", ")
+				#print "args:" + str(args)
+
+				if function == 'teleportRandom':
+					newRoom.onExit[exit] = onExits.teleportRandom
+				elif function == 'gotoRoom':
+					newRoom.onExit[exit] = onExits.gotoRoom
+
+
+				newRoom.onExitArgs[exit] = args
+
+
+			# exitTaken = onExit[0]
+			# exitTaken = exitTaken[1:]
+			# dataString = onExit[1]
+			# dataString = dataString.split(":")
+			# function = dataString[0]
+			# args = dataString[1]
+			# args = args.split(", ")
 
 
 
