@@ -343,7 +343,67 @@ def equip(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
 
 
 def remove(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
-	pass
+	player = CLIENT_DATA[clientDataID].avatar
+
+	if args == [] or args == [''] or args == [None]:
+		client.send("What did I want to remove?\n")
+		return
+
+	elif len(args) == 1:
+		resultsList = []
+		for item in player.kind.equipment:
+			if player.kind.equipment[item].name == str(args[0]):
+				resultsList.append(player.kind.equipment[item])
+
+		if resultsList == []:
+			client.send("I do not have %s equipped.\n" %args[0])
+
+		else:
+			eq = resultsList[0].kind.equipment
+
+			player.kind.hp -= eq.hp
+			player.kind.maxHp -= eq.hp
+			player.kind.pp -= eq.pp
+			player.kind.maxPp -= eq.pp
+			player.kind.offense -= eq.offense
+			player.kind.defense -= eq.defense
+			player.kind.speed -= eq.speed
+			player.kind.guts -= eq.guts
+			player.kind.luck -= eq.luck
+			player.kind.vitality -= eq.vitality
+			player.kind.IQ -= eq.IQ
+
+			del player.kind.equipment[eq.slot]
+			client.send("I removed the %s.\n" %args[0])
+
+	else:
+		resultsList = []
+		for item in player.kind.equipment:
+			if player.kind.equipment[item].name == str(args[0]) and player.kind.equipment[item].slot == str(args[1]):
+				resultsList.append(player.kind.equipment[item])
+
+		if resultsList == []:
+			client.send("I do not have a '%s' equipped on my '%s'.\n" %(args[0], args[1]))
+
+		else:
+			eq = resultsList[0].kind.equipment
+
+			player.kind.hp -= eq.hp
+			player.kind.maxHp -= eq.hp
+			player.kind.pp -= eq.pp
+			player.kind.maxPp -= eq.pp
+			player.kind.offense -= eq.offense
+			player.kind.defense -= eq.defense
+			player.kind.speed -= eq.speed
+			player.kind.guts -= eq.guts
+			player.kind.luck -= eq.luck
+			player.kind.vitality -= eq.vitality
+			player.kind.IQ -= eq.IQ
+
+			del player.kind.equipment[eq.slot]
+			client.send("I removed the %s from my %s.\n" %(args[0], args[1]))
+
+
 
 
 def check(client, args, clientDataID, CLIENT_DATA, room):
