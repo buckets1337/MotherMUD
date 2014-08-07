@@ -623,9 +623,9 @@ def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 			longestItemDescription = len(obj.description)
 
 	client.send_cc("\n   _" +  ("_"*(longestItemName+13)) +"^I[ Inventory ]^~" + ("_"*longestItemDescription)+"\n   |" + (" "*(longestItemName+longestItemDescription+26)) + "|")
-	client.send_cc("\n ^I  ^~| Space: " + str(len(CLIENT_DATA[clientDataID].avatar.kind.inventory)) + "/" + str(CLIENT_DATA[clientDataID].avatar.kind.inventorySize)+ " used. \n ^I  ^~|\n ^I  ^~|")
+	client.send_cc("\n ^I  ^~| Space: " + str(len(CLIENT_DATA[clientDataID].avatar.kind.inventory)) + "/" + str(CLIENT_DATA[clientDataID].avatar.kind.inventorySize)+ " used. " + (longestItemDescription*" ") +(longestItemName* " ") + (" "* 4)  + ((4-len(str(len(CLIENT_DATA[clientDataID].avatar.kind.inventory))))* " ") + "|\n ^I  ^~|" + (longestItemDescription*" ") +(longestItemName* " ") +  (" "*26) +"|\n ^I  ^~|")
 
-	client.send_cc(" ^U^!  Name" + (longestItemName* " ") +"       Description"+ ((longestItemDescription-1) * " ") + "^~  |\n")
+	client.send_cc(" ^U^!  Name" + (longestItemName* " ") +"       Description"+ ((longestItemDescription) * " ") + "^~ |\n")
 
 	for obj in CLIENT_DATA[clientDataID].avatar.kind.inventory:
 		if obj.kind.equipment == None:
@@ -724,7 +724,7 @@ def inventory(client, args, CLIENT_LIST, CLIENT_DATA):
 					equipToken = '^WE ^~'
 			client.send_cc(" ^I  ^~| " +(" "*equipBuffer)+ equipToken+str(obj.name) + (((7 + longestItemName) - len(obj.name)) * " ") + "    " + description +(" "*descBuffer) + (" "*(longestItemDescription-len(description))) + "|\n")
 
-	client.send_cc(" ^I  ^~|" + "\n ^I  ^~|" + ("_"*longestItemName) + ("_"*longestItemDescription) + ("_"*26) + "|\n")
+	client.send_cc(" ^I  ^~|" + (longestItemDescription*" ") +(longestItemName* " ") +  (" "*26) +"|\n ^I  ^~|" + ("_"*longestItemName) + ("_"*longestItemDescription) + ("_"*26) + "|\n")
 	client.send_cc(" ^I   " + (" "*longestItemName) + (" "*longestItemDescription) + (" "*26) + "^~\n\n")
 
 

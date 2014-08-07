@@ -90,10 +90,12 @@ def saveEqToFile(eq, path):
 	handles saving a single bit of equipment to a unique equipment definition file when the server is shutdown
 	'''
 	eqType = ''
-	if eq.kind.equipment.weapon != None:
-		eqType = 'weapon'
-	elif eq.kind.equipment.armor != None:
-		eqType = 'armor'
+	if hasattr(eq.kind.equipment, 'weapon'):
+		if eq.kind.equipment.weapon != None:
+			eqType = 'weapon'
+	if hasattr(eq.kind.equipment, 'armor'):
+		if eq.kind.equipment.armor != None:
+			eqType = 'armor'
 
 	battleCommands = []
 	if eq.kind.equipment.battleCommands != [''] and eq.kind.equipment.battleCommands != []:
