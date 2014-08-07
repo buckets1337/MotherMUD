@@ -122,6 +122,7 @@ def saveRoom(room):
 			mobString = mobString[:-2]+'\n'
 		f.write(mobString)
 		f.write('\n')
+		f.write('\n')
 		f.write('equipment=',)
 		eqString=''
 		for eq in room.equipment:
@@ -129,6 +130,25 @@ def saveRoom(room):
 		if eqString.endswith(', '):
 			eqString = eqString[:-2]+'\n'
 		f.write(eqString)
+		f.write('\n')
+		f.write('\n')
+		f.write('onExit=',)
+		onExitStr = ''
+		for exit in room.onExit:
+			exitStr = ''
+			argStr = ''
+			args = []
+			for argList in room.onExitArgs:
+				if argList == exit:
+					args = room.onExitArgs[argList]
+			for arg in args:
+				argStr += str(arg) + ', '
+			if argStr.endswith(', '):
+				argStr = argStr[:-2]
+			exitStr = '(' + str(exit) + '|' + str(room.onExit[exit].__name__) + ':' + argStr + ')'
+			onExitStr += exitStr
+		f.write(onExitStr)
+		f.write('\n')
 		f.write('\n')
 
 

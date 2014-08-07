@@ -34,7 +34,11 @@ def teleportRandom(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, argsList)
 
 	#print argsList
 
+	client.send_cc("^!^YEverything freezes and a void evelops you.\n*POP*^~\n")
+
 	teleport(client, cmd, teleportArgs, CLIENT_LIST, CLIENT_DATA, exits)
+
+
 
 	return False
 
@@ -45,6 +49,8 @@ def gotoRoom(client, cmd, args, CLIENT_LIST, CLIENT_DATA, exits, argsList):
 	and argsList[1] being a string naming a room
 	'''
 	#print argsList
+	client.send_cc("^!^YYou feel reality pinch inward, and your view suddenly shifts.^~\n")
 	teleport(client, cmd, argsList, CLIENT_LIST, CLIENT_DATA, exits)
+
 
 	return False

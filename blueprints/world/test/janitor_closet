@@ -1,0 +1,14 @@
+name=janitor_closet
+region=test
+
+description='A small janitor's closet.  The door seems to be glowing.'
+
+longDescription='Just a mop and some things, nothing really interesting in here, except for the glowing door.'
+
+exits=test:lobby
+
+objects=
+
+equipment=
+
+onExit=(lobby|teleportRandom:test)
