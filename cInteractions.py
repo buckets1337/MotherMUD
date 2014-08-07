@@ -377,13 +377,22 @@ def remove(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
 			client.send("I removed the %s.\n" %args[0])
 
 	else:
+		i = True
+		while i == True:
+			if len(args) < 4:
+				args.append('')
+			else:
+				i = False
+
 		resultsList = []
+		twoString = str(args[1]) + ' ' + str(args[2])
+		threeString = str(args[1]) + ' ' + str(args[2]) + ' ' + str(args[3])
 		for item in player.kind.equipment:
-			if player.kind.equipment[item].name == str(args[0]) and player.kind.equipment[item].slot == str(args[1]):
+			if player.kind.equipment[item].name == str(args[0]) and (player.kind.equipment[item].kind.equipment.slot == str(args[1]) or player.kind.equipment[item].kind.equipment.slot == twoString or player.kind.equipment[item].kind.equipment.slot == threeString):
 				resultsList.append(player.kind.equipment[item])
 
 		if resultsList == []:
-			client.send("I do not have a '%s' equipped on my '%s'.\n" %(args[0], args[1]))
+			client.send("I do not have a '%s' equipped on my '%s%s%s'.\n" %(args[0], str(args[1]), ' ' + str(args[2]), ' ' + str(args[3])))
 
 		else:
 			eq = resultsList[0].kind.equipment
@@ -401,7 +410,7 @@ def remove(client, args, CLIENT_LIST, clientDataID, CLIENT_DATA):
 			player.kind.IQ -= eq.IQ
 
 			del player.kind.equipment[eq.slot]
-			client.send("I removed the %s from my %s.\n" %(args[0], args[1]))
+			client.send("I removed the %s from my %s %s.\n" %(args[0], args[1], args[2]))
 
 
 
